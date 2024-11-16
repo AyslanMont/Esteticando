@@ -1,0 +1,9 @@
+
+.bg-image {
+    background-image: url('../imgs/dash.jpg');
+    background-size: cover;
+    background-position: center; 
+    background-repeat: no-repeat; 
+    height: 100vh; 
+    color: white 
+}
