@@ -13,3 +13,11 @@ def login():
 @app.route('/register')
 def register():
     return render_template("register.html")
+
+@app.route('/gerenciar_perfil')
+def gerenciar_perfil():
+    return render_template('gerenciar_perfil.html')
+
+@app.route('/estabelecimento')
+def estabelecimento():
+    return render_template ('estabelecimento.html')
