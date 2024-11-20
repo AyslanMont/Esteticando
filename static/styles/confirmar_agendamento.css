@@ -1,0 +1,36 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.foto-servico {
+    width: 100px;
+    height: 100px;
+    background-color: #007bff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    overflow: hidden;
+    font-size: 12px;
+}
+
+.table th,
+.table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.confirmar-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirmar-btn:hover {
+    background-color: #218838;
+}

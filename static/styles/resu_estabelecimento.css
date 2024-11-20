@@ -1,0 +1,69 @@
+body {
+    background-color: gray;
+  }
+  .header {
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: gray;
+    color: white;
+    font-size: 24px;
+  }
+  .divider {
+    border-top: 2px solid black;
+    margin: 10px 0;
+  }
+  .filters {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+  }
+  .card-estabelecimento {
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .foto-estabelecimento {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 5px;
+    word-wrap: break-word;
+    font-size: 12px;
+
+  }
+  .btn-favoritar {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  .btn-agendar {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  .map-container {
+    background-color: black;
+    color: white;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+  }

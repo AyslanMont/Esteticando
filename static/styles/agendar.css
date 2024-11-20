@@ -1,0 +1,25 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.status-disponivel {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.status-agendado {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.btn-agendar {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+}
+
+.btn-agendar:hover {
+    background-color: #0056b3;
+}

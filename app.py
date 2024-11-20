@@ -21,3 +21,19 @@ def gerenciar_perfil():
 @app.route('/estabelecimento')
 def estabelecimento():
     return render_template ('estabelecimento.html')
+
+@app.route('/resu_estabelecimento')
+def resu_estabelecimento():
+    return render_template ('resu_estabelecimento.html')
+
+@app.route('/dentro_estabelecimento')
+def dentro_estabelecimento():
+    return render_template('dentro_estabelecimento.html')
+
+@app.route('/confirmar_agendamento')
+def confirmar_agendamento():
+    return render_template ('confirmar_agendamento.html')
+
+@app.route('/agendar')
+def agendar():
+    return render_template ('agendar.html')
