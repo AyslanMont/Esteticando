@@ -1,5 +1,5 @@
 from flask_mysqldb import MySQL
-from config import Config
+from database.config import Config
 
 mysql = MySQL()
 
