@@ -1,5 +1,5 @@
 from flask_mysqldb import MySQL
-from database.config import Config
+from esteticando.database.config import Config
 
 mysql = MySQL()
 

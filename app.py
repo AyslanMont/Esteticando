@@ -1,14 +1,11 @@
 from flask import Flask, render_template
-from database.database import init_db
-from flask_login import LoginManager, login_required
-from flask_bcrypt import Bcrypt
-from controllers.users import auth_bp
+from esteticando.database.database import init_db
+from flask_login import LoginManager, login_required, current_user
+from esteticando.controllers.users import auth_bp
 
 app = Flask(__name__)
 
 init_db(app)
-bcrypt = Bcrypt(app)
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'

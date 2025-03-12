@@ -1,8 +1,8 @@
 from flask import Blueprint, request, redirect, render_template, flash, url_for
-from database.database import mysql
+from esteticando.database.database import mysql
 from flask_login import login_user, logout_user, login_required
-from app import bcrypt
-from models.user import User
+from esteticando.models.user import User
+from werkzeug.security import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint('auth', __name__, url_prefix="/auth", template_folder="templates")
 
@@ -21,8 +21,9 @@ def register():
         if cur.fetchone():
             flash('E-mail já cadastrado!', 'danger')
             return redirect(url_for('register'))
+        
+        hashed_password = generate_password_hash(password)
 
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         cur.execute("""
             INSERT INTO tb_cliente (cli_nome, cli_email, cli_senha, cli_cpf, cli_telefone, cli_dataCriacao)
             VALUES (%s, %s, %s, %s, %s, NOW())
@@ -47,7 +48,7 @@ def login():
         user_data = cur.fetchone()
         cur.close()
 
-        if user_data and bcrypt.check_password_hash(user_data['cli_senha'], password):
+        if user_data and check_password_hash(user_data['cli_senha'], password):
             user = User(user_data['cli_id'], user_data['cli_nome'], user_data['cli_email'])
             login_user(user)
             flash('Login realizado com sucesso!', 'success')

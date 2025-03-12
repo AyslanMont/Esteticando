@@ -1,5 +1,6 @@
-from flask_login import UserMixin, login_manager
-from database.database import mysql
+from flask_login import UserMixin
+from esteticando.app import login_manager
+from esteticando.database.database import mysql
 
 class User(UserMixin):
     def __init__(self, id, username, email):
