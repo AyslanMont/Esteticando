@@ -21,6 +21,11 @@
             <div id="emailHelp" class="form-text">Não compartilharemos seu e-mail com mais ninguém.</div>
         </div>
 
+        <div class="mb-3">
+            <label for="registerendereco" class="form-label">Endereço</label>
+            <input type="text" class="form-control rounded-pill" id="registerendereco" name="endereco" required placeholder="Digite seu Endereço...">
+        </div>
+
 
         <div class="mb-3">
             <label for="registercpf" class="form-label">CPF</label>
@@ -50,7 +55,7 @@
 
         <button type="submit" class="btn btn-primary w-50 mx-auto d-block rounded-pill">Registrar</button>
         <hr>
-        <p>Já possui conta? <a class="link-opacity-100" href="{{ url_for('login') }}">Clique aqui!</a></p>
+        <p>Já possui conta? <a class="link-opacity-100" href="{{ url_for('auth.login') }}">Clique aqui!</a></p>
     </form>
 </div>
 

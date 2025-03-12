@@ -1,16 +1,31 @@
-from flask import Flask, render_template
-from esteticando.database.database import init_db
-from flask_login import LoginManager, login_required, current_user
-from esteticando.controllers.users import auth_bp
+from flask import Flask,render_template
+from flask_login import LoginManager,login_required
+from Esteticando.database.database import init_db
+from Esteticando.controllers.users import auth_bp
+from Esteticando.models.user import User  
 
 app = Flask(__name__)
 
+
 init_db(app)
+
+
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view = 'auth.login'
 
 app.register_blueprint(auth_bp)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT cli_id, cli_nome, cli_email FROM tb_cliente WHERE cli_id = %s", (user_id,))
+    user_data = cur.fetchone()
+    cur.close()
+    if user_data:
+        return User(user_data['cli_id'], user_data['cli_nome'], user_data['cli_email'])
+    return None
 
 @app.route('/')
 def index():

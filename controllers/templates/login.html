@@ -8,7 +8,7 @@
 </div>
 
 <div class="container mt-5">
-    <form class="w-50 mx-auto" action="{{ url_for('login') }}" method="POST">
+    <form class="w-50 mx-auto" action="{{ url_for('auth.login') }}" method="POST">
         <div class="mb-3">
             <label for="loginemail" class="form-label">Email</label>
             <input type="email" class="form-control rounded-pill" id="loginemail" aria-describedby="emailHelp"
@@ -22,7 +22,7 @@
         </div>
         <button type="submit" class="btn btn-primary w-50 mx-auto d-block rounded-pill">Entrar</button>
         <hr>
-        <p>Ainda não tem conta? <a class="link-opacity-100" href="{{ url_for('register') }}">Clique aqui!</a></p>
+        <p>Ainda não tem conta? <a class="link-opacity-100" href="{{ url_for('auth.register') }}">Clique aqui!</a></p>
     </form>
 </div>
 

@@ -1,6 +1,5 @@
 from flask_login import UserMixin
-from esteticando.app import login_manager
-from esteticando.database.database import mysql
+from Esteticando.database.database import mysql
 
 class User(UserMixin):
     def __init__(self, id, username, email):
@@ -8,13 +7,5 @@ class User(UserMixin):
         self.username = username
         self.email = email
 
-
-@login_manager.user_loader
-def load_user(user_id):
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT cli_id, cli_nome, cli_email FROM tb_cliente WHERE cli_id = %s", (user_id,))
-    user_data = cur.fetchone()
-    cur.close()
-    if user_data:
-        return User(user_data['cli_id'], user_data['cli_nome'], user_data['cli_email'])
-    return None
+    def __str__(self):
+        return f"User {self.username} ({self.email})"
