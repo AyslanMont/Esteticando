@@ -8,6 +8,15 @@
     color: white 
 }
 
-.btn{
+.btn {
     background-color: #DAA520;
+    border-color: #DAA520;
+    color: white;
+}
+
+.btn:hover,
+.btn:focus {
+    background-color: #C18E20; /* Um tom mais escuro para o hover */
+    border-color: #C18E20;
+    color: white;
 }
