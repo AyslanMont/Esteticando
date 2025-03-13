@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from Esteticando.database.database import mysql
+from esteticando.database.database import mysql
 
 class User(UserMixin):
     def __init__(self, id, username, email):

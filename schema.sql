@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS tb_cliente (
   cli_dataCriacao DATE NOT NULL,
   cli_nome VARCHAR(100) NOT NULL,
   cli_email VARCHAR(100) NOT NULL,
-  cli_senha VARCHAR(100) NOT NULL,
+  cli_senha VARCHAR(255) NOT NULL,
   cli_cpf CHAR(11) NOT NULL,
   cli_telefone VARCHAR(15) NOT NULL,
   cli_endereco VARCHAR(255) NOT NULL

@@ -1,8 +1,8 @@
 from flask import Flask,render_template
 from flask_login import LoginManager,login_required
-from Esteticando.database.database import init_db
-from Esteticando.controllers.users import auth_bp
-from Esteticando.models.user import User  
+from esteticando.database.database import init_db
+from esteticando.controllers.users import auth_bp
+from esteticando.models.user import User  
 
 app = Flask(__name__)
 

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, redirect, render_template, flash, url_for
-from Esteticando.database.database import mysql
+from esteticando.database.database import mysql
 from flask_login import login_user, logout_user, login_required
-from Esteticando.models.user import User
+from esteticando.models.user import User
 from werkzeug.security import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint('auth', __name__, url_prefix="/auth", template_folder="templates")
