@@ -1,9 +1,13 @@
 
 .bg-image {
-    background-image: url('../imgs/dash.jpg');
+    background-image: url('../imgs/teste2.jpg');
     background-size: cover;
     background-position: center; 
     background-repeat: no-repeat; 
     height: 100vh; 
     color: white 
+}
+
+.btn{
+    background-color: #DAA520;
 }
