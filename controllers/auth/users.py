@@ -56,7 +56,7 @@ def login():
             user = User(user_data['cli_id'], user_data['cli_nome'], user_data['cli_email'])
             login_user(user)
             flash('Login realizado com sucesso!', 'success')
-            return redirect(url_for('resu_estabelecimento'))
+            return redirect(url_for('estabelecimento.resu_estabelecimento'))
         else:
             flash('E-mail ou senha incorretos', 'danger')
 

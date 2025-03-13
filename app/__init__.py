@@ -3,6 +3,7 @@ from flask_login import LoginManager, login_required
 from esteticando.database.database import init_db, mysql
 from esteticando.controllers.auth.users import auth_bp
 from esteticando.controllers.estabelecimento.estabelecimento import estabelecimento_bp
+from esteticando.controllers.profissional.profissional import profissional_bp
 from esteticando.models.user import User  
 
 app = Flask(__name__)
@@ -17,6 +18,7 @@ login_manager.login_view = 'auth.login'
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(estabelecimento_bp)
+app.register_blueprint(profissional_bp)
 
 
 @login_manager.user_loader
