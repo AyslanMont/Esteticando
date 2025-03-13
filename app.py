@@ -1,6 +1,6 @@
 from flask import Flask,render_template
 from flask_login import LoginManager,login_required
-from esteticando.database.database import init_db
+from esteticando.database.database import init_db, mysql
 from esteticando.controllers.users import auth_bp
 from esteticando.models.user import User  
 

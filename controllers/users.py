@@ -23,14 +23,15 @@ def register():
             flash('E-mail já cadastrado!', 'danger')
             return redirect(url_for('auth.register'))
         
-        hashed_password = generate_password_hash(password)
+        else:
+            hashed_password = generate_password_hash(password)
 
-        cur.execute(""" 
-            INSERT INTO tb_cliente (cli_nome, cli_email, cli_senha, cli_cpf, cli_telefone, cli_endereco, cli_dataCriacao) 
-            VALUES (%s, %s, %s, %s, %s, %s, NOW())
-        """, (username, email, hashed_password, cpf, telefone, endereco))
-        mysql.connection.commit()
-        cur.close()
+            cur.execute(""" 
+                INSERT INTO tb_cliente (cli_nome, cli_email, cli_senha, cli_cpf, cli_telefone, cli_endereco, cli_dataCriacao) 
+                VALUES (%s, %s, %s, %s, %s, %s, NOW())
+            """, (username, email, hashed_password, cpf, telefone, endereco))
+            mysql.connection.commit()
+            cur.close()
 
         flash('Cadastro realizado com sucesso!', 'success')
         return redirect(url_for('auth.login'))
