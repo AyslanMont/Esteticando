@@ -1,10 +1,10 @@
 from flask import Blueprint, request, redirect, render_template, flash, url_for
 from esteticando.database.database import mysql
 
-profissional_bp = Blueprint('profissional', __name__, url_prefix="/profissional", template_folder="controllers/profissional/templates")
+profissional_bp = Blueprint('profissional', __name__, url_prefix="/profissional", template_folder="templates")
 
 
-@profissional_bp.route('/profissional/cadastro', methods=['GET', 'POST'])
+@profissional_bp.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     if request.method == 'POST':
         nome = request.form['nome']
