@@ -1,0 +1,40 @@
+.profile-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    position: absolute;
+    top: 40px;
+    left: 20px;
+}
+.banner {
+    background-size: cover;
+    background-position: center;
+    height: 200px;
+    position: relative;
+}
+.box {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+}
+.box:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.banner-lateral {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background: #f8f9fa;
+    border-left: 1px solid #ddd;
+    display: none;
+    padding: 15px;
+    overflow-y: auto;
+}
+.banner-lateral.active {
+    display: block;
+}

@@ -1,0 +1,6 @@
+env
+__pycache__
+controllers/__pycache__
+models/__pycache__
+app/_pycache__
+.env

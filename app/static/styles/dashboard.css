@@ -1,0 +1,22 @@
+
+.bg-image {
+    background-image: url('../imgs/teste2.jpg');
+    background-size: cover;
+    background-position: center; 
+    background-repeat: no-repeat; 
+    height: 100vh; 
+    color: white 
+}
+
+.btn {
+    background-color: #DAA520;
+    border-color: #DAA520;
+    color: white;
+}
+
+.btn:hover,
+.btn:focus {
+    background-color: #C18E20; /* Um tom mais escuro para o hover */
+    border-color: #C18E20;
+    color: white;
+}

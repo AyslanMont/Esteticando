@@ -1,0 +1,31 @@
+.banner {
+    background-color: gray;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+  }
+  .circle {
+    width: 80px;
+    height: 80px;
+    background-color: purple;
+    border-radius: 50%;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+  .service-card {
+    background-color: #b2f0f0;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+  }
+  .btn-schedule {
+    background-color: #b2f076;
+    color: black;
+    font-weight: bold;
+  }
