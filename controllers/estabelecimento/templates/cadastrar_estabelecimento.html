@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="container">
+    <h1 class="mt-5">Cadastro de Estabelecimento</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+
+    <form method="POST" action="{{ url_for('estabelecimento.cadastrar_estabelecimento') }}">
+        <div class="form-group">
+            <label for="est_nome">Nome do Estabelecimento:</label>
+            <input type="text" class="form-control" id="est_nome" name="est_nome" required>
+        </div>
+        <div class="form-group">
+            <label for="est_descricao">Descrição:</label>
+            <input type="text" class="form-control" id="est_descricao" name="est_descricao" required>
+        </div>
+        <div class="form-group">
+            <label for="est_cnpj">CNPJ:</label>
+            <input type="text" class="form-control" id="est_cnpj" name="est_cnpj" required>
+        </div>
+        <div class="form-group">
+            <label for="est_email">Email:</label>
+            <input type="email" class="form-control" id="est_email" name="est_email" required>
+        </div>
+        <div class="form-group">
+            <label for="est_telefone">Telefone:</label>
+            <input type="text" class="form-control" id="est_telefone" name="est_telefone" required>
+        </div>
+        <div class="form-group">
+            <label for="est_cat_id">Categoria:</label>
+            <select class="form-control" id="est_cat_id" name="est_cat_id" required>
+                {% for categoria in categorias %}
+                <option value="{{ categoria.cat_id }}">{{ categoria.cat_nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Campos para o endereço -->
+        <h3 class="mt-4">Endereço</h3>
+        <div class="form-group">
+            <label for="end_rua">Rua:</label>
+            <input type="text" class="form-control" id="end_rua" name="end_rua" required>
+        </div>
+        <div class="form-group">
+            <label for="end_numero">Número:</label>
+            <input type="text" class="form-control" id="end_numero" name="end_numero" required>
+        </div>
+        <div class="form-group">
+            <label for="end_complemento">Complemento:</label>
+            <input type="text" class="form-control" id="end_complemento" name="end_complemento">
+        </div>
+        <div class="form-group">
+            <label for="end_bairro">Bairro:</label>
+            <input type="text" class="form-control" id="end_bairro" name="end_bairro" required>
+        </div>
+        <div class="form-group">
+            <label for="end_cidade">Cidade:</label>
+            <input type="text" class="form-control" id="end_cidade" name="end_cidade" required>
+        </div>
+        <div class="form-group">
+            <label for="end_estado">Estado (UF):</label>
+            <input type="text" class="form-control" id="end_estado" name="end_estado" maxlength="2" required>
+        </div>
+        <div class="form-group">
+            <label for="end_cep">CEP:</label>
+            <input type="text" class="form-control" id="end_cep" name="end_cep" maxlength="8" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Cadastrar</button>
+    </form>
+
+    {% endblock %}
