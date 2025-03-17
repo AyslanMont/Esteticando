@@ -36,7 +36,7 @@ def register():
         flash('Cadastro realizado com sucesso!', 'success')
         return redirect(url_for('auth.login'))
 
-    return render_template('register.html')
+    return render_template('user/register.html')
 
 
 
@@ -60,7 +60,7 @@ def login():
         else:
             flash('E-mail ou senha incorretos', 'danger')
 
-    return render_template('login.html')
+    return render_template('user/login.html')
 
 
 @auth_bp.route('/logout')
