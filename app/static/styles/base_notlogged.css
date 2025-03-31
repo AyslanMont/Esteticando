@@ -1,0 +1,49 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+h1, h2, h3, h4 {
+    font-family: "Comfortaa", sans-serif;
+    font-weight: 900;
+}
+
+p {
+    font-family: "Averia Serif Libre", serif;
+}
+
+header.navbar {
+  font-family: "Averia Serif Libre", serif;
+  font-weight: 600;
+  height: 5%;
+  margin: 0;
+}
+
+.navbar menu {
+  width: 95%;
+  height: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  list-style: none;
+
+}
+
+.navbar a {
+  text-decoration: none;
+  color: #8c271e;
+}
+
+#img-navbar {
+  max-height: 48px;
+}
+
+.btn-navbar {
+  background-color: #8c271e;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  padding: 10px 20px;
+}
