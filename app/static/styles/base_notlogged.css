@@ -1,17 +1,22 @@
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    box-sizing: border-box;
-  }
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  box-sizing: border-box;
+  font-size: 16px;
+}
 
-h1, h2, h3, h4 {
-    font-family: "Comfortaa", sans-serif;
-    font-weight: 900;
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Comfortaa", sans-serif;
+  font-weight: 900;
 }
 
 p {
-    font-family: "Averia Serif Libre", serif;
+  font-family: "Averia Serif Libre", serif;
 }
 
 header.navbar {
@@ -28,7 +33,6 @@ header.navbar {
   justify-content: space-around;
   align-items: center;
   list-style: none;
-
 }
 
 .navbar a {
@@ -40,10 +44,25 @@ header.navbar {
   max-height: 48px;
 }
 
+#btn-navbar{
+  display: flex;
+  gap: 20px;
+}
+
 .btn-navbar {
   background-color: #8c271e;
   border: none;
   border-radius: 10px;
   color: white;
   padding: 10px 20px;
+}
+
+.navbar a:hover,
+.btn-navbar:hover {
+  font-size: 1.2rem;
+}
+ 
+
+#img-navbar:hover {
+  max-height: 64px;
 }
