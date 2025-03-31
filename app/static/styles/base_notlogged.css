@@ -15,8 +15,9 @@ h4 {
   font-weight: 900;
 }
 
-p {
+p, button, a, label {
   font-family: "Averia Serif Libre", serif;
+  font-weight: 900;
 }
 
 header.navbar {

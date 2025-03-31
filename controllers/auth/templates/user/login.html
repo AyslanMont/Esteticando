@@ -1,34 +1,31 @@
-{% extends "base_no_login.html" %}
+{% extends "base_notlogged.html" %}
 
 {% block links %}
-<link rel="stylesheet" href="../../../static/styles/login.css">
+<link rel="stylesheet" href="../../../static/styles/auth/login.css">
 {% endblock %}
 
 
 {% block content %}
 
-<div class="text-center mt-5">
-    <i class="bi bi-person-circle fs-1"></i>
-    <p class="fs-3">Bem vindo</p>
-</div>
-
-<div class="container mt-5">
-    <form class="w-50 mx-auto" action="{{ url_for('auth_professional.login') }}" method="POST">
-        <div class="mb-3">
-            <label for="loginemail" class="form-label">Email</label>
-            <input type="email" class="form-control rounded-pill" id="loginemail" aria-describedby="emailHelp"
-                name="email" required placeholder="Digite seu email...">
-            <div id="emailHelp" class="form-text">Não compartilharemos seu e-mail com mais ninguém.</div>
+<main>
+    <div class="container">
+        <div class="form">
+            <h2>Entrar</h2>
+            <form action="">
+                <label for="" id="label-login">Email</label>
+                <input type="text" placeholder="Email">
+                <label for="" id="label-login">Senha</label>
+                <input type="text" placeholder="Senha">
+                <button>Entrar</button>
+            </form>
+            <a href="">Esqueceu sua senha?</a>
         </div>
-        <div class="mb-3">
-            <label for="loginsenha" class="form-label">Senha</label>
-            <input type="password" class="form-control rounded-pill" id="loginsenha" name="password" required
-                placeholder="Digite sua senha...">
+        <div class="redirect">
+            <h2>Bem vindo ao login</h2>
+            <p>Não tem uma conta?</p>
+            <button>Registre-se</button>
         </div>
-        <button type="submit" class="btn btn-primary w-50 mx-auto d-block rounded-pill">Entrar</button>
-        <hr>
-        <p>Ainda não tem conta? <a class="link-opacity-100" href="{{ url_for('auth_professional.register') }}">Clique aqui!</a></p>
-    </form>
-</div>
+    </div>
+</main>
 
 {% endblock %}
