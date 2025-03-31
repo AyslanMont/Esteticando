@@ -35,7 +35,7 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template("dashboard.html")
+    return render_template("index.html")
 
 
 @app.route('/gerenciar_perfil')
