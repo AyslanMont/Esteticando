@@ -37,6 +37,9 @@ def load_user(user_id):
 def index():
     return render_template("index.html")
 
+@app.route('/home')
+def home():
+    return render_template("filtrar_estabelecimento.html")  
 
 @app.route('/gerenciar_perfil')
 def gerenciar_perfil():

@@ -1,0 +1,47 @@
+{% extends "base.html" %} {% block links %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='styles/filtrar_estabelecimento.css') }}"
+/>
+
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search"
+/>
+{% endblock %} {% block content %}
+
+<main>
+  <div class="filtros">
+    <div class="search">
+      <label for="search-input"
+        ><span class="material-symbols-outlined"> search </span></label
+      >
+      <input
+        type="text"
+        name=""
+        id="search-input"
+        placeholder="Filtrar estabelecimentos"
+      />
+    </div>
+    <div class="estabelecimento">
+      <div class="foto"></div>
+      <div class="interacao">
+        <div class="informacoes">
+          <h3>Nome do estabelecimento</h3>
+          <p>informacoes</p>
+          <p>informacoes</p>
+          <p>informacoes</p>
+          <p>informacoes</p>
+        </div>
+        <div class="interecao-buttons">
+          <img src="/static/imgs/favorito.png" alt="" />
+          <button><a href="">Agendar</a></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="api">
+    <h1>Api do Google</h1>
+  </div>
+</main>
+{% endblock %}

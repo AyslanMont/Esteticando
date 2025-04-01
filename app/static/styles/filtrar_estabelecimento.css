@@ -1,0 +1,110 @@
+body {
+  height: 100vh;
+}
+
+main {
+  height: 100%;
+  display: flex;
+}
+
+.filtros {
+  flex-basis: 50%;
+  flex-grow: 2;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.api {
+  flex-basis: 30%;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.filtros .search {
+  background-color: #f2f4f4;
+  min-width: 50%;
+  padding: 10px 20px;
+  border-radius: 40px;
+  border: 1px solid #b2babb;
+  display: flex;
+  align-items: center;
+}
+
+.filtros .search input {
+  padding: 10px;
+  border: none;
+  background-color: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 1.1rem;
+}
+
+.estabelecimento {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.estabelecimento .foto {
+  width: 35%;
+  height: 100%;
+  background-image: url("/static/imgs/favicon.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.estabelecimento .interacao {
+  width: 65%;
+  height: 50%;
+  padding: 10px;
+  display: flex;
+}
+
+.estabelecimento .interacao .informacoes {
+  height: 100%;
+  flex-basis: 50%;
+  flex-grow: 1;
+}
+
+.estabelecimento .interacao .interecao-buttons {
+  height: 100%;
+  flex-basis: 50%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.estabelecimento .interacao .interecao-buttons img {
+  height: 32px;
+}
+
+.estabelecimento .interacao .interecao-buttons button {
+  width:40%;
+  border-radius: 40px;
+  padding: 10px 20px;
+  border-style: none;
+  background: rgb(140, 39, 30);
+  background: linear-gradient(
+    0deg,
+    rgba(140, 39, 30, 1) 34%,
+    rgba(240, 29, 10, 1) 100%
+  );
+  color: white;
+}
+
+.estabelecimento .interacao .interecao-buttons a {
+    text-decoration: none;
+    color: white;
+}
+
+.estabelecimento .interacao .interecao-buttons button:hover {
+    font-size: 1.2rem;
+}
