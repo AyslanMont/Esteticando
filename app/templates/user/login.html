@@ -19,9 +19,9 @@
             <option value="profissional">Sou um Profissional</option>
           </select>
         </div>
-        <button>Entrar</button>
+        <button class="button-entrar">Entrar</button>
       </form>
-      <a href="">Esqueceu sua senha?</a>
+      <button onclick="abrirModal()" id="button-forgot">Esqueceu sua senha?</button>
     </div>
     <div class="redirect">
       <h2>Bem vindo ao login</h2>
@@ -30,5 +30,20 @@
     </div>
   </div>
 </main>
+
+<div class="window-modal" id="window-modal">
+    <div class="modal">
+        <button class="close" id="close" onclick="fecharModal()">X</button>
+        <h2>Redefinir Senha</h2>
+        <p>Informe o e-mail para o qual deseja redefinir sua senha.</p>
+        <form action="" class="modal-form">
+            <label for="">Email</label>
+            <input type="email" name="" id="" placeholder="Email">
+            <button class="button-redefinir">REDEFINIR SENHA</button>
+        </form>
+    </div>
+</div>
+
+<script src="../../static/scripts/login.js"></script>
 
 {% endblock %}

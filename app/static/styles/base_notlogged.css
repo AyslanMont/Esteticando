@@ -47,6 +47,8 @@ header.navbar {
 
 #img-navbar {
   max-height: 48px;
+  min-height: 48px;
+  min-width: 48px;
 }
 
 #btn-navbar{
