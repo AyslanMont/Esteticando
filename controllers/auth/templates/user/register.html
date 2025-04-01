@@ -1,69 +1,45 @@
-{% extends "base_no_login.html" %}
+{% extends "base_notlogged.html" %} {% block links %}
+<link rel="stylesheet" href="../../../static/styles/auth/register.css" />
+{% endblock %} {% block content %}
 
-{% block links %}
-<link rel="stylesheet" href="../../../static/styles/register.css">
+<main>
+  <div class="container">
+    <div class="form">
+      <h2>Registrar</h2>
+      <form action="">
+        <label for="" id="label-login">Nome</label>
+        <input type="text" placeholder="Nome" />
+        <label for="" id="label-login">Email</label>
+        <input type="email" placeholder="Email" />
+        <label for="" id="label-login">CPF</label>
+        <input type="text" placeholder="CPF" />
+        <label for="" id="label-login">Telefone</label>
+        <input type="text" placeholder="Telefone" />
+        <label for="" id="label-login">Senha</label>
+        <input type="password" placeholder="Senha" />
+        <div class="termos">
+          <label for="" id="label-login">Eu li e concordo com os termos de uso</label>
+          <input type="radio" />
+        </div>
+        <button>Avançar</button>
+      </form>
+    </div>
+    <div class="redirect">
+      <h2>Bem vindo ao register</h2>
+      <p>Já tem uma conta?</p>
+      <button><a href="">Entrar</a></button>
+    </div>
+  </div>
+</main>
+
 {% endblock %}
 
-{% block content %}
-
-<div class="text-center mt-5">
-    <i class="bi bi-person-circle fs-1"></i>
-    <p class="fs-3">Bem-vindo</p>
-</div>
-
-<div class="container mt-5">
-    <form class="w-50 mx-auto" method="POST">
-
-        <div class="mb-3">
-            <label for="registernome" class="form-label">Nome</label>
-            <input type="text" class="form-control rounded-pill" id="registernome" name="nome" required placeholder="Digite seu nome...">
-        </div>
-
-        <div class="mb-3">
-            <label for="registeremail" class="form-label">Email</label>
-            <input type="email" class="form-control rounded-pill" id="registeremail" name="email" required placeholder="Digite seu email...">
-            <div id="emailHelp" class="form-text">Não compartilharemos seu e-mail com mais ninguém.</div>
-        </div>
-
-        <div class="mb-3">
-            <label for="registerendereco" class="form-label">Endereço</label>
-            <input type="text" class="form-control rounded-pill" id="registerendereco" name="endereco" required placeholder="Digite seu Endereço...">
-        </div>
-
-
-        <div class="mb-3">
-            <label for="registercpf" class="form-label">CPF</label>
-            <input type="text" class="form-control rounded-pill" id="registercpf" name="cpf" required placeholder="Digite seu CPF...">
-        </div>
-
-
-        <div class="mb-3">
-            <label for="registertelefone" class="form-label">Telefone</label>
-            <input type="tel" class="form-control rounded-pill" id="registertelefone" name="telefone" required placeholder="Digite seu telefone...">
-        </div>
-
-
-        <div class="mb-3">
-            <label for="registersenha" class="form-label">Senha</label>
-            <input type="password" class="form-control rounded-pill" id="registersenha" name="password" required placeholder="Digite sua senha...">
-        </div>
-
-
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="invalidCheck2" required>
-            <label class="form-check-label" for="invalidCheck2">
-                Concordo com os termos e condições
-            </label>
-        </div>
-
-
-        <button type="submit" class="btn btn-primary w-50 mx-auto d-block rounded-pill">Registrar</button>
-        <hr>
-        <div class="d-flex justify-content-between">
-            <p>Já possui conta? <a class="link-opacity-100" href="{{ url_for('auth.login') }}">Clique aqui!</a></p>
-            <p>Você presta serviços? <a class="link-opacity-100" href="{{ url_for('auth_professional.register') }}">Clique aqui!</a></p>
-        </div>
-    </form>
-</div>
-
-{% endblock %}
+<!-- 
+nome 
+email
+senha
+endereco: estado, Cidade, bairro, rua, numero
+cpf
+telefone
+termo e condições
+ -->

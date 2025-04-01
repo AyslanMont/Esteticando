@@ -7,7 +7,7 @@ main {
 
 .container {
   width: 60%;
-  height: 60%;
+  height: 80%;
   display: flex;
   box-shadow: 0 0 5px 1px black;
 }
@@ -28,6 +28,7 @@ main {
 }
 
 .form form {
+  max-height: 90%;
   display: flex;
   flex-direction: column;
   width: 80%;
@@ -35,10 +36,24 @@ main {
   gap: 10px;
 }
 
+.form .termos {
+  display: flex;
+  width: 100%;
+  gap: 20px;
+}
+
+.termos input {
+  max-width: 15px;
+}
+
+.termos label {
+  font-size: 0.8rem;
+}
+
 .form input {
   width: 100%;
   border-radius: 40px;
-  padding: 15px 10px;
+  padding: 10px 10px;
   background-color: rgb(211, 211, 211);
   border-style: none;
 }
@@ -58,12 +73,12 @@ main {
 }
 
 button:hover {
-    cursor: pointer;
-    font-size: 1.2rem;
+  cursor: pointer;
+  font-size: 1.2rem;
 }
 
 a:hover {
-    font-size: 1.1rem;
+  font-size: 1.1rem;
 }
 
 .form a {
