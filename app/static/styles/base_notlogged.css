@@ -7,6 +7,10 @@ body {
   font-size: 16px;
 }
 
+:root {
+  --main-color: #8c271e;
+}
+
 h1,
 h2,
 h3,
@@ -38,7 +42,7 @@ header.navbar {
 
 .navbar a {
   text-decoration: none;
-  color: #8c271e;
+  color: var(--main-color);
 }
 
 #img-navbar {
@@ -51,7 +55,7 @@ header.navbar {
 }
 
 .btn-navbar {
-  background-color: #8c271e;
+  background-color: var(--main-color);
   border: none;
   border-radius: 10px;
   color: white;

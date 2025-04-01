@@ -92,7 +92,7 @@ a:hover {
 }
 
 .container .redirect button {
-  background-color: #8c271e;
+  background-color: var(--main-color);
   border: 1px solid white;
   border-radius: 40px;
   color: white;
