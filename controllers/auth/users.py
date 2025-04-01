@@ -62,6 +62,9 @@ def login():
 
     return render_template('user/login.html')
 
+@auth_bp.route('/endereco', methods=["GET", "POST"])
+def endereco():
+    return render_template("user/endereco.html")
 
 @auth_bp.route('/logout')
 @login_required
