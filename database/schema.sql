@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS tb_cliente (
   cli_senha VARCHAR(255) NOT NULL,
   cli_cpf CHAR(11) NOT NULL,
   cli_telefone VARCHAR(15) NOT NULL,
-  cli_endereco VARCHAR(255) NOT NULL
+  cli_endereco VARCHAR(255) DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS tb_categoria (
@@ -48,11 +48,11 @@ CREATE TABLE IF NOT EXISTS tb_profissional (
   pro_dataCriacao DATE NOT NULL,
   pro_nome VARCHAR(100) NOT NULL,
   pro_email VARCHAR(100) NOT NULL,
-  pro_senha VARCHAR(100) NOT NULL,
+  pro_senha VARCHAR(255) NOT NULL,
   pro_cpf CHAR(11) NOT NULL,
   pro_telefone VARCHAR(15) NOT NULL,
-  pro_est_id INT NOT NULL,
-  pro_cat_id INT NOT NULL,
+  pro_est_id INT DEFAULT NULL,
+  pro_cat_id INT DEFAULT NULL,
   FOREIGN KEY (pro_est_id) REFERENCES tb_estabelecimento(est_id) ON DELETE CASCADE,
   FOREIGN KEY (pro_cat_id) REFERENCES tb_categoria(cat_id) ON DELETE CASCADE
 );
@@ -114,3 +114,7 @@ CREATE TABLE IF NOT EXISTS tb_avaliacao (
   FOREIGN KEY (ava_cli_id) REFERENCES tb_cliente(cli_id) ON DELETE CASCADE,
   FOREIGN KEY (ava_age_id) REFERENCES tb_agendamento(age_id) ON DELETE CASCADE
 );
+
+
+
+

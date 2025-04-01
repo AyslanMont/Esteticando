@@ -6,20 +6,19 @@
   <div class="container">
     <div class="form">
       <h2>Registrar</h2>
-      <form action="">
+      <form action="{{ url_for('auth.register') }}" method="POST">
         <label for="" id="label-login">Nome</label>
-        <input type="text" placeholder="Nome" />
+        <input type="text" name="nome"placeholder="Nome" />
         <label for="" id="label-login">Email</label>
-        <input type="email" placeholder="Email" />
+        <input type="email" name="email" placeholder="Email" />
         <label for="" id="label-login">CPF</label>
-        <input type="text" placeholder="CPF" />
+        <input type="text" name="cpf" placeholder="CPF" />
         <label for="" id="label-login">Telefone</label>
-        <input type="text" placeholder="Telefone" />
+        <input type="text" name="telefone" placeholder="Telefone" />
         <label for="" id="label-login">Senha</label>
-        <input type="password" placeholder="Senha" />
+        <input type="password" name="password" placeholder="Senha" />
         <div class="select-servico">
-          <label for="estado" id="label-servico">Servico</label>
-          <select name="estado" id="estado">
+          <select name="tipo_usuario" id="tipo_usuario" required>
             <option value="">Selecione um serviço</option>
             <option value="cliente">Sou Cliente</option>
             <option value="profissional">Sou um Profissional</option>
@@ -37,7 +36,7 @@
     <div class="redirect">
       <h2>Bem vindo ao register</h2>
       <p>Já tem uma conta?</p>
-      <button><a href="">Entrar</a></button>
+      <button><a href="{{ url_for('auth.login') }}">Entrar</a></button>
     </div>
   </div>
 </main>

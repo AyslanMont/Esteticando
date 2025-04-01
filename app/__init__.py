@@ -3,8 +3,6 @@ from flask_login import LoginManager
 from esteticando.database.database import init_db, mysql
 from esteticando.controllers.auth.users import auth_bp
 from esteticando.controllers.estabelecimento.estabelecimento import estabelecimento_bp
-from esteticando.controllers.profissional.profissional import profissional_bp
-from esteticando.controllers.auth.professionals import auth_professional_bp
 from esteticando.models.user import User  
 
 app = Flask(__name__)
@@ -19,18 +17,28 @@ login_manager.login_view = 'auth.login'
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(estabelecimento_bp)
-app.register_blueprint(profissional_bp)
-app.register_blueprint(auth_professional_bp)
 
 
 @login_manager.user_loader
 def load_user(user_id):
+    # Tenta carregar como cliente
     cur = mysql.connection.cursor()
     cur.execute("SELECT cli_id, cli_nome, cli_email FROM tb_cliente WHERE cli_id = %s", (user_id,))
     user_data = cur.fetchone()
+
+    # Se não encontrar como cliente, tenta como profissional
+    if not user_data:
+        cur.execute("SELECT pro_id, pro_nome, pro_email FROM tb_profissional WHERE pro_id = %s", (user_id,))
+        user_data = cur.fetchone()
+
     cur.close()
+
     if user_data:
-        return User(user_data['cli_id'], user_data['cli_nome'], user_data['cli_email'])
+        # Retorna o objeto User (para ambos cliente e profissional)
+        return User(user_data['cli_id'] if 'cli_id' in user_data else user_data['pro_id'],
+                    user_data['cli_nome'] if 'cli_nome' in user_data else user_data['pro_nome'],
+                    user_data['cli_email'] if 'cli_email' in user_data else user_data['pro_email'])
+    
     return None
 
 @app.route('/')

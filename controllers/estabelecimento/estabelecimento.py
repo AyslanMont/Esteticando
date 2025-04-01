@@ -13,6 +13,7 @@ def estabelecimento():
 
 
 @estabelecimento_bp.route('/resu_estabelecimento')
+@login_required
 def resu_estabelecimento():
     ordem = request.args.get('ordem', 'asc')
     nome_filtro = request.args.get('nome', '')

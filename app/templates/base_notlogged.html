@@ -29,11 +29,12 @@
         />
         <a href="#">Página Inicial</a>
         <a href="#">Sobre</a>
-        <a href="#">Serviços</a>
+        <a href="{{url_for('estabelecimento.resu_estabelecimento')}}">Serviços</a>
         <a href="#">Contato</a>
         <div id="btn-navbar">
-          <button class="btn-navbar">Inscreva-se</button>
-          <button class="btn-navbar">Entrar</button>
+          <a href="{{ url_for('auth.register') }}"><button class="btn-navbar">Inscreva-se</button></a>
+          <a href="{{ url_for('auth.login') }}"><button class="btn-navbar">Entrar</button></a>
+          
         </div>
       </menu>
     </header>
