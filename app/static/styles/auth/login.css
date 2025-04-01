@@ -103,3 +103,19 @@ a:hover {
   text-decoration: none;
   color: white;
 }
+
+.select-servico {
+  width: 100%;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.select-servico select {
+  display: flex;
+  width: 100%;
+  border-radius: 40px;
+  padding: 10px 15px;
+  background-color: rgb(211, 211, 211);
+  border-style: none;
+}
