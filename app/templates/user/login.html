@@ -7,10 +7,22 @@
     <div class="form">
       <h2>Entrar</h2>
       <form action="{{ url_for('auth.login') }}" method="POST">
-        <label for="" id="label-login">Email</label>
-        <input type="email" name="email"  placeholder="Email" />
-        <label for="" id="label-login">Senha</label>
-        <input type="password" name="password" placeholder="Senha" />
+        <label for="login-email" id="label-login">Email</label>
+        <input
+          type="email"
+          name="email"
+          id="login-email"
+          placeholder="Email"
+          required
+        />
+        <label for="login-senha" id="label-login">Senha</label>
+        <input
+          type="password"
+          name="password"
+          id="login-senha"
+          placeholder="Senha"
+          required
+        />
         <div class="select-servico">
           <select name="tipo_usuario" id="tipo_usuario" required>
             <option value="">Selecione um serviço</option>
@@ -18,29 +30,41 @@
             <option value="profissional">Sou um Profissional</option>
           </select>
         </div>
-        <button class="button-entrar">Entrar</button>
+        <button class="button-entrar" type="submit">Entrar</button>
       </form>
-      <button onclick="abrirModal()" id="button-forgot">Esqueceu sua senha?</button>
+      <button onclick="abrirModal()" id="button-forgot" type="button">
+        Esqueceu sua senha?
+      </button>
     </div>
     <div class="redirect">
       <h2>Bem vindo ao login</h2>
       <p>Não tem uma conta?</p>
-      <button><a href="{{ url_for('auth.register') }}">Registra-se</a></button>
+      <a href="{{ url_for('auth.register') }}"
+        ><button type="submit">Registra-se</button></a
+      >
     </div>
   </div>
 </main>
 
 <div class="window-modal" id="window-modal">
-    <div class="modal">
-        <button class="close" id="close" onclick="fecharModal()">X</button>
-        <h2>Redefinir Senha</h2>
-        <p>Informe o e-mail para o qual deseja redefinir sua senha.</p>
-        <form action="" class="modal-form">
-            <label for="">Email</label>
-            <input type="email" name="" id="" placeholder="Email">
-            <button class="button-redefinir">REDEFINIR SENHA</button>
-        </form>
-    </div>
+  <div class="modal">
+    <button class="close" id="close" onclick="fecharModal()" type="button">
+      X
+    </button>
+    <h2>Redefinir Senha</h2>
+    <p>Informe o e-mail para o qual deseja redefinir sua senha.</p>
+    <form action="" class="modal-form">
+      <label for="redefinir-email">Email</label>
+      <input
+        type="email"
+        name=""
+        id="redefinir-email"
+        placeholder="Email"
+        required
+      />
+      <button class="button-redefinir" type="button">REDEFINIR SENHA</button>
+    </form>
+  </div>
 </div>
 
 <script src="../../static/scripts/login.js"></script>
