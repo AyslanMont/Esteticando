@@ -9,7 +9,7 @@
       <form action="">
         <div class="select-estado">
           <label for="estado" id="label-estado">Estado</label>
-          <select name="estado" id="estado">
+          <select name="estado" id="estado" required>
             <option value="">Selecione um estado</option>
             <option value="AC">Acre</option>
             <option value="AL">Alagoas</option>
@@ -41,21 +41,21 @@
           </select>
         </div>
 
-        <label for="" id="label-login">Cidade</label>
-        <input type="text" placeholder="Cidade" />
-        <label for="" id="label-login">Bairro</label>
-        <input type="text" placeholder="Bairro" />
-        <label for="" id="label-login">Rua</label>
-        <input type="text" placeholder="Rua" />
-        <label for="" id="label-login">Numero</label>
-        <input type="number" placeholder="Numero" />
-        <button>Registrar</button>
+        <label for="endereco-cidade" id="label-login">Cidade</label>
+        <input type="text" id="endereco-cidade" required placeholder="Cidade" />
+        <label for="endereco-bairro" id="label-login">Bairro</label>
+        <input type="text" id="endereco-bairro" required placeholder="Bairro" />
+        <label for="endereco-rua" id="label-login">Rua</label>
+        <input type="text" id="endereco-rua" required placeholder="Rua" />
+        <label for="endereco-numero" id="label-login">Numero</label>
+        <input type="number" id="endereco-numero" required placeholder="Numero" />
+        <button type="submit">Registrar</button>
       </form>
     </div>
     <div class="redirect">
       <h2>Cadastre seu endereço</h2>
       <p>Errou alguma coisa?</p>
-      <button><a href="">Voltar</a></button>
+      <a href=""><button type="submit">Voltar</button></a>
     </div>
   </div>
 </main>
