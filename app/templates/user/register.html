@@ -7,16 +7,16 @@
     <div class="form">
       <h2>Registrar</h2>
       <form action="{{ url_for('auth.register') }}" method="POST">
-        <label for="" id="label-login">Nome</label>
-        <input type="text" name="nome"placeholder="Nome" />
-        <label for="" id="label-login">Email</label>
-        <input type="email" name="email" placeholder="Email" />
-        <label for="" id="label-login">CPF</label>
-        <input type="text" name="cpf" placeholder="CPF" />
-        <label for="" id="label-login">Telefone</label>
-        <input type="text" name="telefone" placeholder="Telefone" />
-        <label for="" id="label-login">Senha</label>
-        <input type="password" name="password" placeholder="Senha" />
+        <label for="register-nome" id="label-login">Nome</label>
+        <input type="text" name="nome" id="register-nome" placeholder="Nome" required />
+        <label for="register-email" id="label-login">Email</label>
+        <input type="email" name="email" id="register-email" placeholder="Email" required />
+        <label for="register-cpf" id="label-login">CPF</label>
+        <input type="text" name="cpf" id="register-cpf" placeholder="CPF" required />
+        <label for="register-telefone" id="label-login">Telefone</label>
+        <input type="text" name="telefone" id="register-telefone" placeholder="Telefone" required />
+        <label for="register-senha" id="label-login">Senha</label>
+        <input type="password" name="password" id="register-senha" placeholder="Senha" required />
         <div class="select-servico">
           <select name="tipo_usuario" id="tipo_usuario" required>
             <option value="">Selecione um serviço</option>
@@ -25,10 +25,10 @@
           </select>
         </div>
         <div class="termos">
-          <label for="" id="label-login"
+          <label for="register-termos" id="label-login"
             >Eu li e concordo com os termos de uso</label
           >
-          <input type="radio" />
+          <input type="radio" id="register-termos"/>
         </div>
         <button>Avançar</button>
       </form>
@@ -36,7 +36,7 @@
     <div class="redirect">
       <h2>Bem vindo ao register</h2>
       <p>Já tem uma conta?</p>
-      <button><a href="{{ url_for('auth.login') }}">Entrar</a></button>
+      <a href="{{ url_for('auth.login') }}"><button type="submit">Entrar</button></a>
     </div>
   </div>
 </main>
