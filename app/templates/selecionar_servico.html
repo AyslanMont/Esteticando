@@ -1,0 +1,35 @@
+{% extends "base_notlogged.html" %} {% block links %}
+<link rel="stylesheet" href="../../../static/styles/selecionar_servico.css" />
+{% endblock %} {% block content %}
+
+<main>
+  <div class="estabelecimento">
+    <img src="/static/imgs/logo.jpg" alt="" />
+    <h1>Nome do estabelecimento</h1>
+    <div class="rating">
+        <input type="radio" name="" id="" />
+        <input type="radio" name="" id="" />
+        <input type="radio" name="" id="" />
+        <input type="radio" name="" id="" />
+        <input type="radio" name="" id="" />
+      </div>
+  </div>
+  <div class="servicos">
+    <div class="servico">
+      <div class="corte">
+        <h3>Corte degradê</h3>
+        <p>Valor: 10 R$</p>
+      </div>
+      <div class="rating">
+        <input type="radio" name="" id="" />
+        <input type="radio" name="" id="" />
+        <input type="radio" name="" id="" />
+        <input type="radio" name="" id="" />
+        <input type="radio" name="" id="" />
+      </div>
+      <button>Agendar</button>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

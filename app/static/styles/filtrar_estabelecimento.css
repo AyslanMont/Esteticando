@@ -87,7 +87,7 @@ main {
 }
 
 .estabelecimento .interacao .interecao-buttons button {
-  width:40%;
+  width: 40%;
   border-radius: 40px;
   padding: 10px 20px;
   border-style: none;
@@ -101,10 +101,28 @@ main {
 }
 
 .estabelecimento .interacao .interecao-buttons a {
-    text-decoration: none;
-    color: white;
+  text-decoration: none;
+  color: white;
 }
 
 .estabelecimento .interacao .interecao-buttons button:hover {
-    font-size: 1.2rem;
+  font-size: 1.2rem;
+}
+
+.favoritar input {
+  display: none;
+}
+.estrela {
+  font-size: 30px;
+  cursor: pointer;
+  color: gray;
+}
+
+.favoritar input:checked + .estrela::before {
+  content: "★";
+  color: gold;
+}
+
+.estrela::before {
+  content: "☆";
 }

@@ -47,7 +47,11 @@ def index():
 
 @app.route('/home')
 def home():
-    return render_template("filtrar_estabelecimento.html")  
+    return render_template("filtrar_estabelecimento.html")
+
+@app.route('/servicos')
+def servicos():
+    return render_template("selecionar_servico.html")  
 
 @app.route('/gerenciar_perfil')
 def gerenciar_perfil():

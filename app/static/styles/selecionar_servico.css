@@ -1,0 +1,62 @@
+main {
+  height: 100%;
+}
+
+.estabelecimento {
+  height: 20%;
+  max-width: 100%;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.estabelecimento .favoritar {
+  height: 30%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.servicos {
+  height: 80%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 50px;
+}
+
+.estabelecimento img {
+  width: 20vh;
+  height: 20vh;
+  border-radius: 50%;
+}
+
+.servico {
+  width: 80%;
+  height: 30%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid black;
+  padding: 0px 50px;
+}
+
+.servico button {
+  width: 15%;
+  border-radius: 40px;
+  padding: 10px 20px;
+  border-style: none;
+  background: rgb(140, 39, 30);
+  background: linear-gradient(
+    0deg,
+    rgba(140, 39, 30, 1) 34%,
+    rgba(240, 29, 10, 1) 100%
+  );
+  color: white;
+}
+
+.servico button:hover {
+  font-size: 1.2rem;
+}
