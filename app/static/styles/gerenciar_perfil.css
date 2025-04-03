@@ -1,0 +1,111 @@
+main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 50px;
+}
+
+.container {
+  width: 80%;
+  height: 80%;
+  display: flex;
+  border: 1px solid rgb(147, 144, 144);
+}
+
+.opcoes {
+  flex-grow: 1;
+  flex-basis: 30%;
+  height: 100%;
+  border: 1px solid rgb(147, 144, 144);
+}
+
+.edicao {
+  flex-grow: 1;
+  flex-basis: 70%;
+  height: 100%;
+  border: 1px solid rgb(147, 144, 144);
+}
+
+.edicao .cabecalho {
+  height: 20%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid rgb(147, 144, 144);
+}
+
+.dados {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dados form {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dados button {
+  width: 40%;
+  border-radius: 40px;
+  padding: 10px 20px;
+  border-style: none;
+  background: rgb(140, 39, 30);
+  background: linear-gradient(
+    0deg,
+    rgba(140, 39, 30, 1) 34%,
+    rgba(240, 29, 10, 1) 100%
+  );
+  color: white;
+  align-self: center;
+}
+
+.dados input {
+  padding: 10px 5px;
+}
+
+.redefinir {
+  padding-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.redefinir button {
+  width: 40%;
+  border-radius: 40px;
+  padding: 10px 20px;
+  border-style: none;
+  background: rgb(140, 39, 30);
+  background: linear-gradient(
+    0deg,
+    rgba(140, 39, 30, 1) 34%,
+    rgba(240, 29, 10, 1) 100%
+  );
+  color: white;
+}
+
+.opcoes .cabecalho {
+  height: 20%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid rgb(147, 144, 144);
+}
+
+.opcoes img {
+  width: 20%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.selecoes {
+  padding-left: 30px;
+}
+
+main button:hover {
+  transform: scale(1.1);
+}

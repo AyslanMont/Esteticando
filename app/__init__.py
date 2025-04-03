@@ -53,7 +53,7 @@ def home():
 def servicos():
     return render_template("selecionar_servico.html")  
 
-@app.route('/gerenciar_perfil')
+@app.route('/gerenciar-perfil')
 def gerenciar_perfil():
     return render_template('gerenciar_perfil.html')
 

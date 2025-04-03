@@ -1,54 +1,45 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block links %}
+<link rel="stylesheet" href="../../../static/styles/gerenciar_perfil.css" />
+{% endblock%} {% block content %}
 
-{% block content %}
-
-
-<div class="container py-5">
-    <div class="row align-items-center shadow p-4 rounded bg-white">
-        <div class="col-md-3 text-center">
-            <img src="https://via.placeholder.com/100" alt="Profile Picture" class="rounded-circle img-fluid">
-        </div>
-        <div class="col-md-6">
-            <h2 class="mb-1">Nome do Usuário</h2>
-            <p class="mb-1"><strong>Email:</strong> usuario@email.com</p>
-            <p class="mb-1"><strong>Telefone:</strong> (11) 99999-9999</p>
-        </div>
-        <div class="col-md-3 text-center">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">Editar Informações</button>
-        </div>
+<main>
+  <div class="container">
+    <div class="opcoes">
+      <div class="cabecalho">
+        <img src="/static/imgs/logo.jpg" alt="" />
+        <p>Neymar dos Santos Silva Junior</p>
+      </div>
+      <div class="selecoes">
+        <h4>Perfil</h4>
+        <h4>Foto</h4>
+        <h4>Encerrar conta</h4>
+      </div>
     </div>
-</div>
-
-
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Editar Informações</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" placeholder="Digite o novo email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="phone" class="form-label">Telefone</label>
-                        <input type="tel" class="form-control" id="phone" placeholder="Digite o novo telefone">
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Senha</label>
-                        <input type="password" class="form-control" id="password" placeholder="Digite a nova senha">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success">Salvar</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            </div>
-        </div>
+    <div class="edicao">
+      <div class="cabecalho">
+        <h1>Perfil</h1>
+        <p>Adicione informações sobre você</p>
+      </div>
+      <div class="dados">
+        <h3>Dados básicos:</h3>
+        <form action="">
+          <input type="text" name="" id="" placeholder="Nome" />
+          <input
+            type="text"
+            name=""
+            id=""
+            placeholder="Telefone - (xx) xxxxx-xxxx"
+          />
+          <input type="text" name="" id="" placeholder="Email" />
+          <button type="submit">Salvar</button>
+        </form>
+      </div>
+      <div class="redefinir">
+        <h3>Quer redefinir sua senha?</h3>
+        <button type="button">Redefinir senha</button>
+      </div>
     </div>
-</div>
+  </div>
+</main>
 
 {% endblock %}
