@@ -19,7 +19,7 @@ h4 {
   font-weight: 900;
 }
 
-p, button, a, label {
+p, button, a, label, span {
   font-family: "Averia Serif Libre", serif;
   font-weight: 900;
 }
@@ -66,10 +66,10 @@ header.navbar {
 
 .navbar a:hover,
 .btn-navbar:hover {
-  font-size: 1.2rem;
+  transform: scale(1.2);
 }
  
 
 #img-navbar:hover {
-  max-height: 64px;
+  transform: scale(1.3);
 }

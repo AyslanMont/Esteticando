@@ -1,111 +1,39 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esteticando</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../static/styles/dashboard.css">
-    <link rel="stylesheet" href="../static/styles/confirmar_agendamento.css">
-
-</head>
-
-<body>
-
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">Página Inicial</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('estabelecimento.resu_estabelecimento')}}">Serviços</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Sobre nós</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-5">
-        <div class="text-center mb-4">
-            <h1>Agendar Horário</h1>
-            <p>Selecione um serviço, dia e horário para confirmar seu agendamento.</p>
-        </div>
-
-        <div class="d-flex align-items-center mb-4 p-3 bg-white shadow rounded">
-            <div class="foto-servico">
-                Foto<br>do<br>Serviço
-            </div>
-            <div class="ms-3">
-                <h4>Corte Degrade</h4>
-                <p class="mb-0">Valor: <strong>R$ 20,00</strong></p>
-            </div>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-bordered shadow">
-                <thead class="table-light">
-                    <tr>
-                        <th>Horários</th>
-                        <th>Clientes Agendados</th>
-                        <th>Confirmar Agendamento</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Parte de confirmar do barbeiro -->
-                    <!-- Repetir tabela de acordo com o bd-->
-                    <tr>
-                        <td>14:00</td>
-                        <td>
-                            <ul class="list-unstyled mb-0">
-                                <li>Maria</li>
-                            </ul>
-                        </td>
-                        <td>
-                            <button class="confirmar-btn">Confirmar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>15:00</td>
-                        <td>
-                            <ul class="list-unstyled mb-0">
-                                <li>Carlos</li>
-                            </ul>
-                        </td>
-                        <td>
-                            <button class="confirmar-btn">Confirmar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>16:00</td>
-                        <td>
-                            <ul class="list-unstyled mb-0">
-                                <li>Sem agendamentos</li>
-                            </ul>
-                        </td>
-                        <td>
-                            <button class="confirmar-btn">Confirmar</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+{% extends "base.html" %} {% block links %}
+<link
+  rel="stylesheet"
+  href="../../../static/styles/confirmar_agendamento.css"
+/>
+{% endblock %} {% block content %}
+<main>
+  <div class="cabecalho">
+    <h1>Agendar Horário</h1>
+    <p>Confirme seus agendamentos e notifique seus clientes</p>
+  </div>
+  <div class="informacoes">
+    <img src="/static/imgs/logo.jpg" alt="Logo" />
+    <div class="informacoes-corte">
+      <h3>Nome do corte</h3>
+      <p>Valor do corte</p>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
-</body>
-
-</html>
+  </div>
+  <div class="horarios">
+    <ul>
+      <li class="tabela-header">
+        <span class="horario">Horários</span>
+        <span class="cliente">Clientes Agendados</span>
+        <span class="confirmar">Confirmar Agendamento</span>
+      </li>
+      <li>
+        <span class="horario">14:00</span>
+        <span class="cliente">João Silva</span>
+        <span class="confirmar"><button>Confirmar</button></span>
+      </li>
+      <li>
+        <span class="horario">15:00</span>
+        <span class="cliente">Maria Souza</span>
+        <span class="confirmar"><button>Confirmar</button></span>
+      </li>
+    </ul>
+  </div>
+</main>
+{% endblock %}

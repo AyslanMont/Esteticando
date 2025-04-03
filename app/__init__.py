@@ -58,7 +58,7 @@ def gerenciar_perfil():
     return render_template('gerenciar_perfil.html')
 
 
-@app.route('/confirmar_agendamento')
+@app.route('/confirmar-agendamento')
 def confirmar_agendamento():
     return render_template('confirmar_agendamento.html')
 
