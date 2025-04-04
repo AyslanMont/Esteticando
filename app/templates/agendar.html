@@ -1,104 +1,39 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esteticando</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../static/styles/dashboard.css">
-    <link rel="stylesheet" href="../static/styles/agendar.css">
-
-</head>
-
-<body>
-
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">Página Inicial</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('estabelecimento.resu_estabelecimento')}}" >Serviços</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <div class="container mt-5">
-
-        <div class="text-center mb-4">
-            <h1>Agendamento de Horários</h1>
-            <p>Veja os horários disponíveis e agendados abaixo.</p>
-        </div>
-
-
-        <div class="mb-4">
-            <label for="selectDia" class="form-label">Selecione o Dia</label>
-            <input type="date" class="form-control" id="selectDia" />
-        </div>
-
- 
-        <div class="table-responsive">
-            <table class="table table-bordered shadow">
-                <thead class="table-light">
-                    <tr>
-                        <th>Horário</th>
-                        <th>Status</th>
-                        <th>Cliente</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    <tr>
-                        <td>09:00</td>
-                        <td class="status-disponivel">Disponível</td>
-                        <td>-</td>
-                        <td>
-                            <button class="btn btn-agendar">Agendar</button>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>10:00</td>
-                        <td class="status-agendado">Agendado</td>
-                        <td>Maria Silva</td>
-                        <td>
-                            <button class="btn btn-secondary" disabled>Indisponível</button>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>11:00</td>
-                        <td class="status-disponivel">Disponível</td>
-                        <td>-</td>
-                        <td>
-                            <button class="btn btn-agendar">Agendar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>12:00</td>
-                        <td class="status-agendado">Agendado</td>
-                        <td>João Pereira</td>
-                        <td>
-                            <button class="btn btn-secondary" disabled>Indisponível</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+{% extends "base.html" %} {% block links %}
+<link rel="stylesheet" href="../../../static/styles/agendar.css" />
+{% endblock %} {% block content %}
+<main>
+  <div class="cabecalho">
+    <h1>Agendamento de Horários</h1>
+    <p>Confira os horários disponíveis abaixo e garanta seu atendimento.</p>
+  </div>
+  <div class="informacoes">
+    <form action="">
+      <label for="informacoes-data">Selecione o dia:</label>
+      <input type="date" id="informacoes-data" required />
+      <button type="submit" class="informacoes-button">Verificar</button>
+    </form>
+  </div>
+  <div class="horarios">
+    <ul>
+      <li class="tabela-header">
+        <span class="horario">Horário</span>
+        <span class="status">Status</span>
+        <span class="cliente">Cliente</span>
+        <span class="acao">Ação</span>
+      </li>
+      <li>
+        <span class="horario">14:00</span>
+        <span class="status disponivel">Disponível</span>
+        <span class="cliente">João Silva</span>
+        <span class="acao"><button>Confirmar</button></span>
+      </li>
+      <li>
+        <span class="horario">15:00</span>
+        <span class="status indisponivel">Indisponível</span>
+        <span class="cliente">Maria Souza</span>
+        <span class="acao"><button disabled>Confirmar</button></span>
+      </li>
+    </ul>
+  </div>
+</main>
+{% endblock %}

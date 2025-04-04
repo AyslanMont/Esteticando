@@ -1,25 +1,122 @@
-body {
-    background-color: #f8f9fa;
+main {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 50px 20%;
+  gap: 20px;
 }
 
-.status-disponivel {
-    color: #28a745;
-    font-weight: bold;
+.cabecalho {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.status-agendado {
-    color: #dc3545;
-    font-weight: bold;
+.informacoes {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  box-shadow: 3px 3px 5px 3px rgb(175, 174, 174);
+  padding: 20px;
+  border-radius: 10px;
 }
 
-.btn-agendar {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
+.informacoes form {
+  display: flex;
+  gap: 30px;
+  align-items: center;
 }
 
-.btn-agendar:hover {
-    background-color: #0056b3;
+.informacoes input[type="date"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.horarios {
+  width: 100%;
+  box-shadow: 3px 3px 5px 3px rgb(175, 174, 174);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.horarios ul {
+  padding: 0;
+  margin: 0;
+}
+
+.horarios li {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.horarios .tabela-header {
+  font-weight: bold;
+  background-color: var(--main-color);
+  color: white;
+  padding: 10px;
+}
+
+.horarios li span {
+  flex: 1;
+  text-align: center;
+}
+
+.status.disponivel {
+  color: green;
+  font-weight: bold;
+}
+
+.status.indisponivel {
+  color: red;
+  font-weight: bold;
+}
+
+.acao button {
+  width: 100%;
+  max-width: 120px;
+  border-radius: 40px;
+  padding: 10px 20px;
+  border-style: none;
+  background: linear-gradient(
+    0deg,
+    rgba(140, 39, 30, 1) 34%,
+    rgba(240, 29, 10, 1) 100%
+  );
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.acao button:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.acao button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.informacoes-button {
+  width: 100%;
+  max-width: 120px;
+  border-radius: 40px;
+  padding: 10px 20px;
+  border-style: none;
+  background: linear-gradient(
+    0deg,
+    rgba(140, 39, 30, 1) 34%,
+    rgba(240, 29, 10, 1) 100%
+  );
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.informacoes-button:hover {
+  transform: scale(1.1);
 }
