@@ -1,18 +1,23 @@
-{% extends "base.html" %} {% block links %}
-<link rel="stylesheet" href="../../../static/styles/agendar.css" />
-{% endblock %} {% block content %}
+{% extends "base.html" %}
+{% block links %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/agendar.css') }}" />
+{% endblock %}
+{% block content %}
 <main>
   <div class="cabecalho">
     <h1>Agendamento de Horários</h1>
     <p>Confira os horários disponíveis abaixo e garanta seu atendimento.</p>
   </div>
+
   <div class="informacoes">
-    <form action="">
+    <form method="get">
       <label for="informacoes-data">Selecione o dia:</label>
-      <input type="date" id="informacoes-data" required />
+      <input type="date" name="data" id="informacoes-data" required value="{{ data if data else '' }}" />
       <button type="submit" class="informacoes-button">Verificar</button>
     </form>
   </div>
+
+  {% if data %}
   <div class="horarios">
     <ul>
       <li class="tabela-header">
@@ -21,19 +26,24 @@
         <span class="cliente">Cliente</span>
         <span class="acao">Ação</span>
       </li>
+      {% for h in horarios %}
       <li>
-        <span class="horario">14:00</span>
-        <span class="status disponivel">Disponível</span>
-        <span class="cliente">João Silva</span>
-        <span class="acao"><button>Confirmar</button></span>
+        <span class="horario">{{ h.hora }}</span>
+        <span class="status {{ 'disponivel' if h.status == 'Disponível' else 'indisponivel' }}">{{ h.status }}</span>
+        <span class="cliente">{{ h.cliente_nome if h.cliente_nome else '-' }}</span>
+        <span class="acao">
+          {% if h.status == 'Disponível' %}
+          <form method="post" action="/confirmar_agendamento/{{ h.id }}">
+            <button type="submit">Confirmar</button>
+          </form>
+          {% else %}
+          <button disabled>Confirmar</button>
+          {% endif %}
+        </span>
       </li>
-      <li>
-        <span class="horario">15:00</span>
-        <span class="status indisponivel">Indisponível</span>
-        <span class="cliente">Maria Souza</span>
-        <span class="acao"><button disabled>Confirmar</button></span>
-      </li>
+      {% endfor %}
     </ul>
   </div>
+  {% endif %}
 </main>
 {% endblock %}

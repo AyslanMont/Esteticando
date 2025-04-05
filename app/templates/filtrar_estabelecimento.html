@@ -13,38 +13,70 @@
 <main>
   <div class="filtros">
     <div class="search">
-      <label for="search-input"
-        ><span class="material-symbols-outlined"> search </span></label
-      >
-      <input
-        type="text"
-        name=""
-        id="search-input"
-        placeholder="Filtrar estabelecimentos"
-      />
+      <form action="{{url_for('home')}}" method="post">
+        <label for="estado">Selecione seu estado:</label>
+        <select id="estado" name="estado">
+            <option value="AC">Acre</option>
+            <option value="AL">Alagoas</option>
+            <option value="AP">Amapá</option>
+            <option value="AM">Amazonas</option>
+            <option value="BA">Bahia</option>
+            <option value="CE">Ceará</option>
+            <option value="DF">Distrito Federal</option>
+            <option value="ES">Espírito Santo</option>
+            <option value="GO">Goiás</option>
+            <option value="MA">Maranhão</option>
+            <option value="MT">Mato Grosso</option>
+            <option value="MS">Mato Grosso do Sul</option>
+            <option value="MG">Minas Gerais</option>
+            <option value="PA">Pará</option>
+            <option value="PB">Paraíba</option>
+            <option value="PR">Paraná</option>
+            <option value="PE">Pernambuco</option>
+            <option value="PI">Piauí</option>
+            <option value="RJ">Rio de Janeiro</option>
+            <option value="RN">Rio Grande do Norte</option>
+            <option value="RS">Rio Grande do Sul</option>
+            <option value="RO">Rondônia</option>
+            <option value="RR">Roraima</option>
+            <option value="SC">Santa Catarina</option>
+            <option value="SP">São Paulo</option>
+            <option value="SE">Sergipe</option>
+            <option value="TO">Tocantins</option>
+        </select>
+        <input type="text" name="cidade" placeholder="Cidade">
+        <input type="text" name="bairro" placeholder="Bairro">
+        <input type="text" name="nome" placeholder="Nome do estabelecimento">
+        <input type="submit" >
+      </form>
     </div>
-    <div class="estabelecimento">
-      <div class="foto"></div>
-      <div class="interacao">
-        <div class="informacoes">
-          <h3>Nome do estabelecimento</h3>
-          <p>informacoes</p>
-          <p>informacoes</p>
-          <p>informacoes</p>
-          <p>informacoes</p>
-        </div>
-        <div class="interecao-buttons">
-          <div class="favoritar">
-            <input type="checkbox" id="favoritar" />
-            <label for="favoritar" class="estrela"></label>
+    <!-- Lista de Estabelecimentos -->
+    <div class="resultados">
+      {% if result_est %}
+        {% for estabelecimento in result_est %}
+        <div class="estabelecimento">
+          <div class="foto"></div>
+          <div class="interacao">
+            <div class="informacoes">
+              <h3>{{ estabelecimento.est_nome }}</h3>
+              <p>{{ estabelecimento.end_bairro }}, {{ estabelecimento.end_cidade }} - {{ estabelecimento.end_estado }}</p>
+            </div>
+            <div class="interecao-buttons">
+              <img src="/static/imgs/favorito.png" alt="Favorito" />
+              <button><a href="{{ url_for('perfil_estabelecimento', est_id=estabelecimento.est_id) }}">Agenda</a></button>
+            </div>
           </div>
-          <button><a href="">Agendar</a></button>
         </div>
-      </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted">Nenhum estabelecimento encontrado. Tente ajustar seus filtros.</p>
+      {% endif %}
     </div>
   </div>
+  
   <div class="api">
     <h1>Api do Google</h1>
   </div>
 </main>
+
 {% endblock %}

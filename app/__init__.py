@@ -1,8 +1,10 @@
-from flask import Flask, render_template
+from flask import Flask, render_template,request,flash,url_for
 from flask_login import LoginManager
 from esteticando.database.database import init_db, mysql
 from esteticando.controllers.auth.users import auth_bp
 from esteticando.controllers.estabelecimento.estabelecimento import estabelecimento_bp
+from esteticando.controllers.profissional.profissional import profissional_bp
+from esteticando.controllers.servico.cli_est import cli_est_bp
 from esteticando.models.user import User  
 
 app = Flask(__name__)
@@ -17,7 +19,8 @@ login_manager.login_view = 'auth.login'
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(estabelecimento_bp)
-
+app.register_blueprint(profissional_bp)
+app.register_blueprint(cli_est_bp)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -45,13 +48,82 @@ def load_user(user_id):
 def index():
     return render_template("index.html")
 
-@app.route('/home')
+#filtro de estabelecimentos
+@app.route('/home', methods=['GET', 'POST'])
 def home():
-    return render_template("filtrar_estabelecimento.html")
+    result_est = []
+    
+    if request.method == 'POST':
+        end_estado = request.form.get('estado', '').strip()
+        end_cidade = request.form.get('cidade', '').strip()
+        end_bairro = request.form.get('bairro', '').strip()
+        est_nome = request.form.get('nome', '').strip()
 
-@app.route('/servicos')
-def servicos():
-    return render_template("selecionar_servico.html")  
+        if not end_estado:
+            flash('Estado é um campo obrigatório.', 'warning')
+            return render_template('filtrar_estabelecimento.html', result_est=result_est)
+
+        query_est = """
+            SELECT est_id, est_nome, est_descricao, est_email, est_telefone, end_rua, end_numero, end_bairro, end_cidade, end_estado 
+            FROM tb_endereco_estabelecimento 
+            JOIN tb_estabelecimento ON est_id = end_est_id 
+            WHERE end_estado = %s
+        """
+        parametros = [end_estado]
+
+        if end_cidade:
+            query_est += " AND end_cidade = %s"
+            parametros.append(end_cidade)
+        
+        if end_bairro:
+            query_est += " AND end_bairro = %s"
+            parametros.append(end_bairro)
+
+        if est_nome:
+            query_est += " AND est_nome LIKE %s"
+            parametros.append(f"%{est_nome}%")
+
+        cur = mysql.connection.cursor()
+        try:
+            cur.execute(query_est, tuple(parametros))
+            result_est = cur.fetchall()
+        finally:
+            cur.close()
+
+        if not result_est:
+            flash('Nenhum estabelecimento encontrado com esses filtros.', 'info')
+
+    else:  # Método GET
+        cur = mysql.connection.cursor()
+        try:
+            query = """
+                SELECT est_id, est_nome, est_descricao, est_email, est_telefone, end_rua, end_numero, end_bairro, end_cidade, end_estado
+                FROM tb_endereco_estabelecimento 
+                JOIN tb_estabelecimento ON est_id = end_est_id 
+                ORDER BY est_nome
+                LIMIT 20
+            """
+            cur.execute(query)
+            result_est = cur.fetchall()
+        finally:
+            cur.close()
+
+    return render_template('filtrar_estabelecimento.html', result_est=result_est)
+  
+@app.route('/estabelecimento/<int:est_id>/servicos')
+def perfil_estabelecimento(est_id):
+    cur = mysql.connection.cursor()
+    query_servicos = """
+        SELECT est_nome, ser_nome, ser_preco,ser_id 
+        FROM tb_estabelecimento 
+        JOIN tb_servico ON ser_est_id = est_id
+        WHERE est_id = %s
+    """
+    cur.execute(query_servicos, (est_id,))
+    servicos = cur.fetchall()
+    cur.close()
+    return render_template('selecionar_servico.html', servicos=servicos, est_id=est_id)
+
 
 @app.route('/gerenciar-perfil')
 def gerenciar_perfil():
@@ -62,7 +134,46 @@ def gerenciar_perfil():
 def confirmar_agendamento():
     return render_template('confirmar_agendamento.html')
 
+#ROTA QUEBRADA!!!!!!
+@app.route('/<int:ser_id>/agendar', methods=['GET', 'POST'])
+def agendar(ser_id):
+    data = request.args.get('data')  # Pega a data do input
 
-@app.route('/agendar')
-def agendar():
-    return render_template('agendar.html')
+    horarios_disponiveis = [
+        "08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"
+    ]
+    
+    agendamentos = []
+    
+    if data:
+        cur = mysql.connection.cursor()
+        query = """
+            SELECT ag_horario, cli_nome
+            FROM tb_agendamento
+            INNER JOIN tb_cliente ON ag_cli_id = cli_id
+            WHERE ag_data = %s AND ag_ser_id = %s
+        """
+        cur.execute(query, (data, ser_id))
+        resultados = cur.fetchall()
+        cur.close()
+
+        # Mapeia horários ocupados
+        ocupados = {r[0]: r[1] for r in resultados}
+
+        for hora in horarios_disponiveis:
+            if hora in ocupados:
+                agendamentos.append({
+                    "horario": hora,
+                    "status": "Indisponível",
+                    "cliente": ocupados[hora],
+                    "disponivel": False
+                })
+            else:
+                agendamentos.append({
+                    "horario": hora,
+                    "status": "Disponível",
+                    "cliente": "",
+                    "disponivel": True
+                })
+    
+    return render_template('agendar.html', agendamentos=agendamentos, data=data)

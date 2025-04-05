@@ -11,7 +11,6 @@ def estabelecimento():
     return render_template('estabelecimento.html')
 
 
-
 @estabelecimento_bp.route('/resu_estabelecimento')
 @login_required
 def resu_estabelecimento():
@@ -32,9 +31,7 @@ def resu_estabelecimento():
 #não esta finalizada mas ja da pra ter uma noção, falta a verificação de profissional
 @estabelecimento_bp.route('/dentro_estabelecimento')
 def dentro_estabelecimento():
-    cur = mysql.connection.cursor()
-    
-    
+    cur = mysql.connection.cursor()    
     cur.execute("SELECT est_nome FROM tb_estabelecimento ORDER BY est_id DESC LIMIT 1")
     estabelecimento = cur.fetchone()
 
