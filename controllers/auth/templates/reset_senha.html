@@ -1,0 +1,15 @@
+{% extends "base_notlogged.html" %}
+
+{% block content %}
+<main>
+  <div class="container">
+    <h2>Redefinir Senha</h2>
+    <form action="{{ url_for('auth.redefinir_senha', token=token) }}" method="POST">
+      <label for="password">Nova Senha:</label>
+      <input type="password" id="password" name="password" required>
+
+      <button type="submit">Salvar Nova Senha</button>
+    </form>
+  </div>
+</main>
+{% endblock %}

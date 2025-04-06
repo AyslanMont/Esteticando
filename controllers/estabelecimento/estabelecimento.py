@@ -5,7 +5,6 @@ from esteticando.database.database import mysql
 estabelecimento_bp = Blueprint('estabelecimento', __name__, url_prefix='/estabelecimento', template_folder='templates')
 
 
-#rapaz não sei para que serve essa rota
 @estabelecimento_bp.route('/')
 def estabelecimento():
     return render_template('estabelecimento.html')

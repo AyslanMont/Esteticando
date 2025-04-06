@@ -53,17 +53,18 @@
     </button>
     <h2>Redefinir Senha</h2>
     <p>Informe o e-mail para o qual deseja redefinir sua senha.</p>
-    <form action="" class="modal-form">
+    <form action="{{ url_for('auth.esqueci_senha') }}" method="POST" class="modal-form">
       <label for="redefinir-email">Email</label>
       <input
         type="email"
-        name=""
+        name="email"
         id="redefinir-email"
         placeholder="Email"
         required
       />
-      <button class="button-redefinir" type="button">REDEFINIR SENHA</button>
+      <button class="button-redefinir" type="submit">REDEFINIR SENHA</button>
     </form>
+    
   </div>
 </div>
 

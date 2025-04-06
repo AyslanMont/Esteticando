@@ -114,6 +114,12 @@ CREATE TABLE IF NOT EXISTS tb_avaliacao (
   FOREIGN KEY (ava_cli_id) REFERENCES tb_cliente(cli_id) ON DELETE CASCADE,
   FOREIGN KEY (ava_age_id) REFERENCES tb_agendamento(age_id) ON DELETE CASCADE
 );
+CREATE TABLE tb_tokens_redefinicao (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 
 
