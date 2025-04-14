@@ -177,10 +177,10 @@ def agendar(ser_id):
     if data:
         cur = mysql.connection.cursor()
         query = """
-            SELECT ag_horario, cli_nome
+            SELECT age_horario, cli_nome
             FROM tb_agendamento
-            INNER JOIN tb_cliente ON ag_cli_id = cli_id
-            WHERE ag_data = %s AND ag_ser_id = %s
+            INNER JOIN tb_cliente ON age_cli_id = cli_id
+            WHERE age_data = %s AND age_ser_id = %s
         """
         cur.execute(query, (data, ser_id))
         resultados = cur.fetchall()

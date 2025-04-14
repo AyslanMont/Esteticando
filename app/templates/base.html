@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Esteticando</title>
-    <link rel="stylesheet" href="../static/styles/normalize.css" />
-    <link rel="stylesheet" href="../static/styles/base_notlogged.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/normalize.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/base_notlogged.css') }}" />
+
     <link
       rel="shortcut icon"
       href="../static/imgs/favicon.png"
@@ -22,17 +23,13 @@
   <body>
     <header class="navbar">
       <menu>
-        <img
-          src="../static/imgs/favicon.png"
-          alt="logo barbearia"
-          id="img-navbar"
-        />
-        <a href="#">Página Inicial</a>
+        <img src="{{ url_for('static', filename='imgs/favicon.png') }}" alt="logo barbearia" id="img-navbar" />
+        <a href="{{ url_for('home') }}">Página Inicial</a>
         <a href="#">Sobre</a>
-        <a href="#">Serviços</a>
+        <a href="{{ url_for('home') }}">Serviços</a>
         <a href="#">Contato</a>
         <div id="btn-navbar">
-          <button class="btn-navbar">Sair</button>
+          <a href="{{ url_for('auth.logout') }}"><button class="btn-navbar">Sair</button></a>
         </div>
       </menu>
     </header>
