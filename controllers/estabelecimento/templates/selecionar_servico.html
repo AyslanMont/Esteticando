@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block links %}
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/selecionar_servico.css') }}" />
 {% endblock %}
@@ -6,6 +7,7 @@
 {% block content %}
 <main>
   <div class="estabelecimento">
+    {% if servicos %}
     <img src="{{ url_for('static', filename='imgs/logo.jpg') }}" alt="" />
     <h1>{{ servicos[0].est_nome }}</h1>
     <div class="rating">
@@ -15,6 +17,9 @@
       <input type="radio" />
       <input type="radio" />
     </div>
+    {% else %}
+      <p>{{ mensagem }}</p>
+    {% endif %}
   </div>
 
   <div class="servicos">
@@ -31,7 +36,8 @@
         <input type="radio" />
         <input type="radio" />
       </div>
-      <button><a href="{{ url_for('agendar', ser_id=servico.ser_id) }}">Agendar</a></button>
+      <button><a href="{{ url_for('estabelecimento.agendar', ser_id=servico.ser_id, data=data) }}">Agendar</a></button>
+
     </div>
     {% endfor %}
   </div>

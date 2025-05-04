@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS tb_disponibilidade_profissional (
 CREATE TABLE IF NOT EXISTS tb_agendamento (
   age_id INT AUTO_INCREMENT PRIMARY KEY,
   age_dataCriacao DATETIME NOT NULL,
+  age_data DATETIME NOT NULL,
   age_horario TIME NOT NULL,
   age_valorTotal FLOAT NOT NULL,
   age_quantidade INT NOT NULL,
@@ -123,4 +124,10 @@ CREATE TABLE tb_tokens_redefinicao (
 
 
 
+-- Inserir categorias
+INSERT INTO tb_categoria (cat_nome) VALUES 
+('Beleza'),
+('Saúde'),
+('Estética'),
+('Bem-estar');
 

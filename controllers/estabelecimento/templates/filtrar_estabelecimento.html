@@ -13,7 +13,7 @@
 <main>
   <div class="filtros">
     <div class="search">
-      <form action="{{url_for('home')}}" method="post">
+      <form action="{{ url_for('estabelecimento.filtrar_estabelecimento') }}" method="POST">
         <label for="estado">Selecione seu estado:</label>
         <select id="estado" name="estado">
             <option value="AC">Acre</option>
@@ -63,7 +63,7 @@
             </div>
             <div class="interecao-buttons">
               <img src="/static/imgs/favorito.png" alt="Favorito" />
-              <button><a href="{{ url_for('perfil_estabelecimento', est_id=estabelecimento.est_id) }}">Agenda</a></button>
+              <button><a href="{{ url_for('estabelecimento.perfil_estabelecimento', est_id=estabelecimento.est_id) }}">Agenda</a></button>
             </div>
           </div>
         </div>

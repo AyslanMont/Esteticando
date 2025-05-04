@@ -168,7 +168,7 @@ def login():
                 user = User(user_data['pro_id'], user_data['pro_nome'], user_data['pro_email'])
                 login_user(user)
                 flash('Login realizado com sucesso!', 'success')
-                return redirect(url_for('home'))
+                return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
             else:
                 flash('E-mail ou senha incorretos', 'danger')
                 print("Senha incorreta ou e-mail não encontrado")
@@ -192,7 +192,7 @@ def login():
                 user = User(user_data['cli_id'], user_data['cli_nome'], user_data['cli_email'])
                 login_user(user)
                 flash('Login realizado com sucesso!', 'success')
-                return redirect(url_for('home'))
+                return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
             else:
                 flash('E-mail ou senha incorretos', 'danger')
                 print("Senha incorreta ou e-mail não encontrado")

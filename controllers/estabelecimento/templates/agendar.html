@@ -26,14 +26,17 @@
         <span class="cliente">Cliente</span>
         <span class="acao">Ação</span>
       </li>
-      {% for h in horarios %}
+      {% for h in agendamentos %}
       <li>
         <span class="horario">{{ h.hora }}</span>
         <span class="status {{ 'disponivel' if h.status == 'Disponível' else 'indisponivel' }}">{{ h.status }}</span>
         <span class="cliente">{{ h.cliente_nome if h.cliente_nome else '-' }}</span>
         <span class="acao">
           {% if h.status == 'Disponível' %}
-          <form method="post" action="/confirmar_agendamento/{{ h.id }}">
+          <form method="post" action="{{ url_for('estabelecimento.confirmar_agendamento') }}">
+            <input type="hidden" name="data" value="{{ data }}">
+            <input type="hidden" name="ser_id" value="{{ ser_id }}">
+            <input type="hidden" name="horario" value="{{ h.hora }}">
             <button type="submit">Confirmar</button>
           </form>
           {% else %}

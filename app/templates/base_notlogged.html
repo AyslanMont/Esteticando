@@ -27,9 +27,9 @@
           alt="logo barbearia"
           id="img-navbar"
         />
-        <a href="#">Página Inicial</a>
+        <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Página Inicial</a>
         <a href="#">Sobre</a>
-        <a href="{{url_for('estabelecimento.resu_estabelecimento')}}">Serviços</a>
+        <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Serviços</a>
         <a href="#">Contato</a>
         <div id="btn-navbar">
           <a href="{{ url_for('auth.register') }}"><button class="btn-navbar">Inscreva-se</button></a>

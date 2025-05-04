@@ -24,13 +24,15 @@
     <header class="navbar">
       <menu>
         <img src="{{ url_for('static', filename='imgs/favicon.png') }}" alt="logo barbearia" id="img-navbar" />
-        <a href="{{ url_for('home') }}">Página Inicial</a>
+        <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Página Inicial</a>
         <a href="#">Sobre</a>
-        <a href="{{ url_for('home') }}">Serviços</a>
+        <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Serviços</a>
         <a href="#">Contato</a>
+        {% if current_user.is_authenticated %}
         <div id="btn-navbar">
           <a href="{{ url_for('auth.logout') }}"><button class="btn-navbar">Sair</button></a>
         </div>
+        {% endif %}
       </menu>
     </header>
     {% block content %} {% endblock %}
