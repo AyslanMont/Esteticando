@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block content %}
+
+
+
 <main>
   <div class="estabelecimento">
     {% if servicos %}
@@ -21,6 +24,7 @@
       <p>{{ mensagem }}</p>
     {% endif %}
   </div>
+  
 
   <div class="servicos">
     {% for servico in servicos %}

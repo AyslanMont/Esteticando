@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash,session
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from flask_login import login_required,current_user
 from esteticando.database.database import mysql
-from datetime import datetime
+from datetime import datetime, date
 
 estabelecimento_bp = Blueprint('estabelecimento', __name__, url_prefix='/estabelecimento', template_folder='templates')
 
@@ -101,139 +101,155 @@ def perfil_estabelecimento(est_id):
 
 
 
+HORARIOS_DISPONIVEIS = [
+    "08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"
+]
 
+#primeira rota serve para carregar a pagina sem data
+@estabelecimento_bp.route('/agendar/<int:ser_id>', methods=['GET', 'POST'])
+#segunda rota serve para carregar a lista de horários já filtrada pela data selecionada
 @estabelecimento_bp.route('/agendar/<int:ser_id>/<data>', methods=['GET', 'POST'])
-def agendar(ser_id, data):
-    horarios_disponiveis = [
-        "08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"
-    ]
-    
-    agendamentos = []
-    
-    if data:
-        cur = mysql.connection.cursor()
-        query = """
-            SELECT age_horario, cli_nome
+
+#aqui ele esta apenas registrando os nomes de CLIENTES não esta de PROFISSIONAIS
+def agendar(ser_id, data=None):
+    if request.method == 'POST':
+        selected_date = request.form.get('data')
+        if not selected_date:
+            flash("Selecione uma data válida.", "warning")
+            return redirect(url_for('estabelecimento.agendar', ser_id=ser_id))
+        return redirect(url_for('estabelecimento.agendar', ser_id=ser_id, data=selected_date))
+
+    if not data:
+        data = date.today().isoformat()
+
+    with mysql.connection.cursor() as cur:
+        cur.execute("""
+            SELECT TIME_FORMAT(age_horario, '%%H:%%i') AS horario, cli_nome
             FROM tb_agendamento
-            INNER JOIN tb_cliente ON age_cli_id = cli_id
-            WHERE age_data = %s AND age_ser_id = %s
-        """
-        cur.execute(query, (data, ser_id))
+            JOIN tb_cliente ON age_cli_id = cli_id
+            WHERE DATE(age_data) = %s AND age_ser_id = %s
+        """, (data, ser_id))
         resultados = cur.fetchall()
-        cur.close()
 
-        # Mapeia horários ocupados
-        ocupados = {r[0]: r[1] for r in resultados}
+    # Normaliza cada linha em dict {'horario': ..., 'cli_nome': ...}
+    flat = []
+    for row in resultados:
+        if isinstance(row, dict):
+            flat.append(row)
+        elif isinstance(row, tuple) and len(row) == 1 and isinstance(row[0], dict):
+            flat.append(row[0])
+        else:
+            horario, nome = row
+            flat.append({'horario': horario, 'cli_nome': nome})
 
-        for hora in horarios_disponiveis:
-            if hora in ocupados:
-                agendamentos.append({
-                    "hora": hora,
-                    "status": "Indisponível",
-                    "cliente_nome": ocupados[hora],
-                    "disponivel": False
-                })
-            else:
-                agendamentos.append({
-                    "hora": hora,
-                    "status": "Disponível",
-                    "cliente_nome": None,
-                    "disponivel": True
-                })
+    ocupados = {r['horario']: r['cli_nome'] for r in flat}
 
-        session['agendamentos'] = agendamentos
+    agendamentos = []
+    for hora in HORARIOS_DISPONIVEIS:
+        agendamentos.append({
+            'hora': hora,
+            'status': 'Indisponível' if hora in ocupados else 'Disponível',
+            'cliente_nome': ocupados.get(hora),
+            'disponivel': hora not in ocupados
+        })
 
-    return render_template('agendar.html', ser_id=ser_id, data=data, agendamentos=agendamentos)
+    return render_template('agendar.html',
+                           ser_id=ser_id,
+                           data=data,
+                           agendamentos=agendamentos)
 
 
-
-
-
-
-#esta bugada
 @estabelecimento_bp.route('/confirmar_agendamento', methods=['POST'])
 @login_required
 def confirmar_agendamento():
-    if not current_user.is_authenticated:
-        flash('Você precisa estar logado para realizar essa ação.', 'danger')
-        return redirect(url_for('auth.login'))
+    form = request.form.to_dict()
+    ser_id = form.get('ser_id')
+    data = form.get('data')
+    horario = form.get('horario')
 
-    ser_id = request.form['ser_id']
-    data = request.form['data']
-    horario = request.form['horario']
+    if not ser_id or not data or not horario:
+        flash("Dados insuficientes.", "danger")
+        return redirect(url_for('estabelecimento.agendar',
+                                ser_id=int(ser_id) if ser_id else 0,
+                                data=data or date.today().isoformat()))
 
-    print(f"Confirmando agendamento: serviço={ser_id}, horário={horario}, data={data}")
+    ser_id = int(ser_id)
+    horario_completo = horario + ":00"
 
     try:
-        cur = mysql.connection.cursor()
+        with mysql.connection.cursor() as cur:
+            # Checa conflito
+            cur.execute("""
+                SELECT 1 FROM tb_agendamento
+                WHERE age_ser_id=%s AND DATE(age_data)=%s AND age_horario=%s
+            """, (ser_id, data, horario_completo))
+            if cur.fetchone():
+                flash("Este horário já está ocupado.", "danger")
+                return redirect(url_for('estabelecimento.agendar',
+                                        ser_id=ser_id, data=data))
 
-        cur.execute("""
-            SELECT age_id FROM tb_agendamento 
-            WHERE age_data = %s AND age_horario = %s AND age_ser_id = %s
-        """, (data, horario, ser_id))
+            # Busca dados do serviço
+            cur.execute("""
+                SELECT ser_preco, ser_duracao, ser_est_id 
+                FROM tb_servico 
+                WHERE ser_id=%s
+            """, (ser_id,))
+            serv = cur.fetchone()
+            preco = serv['ser_preco']
+            duracao = serv['ser_duracao']
+            est_id = serv['ser_est_id']
 
-        if cur.fetchone():
-            flash('Este horário já foi reservado por outro cliente', 'danger')
-            return redirect(url_for('estabelecimento.agendar', ser_id=ser_id, data=data))
+            # Busca profissional
+            cur.execute("""
+                SELECT pro_id 
+                FROM tb_profissional 
+                WHERE pro_est_id=%s 
+                LIMIT 1
+            """, (est_id,))
+            prof = cur.fetchone()
+            pro_id = prof['pro_id'] if prof else None
 
-        cur.execute("""
-            INSERT INTO tb_agendamento 
-            (age_ser_id, age_cli_id, age_data, age_horario, age_dataCriacao)
-            VALUES (%s, %s, %s, %s, NOW())
-        """, (ser_id, current_user.id, data, horario))
+            # Insere agendamento
+            cur.execute("""
+                INSERT INTO tb_agendamento (
+                  age_ser_id, age_cli_id, age_data, age_horario,
+                  age_dataCriacao, age_valorTotal, age_quantidade,
+                  age_duracao, age_status, age_pro_id
+                ) VALUES (
+                  %s, %s, %s, %s,
+                  NOW(), %s, 1,
+                  %s, 'Agendado', %s
+                )
+            """, (ser_id, current_user.id, data, horario_completo,
+                  preco, duracao, pro_id))
 
         mysql.connection.commit()
-        flash('Agendamento confirmado com sucesso!', 'success')
-        return redirect(url_for('estabelecimento.meus_agendamentos'))
+        flash(f"Agendamento confirmado para {data} às {horario}.", "success")
 
     except Exception as e:
         mysql.connection.rollback()
-        flash(f'Erro ao confirmar agendamento: {str(e)}', 'danger')
-        return redirect(url_for('estabelecimento.agendar', ser_id=ser_id, data=data))
-    finally:
-        cur.close()
+        flash(f"Erro ao confirmar agendamento: {e}", "danger")
+
+    return redirect(url_for('estabelecimento.agendar', ser_id=ser_id, data=data))
 
 
 
-# @estabelecimento_bp.route('/adicionar_servico', methods=['POST'])
-# def adicionar_servico():
-#     if request.method == 'POST':
-#         servico_nome = request.form['servico_nome']
-#         servico_preco = request.form['servico_preco']
 
-#         # Verificar se o nome e o preço foram fornecidos
-#         if not servico_nome or not servico_preco:
-#             flash('Nome e preço do serviço são obrigatórios!', 'danger')
-#             return redirect(url_for('estabelecimento.adicionar_servico'))
 
-#         try:
-#             cur = mysql.connection.cursor()
 
-#             # Verificar se o estabelecimento do usuário está definido
-#             if not current_user.est_id:
-#                 flash('Estabelecimento não encontrado para o usuário.', 'danger')
-#                 return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
-
-#             # Inserir o serviço
-#             cur.execute(
-#                 "INSERT INTO tb_servico (ser_nome, ser_preco, ser_est_id) "
-#                 "VALUES (%s, %s, %s)",
-#                 (servico_nome, servico_preco, current_user.est_id)
-#             )
-#             mysql.connection.commit()
-#             flash('Serviço adicionado com sucesso!', 'success')
-#         except Exception as e:
-#             mysql.connection.rollback()
-#             flash(f'Erro ao adicionar serviço: {str(e)}', 'danger')
-#         finally:
-#             cur.close()
-
-#         return redirect(url_for('estabelecimento.dentro_estabelecimento'))
 
 
 
 @estabelecimento_bp.route('/cadastrar_estabelecimento', methods=['POST', 'GET'])
+@login_required
 def cadastrar_estabelecimento():
+    # Verifica se o usuário logado é profissional
+    if getattr(current_user, 'tipo_usuario', None) != 'profissional':
+        flash('Você precisa estar logado como profissional para cadastrar um estabelecimento.', 'danger')
+        return redirect(url_for('auth.login'))
+
+    pro_id = current_user.id  # pega o id do profissional logado
+
     if request.method == 'POST':
         try:
             required_fields = [
@@ -247,8 +263,6 @@ def cadastrar_estabelecimento():
                     flash(f'O campo {field} é obrigatório!', 'danger')
                     return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
 
-
-            # Coleta de dados com tratamento
             est_data = {
                 'nome': request.form['est_nome'].strip(),
                 'descricao': request.form['est_descricao'].strip(),
@@ -268,8 +282,6 @@ def cadastrar_estabelecimento():
                 'cep': ''.join(filter(str.isdigit, request.form['end_cep']))
             }
 
-
-            # Validações adicionais
             if len(est_data['cnpj']) != 14:
                 flash('CNPJ deve conter 14 dígitos', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
@@ -280,14 +292,10 @@ def cadastrar_estabelecimento():
 
             cur = mysql.connection.cursor()
 
-
-            # Verifica se CNPJ já existe
             cur.execute("SELECT est_id FROM tb_estabelecimento WHERE est_cnpj = %s", (est_data['cnpj'],))
             if cur.fetchone():
                 flash('CNPJ já cadastrado!', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
-
-
 
             # Insere estabelecimento
             cur.execute(
@@ -298,8 +306,6 @@ def cadastrar_estabelecimento():
                  est_data['email'], est_data['telefone'], est_data['cat_id'])
             )
             mysql.connection.commit()
-
-            # Obtém ID do novo estabelecimento
             est_id = cur.lastrowid
 
             # Insere endereço
@@ -310,6 +316,13 @@ def cadastrar_estabelecimento():
                 (end_data['numero'], end_data['complemento'], end_data['bairro'], 
                  end_data['rua'], end_data['cidade'], end_data['estado'], 
                  end_data['cep'], est_id)
+            )
+            mysql.connection.commit()
+
+            # Atualiza o profissional logado para referenciar o estabelecimento cadastrado
+            cur.execute(
+                "UPDATE tb_profissional SET pro_est_id = %s WHERE pro_id = %s",
+                (est_id, pro_id)
             )
             mysql.connection.commit()
 
@@ -326,7 +339,7 @@ def cadastrar_estabelecimento():
         finally:
             cur.close() if 'cur' in locals() else None
 
-    
+    # GET request: carregar form
     cur = mysql.connection.cursor()
     try:
         cur.execute("SELECT cat_id, cat_nome FROM tb_categoria")

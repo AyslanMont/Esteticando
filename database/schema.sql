@@ -130,4 +130,3 @@ INSERT INTO tb_categoria (cat_nome) VALUES
 ('Saúde'),
 ('Estética'),
 ('Bem-estar');
-

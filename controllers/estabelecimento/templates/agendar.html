@@ -10,9 +10,14 @@
   </div>
 
   <div class="informacoes">
-    <form method="get">
+    <form action="{{ url_for('estabelecimento.agendar', ser_id=ser_id) }}" method="post">
       <label for="informacoes-data">Selecione o dia:</label>
-      <input type="date" name="data" id="informacoes-data" required value="{{ data if data else '' }}" />
+      <input
+        type="date"
+        name="data"
+        id="informacoes-data"
+        value="{{ data if data else '' }}"
+      />
       <button type="submit" class="informacoes-button">Verificar</button>
     </form>
   </div>
@@ -29,10 +34,12 @@
       {% for h in agendamentos %}
       <li>
         <span class="horario">{{ h.hora }}</span>
-        <span class="status {{ 'disponivel' if h.status == 'Disponível' else 'indisponivel' }}">{{ h.status }}</span>
-        <span class="cliente">{{ h.cliente_nome if h.cliente_nome else '-' }}</span>
+        <span class="status {{ 'disponivel' if h.disponivel else 'indisponivel' }}">
+          {{ h.status }}
+        </span>
+        <span class="cliente">{{ h.cliente_nome or '-' }}</span>
         <span class="acao">
-          {% if h.status == 'Disponível' %}
+          {% if h.disponivel %}
           <form method="post" action="{{ url_for('estabelecimento.confirmar_agendamento') }}">
             <input type="hidden" name="data" value="{{ data }}">
             <input type="hidden" name="ser_id" value="{{ ser_id }}">

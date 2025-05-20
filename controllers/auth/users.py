@@ -36,9 +36,8 @@ def register():
             return redirect(url_for('auth.login'))
 
         return render_template('professional/register.html')
-    
 
-    #cliente
+    # cliente
     else:  
         if request.method == 'POST':
             username = request.form['nome']
@@ -149,12 +148,12 @@ def redefinir_senha(token):
 
     return render_template('redefinir_senha.html', token=token)
 
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     tipo_usuario = request.form.get("tipo_usuario")
 
     if tipo_usuario == "profissional":
-        tipo_usuario = request.form.get("tipo_usuario")
         if request.method == 'POST':
             email = request.form['email']
             password = request.form['password']
@@ -165,7 +164,12 @@ def login():
             cur.close()
 
             if user_data and check_password_hash(user_data['pro_senha'], password):
-                user = User(user_data['pro_id'], user_data['pro_nome'], user_data['pro_email'])
+                user = User(
+                    user_data['pro_id'], 
+                    user_data['pro_nome'], 
+                    user_data['pro_email'], 
+                    tipo_usuario='profissional'
+                )
                 login_user(user)
                 flash('Login realizado com sucesso!', 'success')
                 return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
@@ -175,13 +179,11 @@ def login():
 
         return render_template('professional/login.html')
     
-    #cliente
+    # cliente
     else:
         if request.method == 'POST':
-            tipo_usuario = request.form.get("tipo_usuario")
             email = request.form['email']
             password = request.form['password']
-
 
             cur = mysql.connection.cursor()
             cur.execute("SELECT cli_id, cli_nome, cli_email, cli_senha FROM tb_cliente WHERE cli_email = %s", (email,))
@@ -189,7 +191,12 @@ def login():
             cur.close()
 
             if user_data and check_password_hash(user_data['cli_senha'], password):
-                user = User(user_data['cli_id'], user_data['cli_nome'], user_data['cli_email'])
+                user = User(
+                    user_data['cli_id'], 
+                    user_data['cli_nome'], 
+                    user_data['cli_email'], 
+                    tipo_usuario='cliente'
+                )
                 login_user(user)
                 flash('Login realizado com sucesso!', 'success')
                 return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
