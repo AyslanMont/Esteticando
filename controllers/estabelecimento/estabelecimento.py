@@ -5,13 +5,9 @@ from datetime import datetime, date
 
 estabelecimento_bp = Blueprint('estabelecimento', __name__, url_prefix='/estabelecimento', template_folder='templates')
 
-
-
 @estabelecimento_bp.route('/')
 def estabelecimento():
     return render_template('estabelecimento.html')
-
-
 
 @estabelecimento_bp.route('/filtrar_estabelecimento', methods=['GET', 'POST'])
 def filtrar_estabelecimento():
@@ -75,9 +71,6 @@ def filtrar_estabelecimento():
     return render_template('filtrar_estabelecimento.html', result_est=result_est)
 
 
-
-
-
 @estabelecimento_bp.route('/estabelecimento/<int:est_id>/servicos')
 @login_required
 def perfil_estabelecimento(est_id):
@@ -98,8 +91,6 @@ def perfil_estabelecimento(est_id):
     data_atual = datetime.now().strftime('%Y-%m-%d') 
     
     return render_template('selecionar_servico.html', servicos=servicos, data=data_atual, est_id=est_id)
-
-
 
 HORARIOS_DISPONIVEIS = [
     "08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"
@@ -231,13 +222,6 @@ def confirmar_agendamento():
         flash(f"Erro ao confirmar agendamento: {e}", "danger")
 
     return redirect(url_for('estabelecimento.agendar', ser_id=ser_id, data=data))
-
-
-
-
-
-
-
 
 
 @estabelecimento_bp.route('/cadastrar_estabelecimento', methods=['POST', 'GET'])

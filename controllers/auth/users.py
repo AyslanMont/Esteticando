@@ -67,7 +67,6 @@ def register():
         return render_template('user/register.html')
 
 
-
 @auth_bp.route('/esqueci-senha', methods=['POST'])
 def esqueci_senha():
     email = request.form.get('email')
