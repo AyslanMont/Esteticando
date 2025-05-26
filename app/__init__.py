@@ -61,7 +61,6 @@ def load_user(user_id):
     
     return None
 
-
 @app.route('/')
 def index():
     return render_template("index.html")

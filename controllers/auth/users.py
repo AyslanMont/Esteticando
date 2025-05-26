@@ -6,65 +6,135 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Message
 from flask import current_app
 import secrets
+import re
 
 auth_bp = Blueprint('auth', __name__, url_prefix="/auth")
 
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    tipo_usuario = request.form.get("tipo_usuario")
+    if request.method == 'POST':
+        tipo_usuario = request.form.get("tipo_usuario")
 
-    if tipo_usuario == "profissional":
-        if request.method == 'POST':
+        # Validação do tipo de usuário
+        if not tipo_usuario or tipo_usuario not in ['cliente', 'profissional']:
+            flash('Você precisa selecionar se é cliente ou profissional.', 'danger')
+            return redirect(url_for('auth.register'))
+
+        # Validação do checkbox de termos de uso
+        termos_aceitos = request.form.get("termos")
+        if not termos_aceitos:
+            flash('Você precisa aceitar os termos de uso para se cadastrar.', 'danger')
+            return redirect(url_for('auth.register'))
+
+        nome = request.form['nome']
+        email = request.form['email']
+        senha = request.form['password']
+        cpf_raw = request.form['cpf']
+        telefone = request.form['telefone']
+
+        # Limpeza e validação de CPF e telefone
+        cpf_limpo = re.sub(r'\D', '', cpf_raw)  # só números
+        telefone_limpo = re.sub(r'\D', '', telefone)
+
+        if not cpf_limpo.isdigit() or len(cpf_limpo) != 11:
+            flash('CPF inválido! Verifique e tente novamente.', 'danger')
+            return redirect(url_for('auth.register'))
+
+        if not telefone_limpo.isdigit() or len(telefone_limpo) < 10:
+            flash('Telefone inválido! Verifique e tente novamente.', 'danger')
+            return redirect(url_for('auth.register'))
+
+        cur = mysql.connection.cursor()
+
+        if tipo_usuario == "profissional":
             nome = request.form['nome']
             email = request.form['email']
             senha = request.form['password']
-            cpf = request.form['cpf']
+            cpf_raw = request.form['cpf']
             telefone = request.form['telefone']
+
+            # Limpeza e validação de CPF e telefone
+            cpf_limpo = re.sub(r'\D', '', cpf_raw)  # só números
+            telefone_limpo = re.sub(r'\D', '', telefone)
+
+            if not cpf_limpo.isdigit() or len(cpf_limpo) != 11:
+                flash('CPF inválido! Verifique e tente novamente.', 'danger')
+                return redirect(url_for('auth.register'))
+
+            if not telefone_limpo.isdigit() or len(telefone_limpo) < 10:
+                flash('Telefone inválido! Verifique e tente novamente.', 'danger')
+                return redirect(url_for('auth.register'))
+            
+            # Verifica se CPF já cadastrado
+            cur.execute("SELECT pro_id FROM tb_profissional WHERE pro_cpf = %s", (cpf_limpo,))
+            if cur.fetchone():
+                flash('CPF já cadastrado!', 'danger')
+                cur.close()
+                return redirect(url_for('auth.register'))
 
             hashed_password = generate_password_hash(senha)
 
-            cur = mysql.connection.cursor()
             cur.execute("""
                 INSERT INTO tb_profissional (pro_dataCriacao, pro_nome, pro_email, pro_senha, pro_cpf, pro_telefone) 
                 VALUES (CURDATE(), %s, %s, %s, %s, %s)
-            """, (nome, email, hashed_password, cpf, telefone))
+            """, (nome, email, hashed_password, cpf_limpo, telefone_limpo))
+
             mysql.connection.commit()
             cur.close()
 
             flash('Profissional cadastrado com sucesso!', 'success')
             return redirect(url_for('auth.login'))
 
-        return render_template('professional/register.html')
-
-    # cliente
-    else:  
-        if request.method == 'POST':
-            username = request.form['nome']
+        else:  # cliente
+            nome = request.form['nome']
             email = request.form['email']
-            password = request.form['password']
-            cpf = request.form['cpf']
+            senha = request.form['password']
+            cpf_raw = request.form['cpf']
             telefone = request.form['telefone']
 
-            cur = mysql.connection.cursor()
+            # Limpeza e validação de CPF e telefone
+            cpf_limpo = re.sub(r'\D', '', cpf_raw)  # só números
+            telefone_limpo = re.sub(r'\D', '', telefone)
+
+            if not cpf_limpo.isdigit() or len(cpf_limpo) != 11:
+                flash('CPF inválido! Verifique e tente novamente.', 'danger')
+                return redirect(url_for('auth.register'))
+
+            if not telefone_limpo.isdigit() or len(telefone_limpo) < 10:
+                flash('Telefone inválido! Verifique e tente novamente.', 'danger')
+                return redirect(url_for('auth.register'))
+            
+
+            # Verifica se email já cadastrado
             cur.execute("SELECT cli_id FROM tb_cliente WHERE cli_email = %s", (email,))
             if cur.fetchone():
                 flash('E-mail já cadastrado!', 'danger')
+                cur.close()
                 return redirect(url_for('auth.register'))
-            
-            hashed_password = generate_password_hash(password)
+
+            # Verifica se CPF já cadastrado
+            cur.execute("SELECT cli_id FROM tb_cliente WHERE cli_cpf = %s", (cpf_limpo,))
+            if cur.fetchone():
+                flash('CPF já cadastrado!', 'danger')
+                cur.close()
+                return redirect(url_for('auth.register'))
+
+            hashed_password = generate_password_hash(senha)
 
             cur.execute("""
                 INSERT INTO tb_cliente (cli_nome, cli_email, cli_senha, cli_cpf, cli_telefone, cli_dataCriacao) 
                 VALUES (%s, %s, %s, %s, %s, NOW())
-            """, (username, email, hashed_password, cpf, telefone))
+            """, (nome, email, hashed_password, cpf_limpo, telefone_limpo))
+
             mysql.connection.commit()
             cur.close()
 
             flash('Cadastro realizado com sucesso!', 'success')
             return redirect(url_for('auth.login'))
 
-        return render_template('user/register.html')
+    return render_template('user/register.html')
+
 
 
 

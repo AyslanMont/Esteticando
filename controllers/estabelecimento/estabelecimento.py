@@ -15,6 +15,7 @@ def estabelecimento():
 
 @estabelecimento_bp.route('/filtrar_estabelecimento', methods=['GET', 'POST'])
 def filtrar_estabelecimento():
+
     result_est = []
     
     if request.method == 'POST':
@@ -110,7 +111,6 @@ HORARIOS_DISPONIVEIS = [
 #segunda rota serve para carregar a lista de horários já filtrada pela data selecionada
 @estabelecimento_bp.route('/agendar/<int:ser_id>/<data>', methods=['GET', 'POST'])
 
-#aqui ele esta apenas registrando os nomes de CLIENTES não esta de PROFISSIONAIS
 def agendar(ser_id, data=None):
     if request.method == 'POST':
         selected_date = request.form.get('data')
@@ -124,33 +124,40 @@ def agendar(ser_id, data=None):
 
     with mysql.connection.cursor() as cur:
         cur.execute("""
-            SELECT TIME_FORMAT(age_horario, '%%H:%%i') AS horario, cli_nome
+            SELECT age_id, TIME_FORMAT(age_horario, '%%H:%%i') AS horario, cli_nome, age_cli_id
             FROM tb_agendamento
             JOIN tb_cliente ON age_cli_id = cli_id
             WHERE DATE(age_data) = %s AND age_ser_id = %s
         """, (data, ser_id))
         resultados = cur.fetchall()
 
-    # Normaliza cada linha em dict {'horario': ..., 'cli_nome': ...}
-    flat = []
+    ocupados = {}
     for row in resultados:
         if isinstance(row, dict):
-            flat.append(row)
-        elif isinstance(row, tuple) and len(row) == 1 and isinstance(row[0], dict):
-            flat.append(row[0])
+            horario = row['horario']
+            ocupados[horario] = {
+                'cliente_nome': row['cli_nome'],
+                'cli_id': row['age_cli_id'],
+                'age_id': row['age_id']
+            }
         else:
-            horario, nome = row
-            flat.append({'horario': horario, 'cli_nome': nome})
-
-    ocupados = {r['horario']: r['cli_nome'] for r in flat}
+            horario, nome, cli_id, age_id = row
+            ocupados[horario] = {
+                'cliente_nome': nome,
+                'cli_id': cli_id,
+                'age_id': age_id
+            }
 
     agendamentos = []
     for hora in HORARIOS_DISPONIVEIS:
+        ocupado = ocupados.get(hora)
         agendamentos.append({
             'hora': hora,
-            'status': 'Indisponível' if hora in ocupados else 'Disponível',
-            'cliente_nome': ocupados.get(hora),
-            'disponivel': hora not in ocupados
+            'status': 'Indisponível' if ocupado else 'Disponível',
+            'cliente_nome': ocupado['cliente_nome'] if ocupado else None,
+            'disponivel': not ocupado,
+            'proprio_agendamento': ocupado and ocupado['cli_id'] == current_user.id,
+            'agendamento_id': ocupado['age_id'] if ocupado else None
         })
 
     return render_template('agendar.html',
@@ -232,6 +239,32 @@ def confirmar_agendamento():
 
     return redirect(url_for('estabelecimento.agendar', ser_id=ser_id, data=data))
 
+
+@estabelecimento_bp.route('/cancelar_agendamento', methods=['POST'])
+@login_required
+def cancelar_agendamento():
+    form = request.form.to_dict()
+    agendamento_id = form.get('agendamento_id')
+
+    if not agendamento_id:
+        flash("ID de agendamento inválido.", "danger")
+        return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
+
+    try:
+        with mysql.connection.cursor() as cur:
+            cur.execute("""
+                DELETE FROM tb_agendamento 
+                WHERE age_id=%s AND age_cli_id=%s
+            """, (agendamento_id, current_user.id))
+            mysql.connection.commit()
+
+        flash("Agendamento cancelado com sucesso.", "success")
+
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f"Erro ao cancelar agendamento: {e}", "danger")
+
+    return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
 
 
 

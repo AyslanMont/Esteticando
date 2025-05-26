@@ -46,8 +46,13 @@
             <input type="hidden" name="horario" value="{{ h.hora }}">
             <button type="submit">Confirmar</button>
           </form>
+          {% elif h.proprio_agendamento %}
+          <form method="post" action="{{ url_for('estabelecimento.cancelar_agendamento') }}">
+            <input type="hidden" name="agendamento_id" value="{{ h.agendamento_id }}">
+            <button type="submit" class="cancelar">Cancelar</button>
+          </form>
           {% else %}
-          <button disabled>Confirmar</button>
+          <button disabled>Confirmado</button>
           {% endif %}
         </span>
       </li>

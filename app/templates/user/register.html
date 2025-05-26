@@ -12,24 +12,27 @@
         <label for="register-email" id="label-login">Email</label>
         <input type="email" name="email" id="register-email" placeholder="Email" required />
         <label for="register-cpf" id="label-login">CPF</label>
-        <input type="text" name="cpf" id="register-cpf" placeholder="CPF" required />
+        <input type="text" name="cpf" id="register-cpf"   required   maxlength="11" pattern="\d{11}" title="Digite 11 números para o CPF"placeholder="CPF" />
+
         <label for="register-telefone" id="label-login">Telefone</label>
-        <input type="text" name="telefone" id="register-telefone" placeholder="Telefone" required />
+        <input type="text" name="telefone" id="register-telefone" placeholder="Telefone" required maxlength="15" pattern="\d{15}"
+        title="Digite um telefone válido com 10 ou 11 dígitos"/>
+
         <label for="register-senha" id="label-login">Senha</label>
         <input type="password" name="password" id="register-senha" placeholder="Senha" required />
         <div class="select-servico">
           <select name="tipo_usuario" id="tipo_usuario" required>
-            <option value="">Selecione um serviço</option>
+            <option value="" disabled selected>Selecione um serviço</option>
             <option value="cliente">Sou Cliente</option>
             <option value="profissional">Sou um Profissional</option>
-          </select>
+          </select>          
         </div>
         <div class="termos">
-          <label for="register-termos" id="label-login"
-            >Eu li e concordo com os termos de uso</label
-          >
-          <input type="checkbox" id="register-termos"/>
-        </div>
+          <label for="register-termos" id="label-login">
+            Eu li e concordo com os termos de uso
+          </label>
+          <input type="checkbox" id="register-termos" name="termos" required />
+        </div>        
         <button>Avançar</button>
       </form>
     </div>
