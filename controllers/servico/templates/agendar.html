@@ -10,7 +10,7 @@
   </div>
 
   <div class="informacoes">
-    <form action="{{ url_for('estabelecimento.agendar', ser_id=ser_id) }}" method="post">
+    <form action="{{ url_for('servico.agendar', ser_id=ser_id) }}" method="post">
       <label for="informacoes-data">Selecione o dia:</label>
       <input
         type="date"
@@ -40,14 +40,14 @@
         <span class="cliente">{{ h.cliente_nome or '-' }}</span>
         <span class="acao">
           {% if h.disponivel %}
-          <form method="post" action="{{ url_for('estabelecimento.confirmar_agendamento') }}">
+          <form method="post" action="{{ url_for('servico.confirmar_agendamento') }}">
             <input type="hidden" name="data" value="{{ data }}">
             <input type="hidden" name="ser_id" value="{{ ser_id }}">
             <input type="hidden" name="horario" value="{{ h.hora }}">
             <button type="submit">Confirmar</button>
           </form>
           {% elif h.proprio_agendamento %}
-          <form method="post" action="{{ url_for('estabelecimento.cancelar_agendamento') }}">
+          <form method="post" action="{{ url_for('servico.cancelar_agendamento') }}">
             <input type="hidden" name="agendamento_id" value="{{ h.agendamento_id }}">
             <button type="submit" class="cancelar">Cancelar</button>
           </form>

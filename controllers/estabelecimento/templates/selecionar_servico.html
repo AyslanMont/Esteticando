@@ -40,7 +40,7 @@
         <input type="radio" />
         <input type="radio" />
       </div>
-      <button><a href="{{ url_for('estabelecimento.agendar', ser_id=servico.ser_id, data=data) }}">Agendar</a></button>
+      <button><a href="{{ url_for('servico.agendar', ser_id=servico.ser_id, data=data) }}">Agendar</a></button>
 
     </div>
     {% endfor %}
