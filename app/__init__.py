@@ -9,6 +9,7 @@ from esteticando.controllers.auth.users import auth_bp
 from esteticando.controllers.estabelecimento.estabelecimento import estabelecimento_bp
 from esteticando.controllers.profissional.profissional import profissional_bp
 from esteticando.controllers.servico.cli_est import cli_est_bp
+from esteticando.controllers.servico.agendamento import servico_bp
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'sua-chave-secreta-aqui'
@@ -31,6 +32,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(estabelecimento_bp)
 app.register_blueprint(profissional_bp)
 app.register_blueprint(cli_est_bp)
+app.register_blueprint(servico_bp)
 
 
 @login_manager.user_loader
