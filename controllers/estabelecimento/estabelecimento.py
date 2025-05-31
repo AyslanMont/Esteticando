@@ -182,9 +182,16 @@ def confirmar_agendamento():
 
     ser_id = int(ser_id)
     horario_completo = horario + ":00"
-
     try:
         with mysql.connection.cursor() as cur:
+            cur.execute("""
+                SELECT COUNT(*) AS total
+                FROM tb_agendamento WHERE age_cli_id= %s AND DATE (age_data) = %s """, (current_user.id, data))
+            res = cur.fetchone()
+            if res['total'] >= 2:
+                flash("Você já possui 2 agendamentos para este dia.", "danger")
+                return redirect(url_for('estabelecimento.agendar', ser_id=ser_id, data=data))            
+
             # Checa conflito
             cur.execute("""
                 SELECT 1 FROM tb_agendamento
