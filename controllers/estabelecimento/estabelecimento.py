@@ -79,10 +79,12 @@ def filtrar_estabelecimento():
 
 
 
-@estabelecimento_bp.route('/estabelecimento/<int:est_id>/servicos')
+@estabelecimento_bp.route('/estabelecimento/<int:est_id>')
 @login_required
 def perfil_estabelecimento(est_id):
     cur = mysql.connection.cursor()
+    
+    # Busca serviços do estabelecimento
     query_servicos = """
         SELECT est_nome, ser_nome, ser_preco, ser_id 
         FROM tb_estabelecimento 
@@ -91,16 +93,32 @@ def perfil_estabelecimento(est_id):
     """
     cur.execute(query_servicos, (est_id,))
     servicos = cur.fetchall()
+
+    # Busca o profissional dono do estabelecimento
+    cur.execute("SELECT pro_id FROM tb_profissional WHERE pro_est_id = %s LIMIT 1", (est_id,))
+    profissional = cur.fetchone()
     cur.close()
-    # Verifica se não há serviços
+
+    pro_id = profissional['pro_id'] if profissional else None
+
+    # Verifica se o usuário atual é o dono do estabelecimento
+    dono = current_user.is_authenticated and (current_user.id == pro_id)
+
     if not servicos:
-        return render_template('selecionar_servico.html', servicos=servicos, est_id=est_id, mensagem="Esse estabelecimento não tem serviços disponíveis.")
+        if dono:
+            # Redireciona para cadastrar serviço, passando o est_id para linkar serviço ao estabelecimento
+            return redirect(url_for('servico.adicionar_servico', est_id=est_id))
+        else:
+            # Se não for o dono, mostra mensagem informando que não há serviços
+            return render_template('sem_servicos.html', est_id=est_id, mensagem="Esse estabelecimento não tem serviços disponíveis.")
 
-    data_atual = datetime.now().strftime('%Y-%m-%d') 
-    
-    return render_template('selecionar_servico.html', servicos=servicos, data=data_atual, est_id=est_id)
+    data_atual = datetime.now().strftime('%Y-%m-%d')
 
-
+    return render_template('selecionar_servico.html',
+                           servicos=servicos,
+                           data=data_atual,
+                           est_id=est_id,
+                           pro_id=pro_id)
 
 
 
@@ -190,8 +208,10 @@ def cadastrar_estabelecimento():
             )
             mysql.connection.commit()
 
-            flash('Estabelecimento cadastrado com sucesso!', 'success')
-            return redirect(url_for('estabelecimento.filtrar_estabelecimento', est_id=est_id))
+            flash("Estabelecimento cadastrado com sucesso! Agora você pode adicionar serviços.", "success")
+            return redirect(url_for('servico.adicionar_servico', est_id=est_id))
+
+
 
         except ValueError as e:
             flash('Dados inválidos fornecidos!', 'danger')

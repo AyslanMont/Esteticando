@@ -18,6 +18,21 @@ CREATE TABLE IF NOT EXISTS tb_categoria (
   cat_nome VARCHAR(100) NOT NULL
 );
 
+
+CREATE TABLE IF NOT EXISTS tb_profissional (
+  pro_id INT AUTO_INCREMENT PRIMARY KEY,
+  pro_dataCriacao DATE NOT NULL,
+  pro_nome VARCHAR(100) NOT NULL,
+  pro_email VARCHAR(100) NOT NULL,
+  pro_senha VARCHAR(255) NOT NULL,
+  pro_cpf CHAR(11) NOT NULL,
+  pro_telefone VARCHAR(15) NOT NULL,
+  pro_est_id INT DEFAULT NULL,
+  pro_cat_id INT DEFAULT NULL,
+  -- NÃO adiciona FK pro_est_id ainda (circular)
+  FOREIGN KEY (pro_cat_id) REFERENCES tb_categoria(cat_id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS tb_estabelecimento (
   est_id INT AUTO_INCREMENT PRIMARY KEY,
   est_dataCriacao DATE NOT NULL,
@@ -27,7 +42,9 @@ CREATE TABLE IF NOT EXISTS tb_estabelecimento (
   est_email VARCHAR(100) NOT NULL,
   est_telefone VARCHAR(15) NOT NULL,
   est_cat_id INT NOT NULL,
+  est_dono_id INT DEFAULT NULL,
   FOREIGN KEY (est_cat_id) REFERENCES tb_categoria (cat_id) ON DELETE CASCADE
+  -- NÃO adiciona FK est_dono_id ainda (circular)
 );
 
 CREATE TABLE IF NOT EXISTS tb_endereco_estabelecimento (
@@ -43,19 +60,6 @@ CREATE TABLE IF NOT EXISTS tb_endereco_estabelecimento (
   FOREIGN KEY (end_est_id) REFERENCES tb_estabelecimento(est_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS tb_profissional (
-  pro_id INT AUTO_INCREMENT PRIMARY KEY,
-  pro_dataCriacao DATE NOT NULL,
-  pro_nome VARCHAR(100) NOT NULL,
-  pro_email VARCHAR(100) NOT NULL,
-  pro_senha VARCHAR(255) NOT NULL,
-  pro_cpf CHAR(11) NOT NULL,
-  pro_telefone VARCHAR(15) NOT NULL,
-  pro_est_id INT DEFAULT NULL,
-  pro_cat_id INT DEFAULT NULL,
-  FOREIGN KEY (pro_est_id) REFERENCES tb_estabelecimento(est_id) ON DELETE CASCADE,
-  FOREIGN KEY (pro_cat_id) REFERENCES tb_categoria(cat_id) ON DELETE CASCADE
-);
 
 CREATE TABLE IF NOT EXISTS tb_servico (
   ser_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -122,6 +126,13 @@ CREATE TABLE tb_tokens_redefinicao (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE tb_estabelecimento
+ADD CONSTRAINT fk_est_dono
+FOREIGN KEY (est_dono_id) REFERENCES tb_profissional(pro_id) ON DELETE SET NULL;
+
+ALTER TABLE tb_profissional
+ADD CONSTRAINT fk_pro_est
+FOREIGN KEY (pro_est_id) REFERENCES tb_estabelecimento(est_id) ON DELETE SET NULL;
 
 
 -- Inserir categorias

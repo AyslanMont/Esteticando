@@ -5,23 +5,23 @@ from datetime import datetime, date
 
 
 
-servico_bp = Blueprint('servico', __name__, url_prefix='/servico')
+agendamento_bp = Blueprint('agendamento', __name__, url_prefix='/agendamento')
 
 HORARIOS_DISPONIVEIS = [
     "08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"
 ]
 
 # rota para carregar a página sem data
-@servico_bp.route('/agendar/<int:ser_id>', methods=['GET', 'POST'])
+@agendamento_bp.route('/agendar/<int:ser_id>', methods=['GET', 'POST'])
 # rota para carregar horários filtrados por data
-@servico_bp.route('/agendar/<int:ser_id>/<data>', methods=['GET', 'POST'])
+@agendamento_bp.route('/agendar/<int:ser_id>/<data>', methods=['GET', 'POST'])
 def agendar(ser_id, data=None):
     if request.method == 'POST':
         selected_date = request.form.get('data')
         if not selected_date:
             flash("Selecione uma data válida.", "warning")
-            return redirect(url_for('servico.agendar', ser_id=ser_id))
-        return redirect(url_for('servico.agendar', ser_id=ser_id, data=selected_date))
+            return redirect(url_for('agendamento.agendar', ser_id=ser_id))
+        return redirect(url_for('agendamento.agendar', ser_id=ser_id, data=selected_date))
 
     if not data:
         data = date.today().isoformat()
@@ -70,7 +70,7 @@ def agendar(ser_id, data=None):
                            agendamentos=agendamentos)
 
 
-@servico_bp.route('/confirmar_agendamento', methods=['POST'])
+@agendamento_bp.route('/confirmar_agendamento', methods=['POST'])
 @login_required
 def confirmar_agendamento():
     form = request.form.to_dict()
@@ -80,7 +80,7 @@ def confirmar_agendamento():
 
     if not ser_id or not data or not horario:
         flash("Dados insuficientes.", "danger")
-        return redirect(url_for('servico.agendar',
+        return redirect(url_for('agendamento.agendar',
                                 ser_id=int(ser_id) if ser_id else 0,
                                 data=data or date.today().isoformat()))
 
@@ -95,7 +95,7 @@ def confirmar_agendamento():
             res = cur.fetchone()
             if res['total'] >= 2:
                 flash("Você já possui 2 agendamentos para este dia.", "danger")
-                return redirect(url_for('servico.agendar', ser_id=ser_id, data=data))            
+                return redirect(url_for('agendamento.agendar', ser_id=ser_id, data=data))            
 
             # Checa conflito
             cur.execute("""
@@ -104,7 +104,7 @@ def confirmar_agendamento():
             """, (ser_id, data, horario_completo))
             if cur.fetchone():
                 flash("Este horário já está ocupado.", "danger")
-                return redirect(url_for('servico.agendar',
+                return redirect(url_for('agendamento.agendar',
                                         ser_id=ser_id, data=data))
 
             # Busca dados do serviço
@@ -149,10 +149,10 @@ def confirmar_agendamento():
         mysql.connection.rollback()
         flash(f"Erro ao confirmar agendamento: {e}", "danger")
 
-    return redirect(url_for('servico.agendar', ser_id=ser_id, data=data))
+    return redirect(url_for('agendamento.agendar', ser_id=ser_id, data=data))
 
 
-@servico_bp.route('/cancelar_agendamento', methods=['POST'])
+@agendamento_bp.route('/cancelar_agendamento', methods=['POST'])
 @login_required
 def cancelar_agendamento():
     form = request.form.to_dict()
