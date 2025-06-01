@@ -24,6 +24,7 @@
     <header class="navbar">
       <menu>
         <img src="{{ url_for('static', filename='imgs/favicon.png') }}" alt="logo barbearia" id="img-navbar" />
+        <a href="{{url_for('estabelecimento.cadastrar_estabelecimento')}}">cadastrar</a>
         <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Página Inicial</a>
         <a href="#">Sobre</a>
         <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Serviços</a>

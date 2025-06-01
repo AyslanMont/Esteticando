@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS tb_estabelecimento (
   est_cnpj CHAR(14) NOT NULL,
   est_email VARCHAR(100) NOT NULL,
   est_telefone VARCHAR(15) NOT NULL,
+  est_imagem LONGBLOB,
   est_cat_id INT NOT NULL,
   est_dono_id INT DEFAULT NULL,
   FOREIGN KEY (est_cat_id) REFERENCES tb_categoria (cat_id) ON DELETE CASCADE

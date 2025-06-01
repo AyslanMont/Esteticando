@@ -1,0 +1,25 @@
+<!-- templates/perfil_profissional.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Editar Perfil</title>
+</head>
+<body>
+    <h1>Editar Perfil Profissional</h1>
+
+    <form method="POST" action="{{ url_for('profissional.editar_perfil') }}">
+        <label for="nome">Nome:</label><br />
+        <input type="text" id="nome" name="nome" /><br /><br />
+
+        <label for="senha">Senha:</label><br />
+        <input type="password" id="senha" name="senha"/><br /><br />
+
+        <label for="telefone">Telefone:</label><br />
+        <input type="text" id="telefone" name="telefone"/><br /><br />
+
+        <button type="submit">Salvar</button>
+    </form>
+</body>
+</html>

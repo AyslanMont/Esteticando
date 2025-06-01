@@ -10,7 +10,6 @@ import re
 
 auth_bp = Blueprint('auth', __name__, url_prefix="/auth")
 
-
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -135,9 +134,6 @@ def register():
 
     return render_template('user/register.html')
 
-
-
-
 @auth_bp.route('/esqueci-senha', methods=['POST'])
 def esqueci_senha():
     email = request.form.get('email')
@@ -247,7 +243,7 @@ def login():
                 flash('E-mail ou senha incorretos', 'danger')
                 print("Senha incorreta ou e-mail não encontrado")
 
-        return render_template('professional/login.html')
+        return render_template('user/login.html')
     
     # cliente
     else:

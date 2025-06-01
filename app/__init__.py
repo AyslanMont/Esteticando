@@ -37,8 +37,6 @@ app.register_blueprint(cli_est_bp, url_prefix='/cli_est')
 app.register_blueprint(agendamento_bp, url_prefix='/agendamento')
 app.register_blueprint(servico_bp, url_prefix='/servico')
 
-
-
 @login_manager.user_loader
 def load_user(user_id):
     cur = mysql.connection.cursor()

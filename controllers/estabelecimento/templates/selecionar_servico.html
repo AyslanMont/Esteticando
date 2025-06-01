@@ -1,50 +1,59 @@
 {% extends "base.html" %}
 
 {% block links %}
-<link rel="stylesheet" href="{{ url_for('static', filename='styles/selecionar_servico.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/selecionar_servico.css') }}">
 {% endblock %}
 
 {% block content %}
-
-
-
-<main>
-  <div class="estabelecimento">
-    {% if servicos %}
-    <img src="{{ url_for('static', filename='imgs/logo.jpg') }}" alt="" />
-    <h1>{{ servicos[0].est_nome }}</h1>
-    <div class="rating">
-      <input type="radio" />
-      <input type="radio" />
-      <input type="radio" />
-      <input type="radio" />
-      <input type="radio" />
-    </div>
+<main class="container">
+  <section class="estabelecimento-header">
+    {% if imagem_base64 %}
+    <img src="data:image/jpeg;base64,{{ imagem_base64 }}" 
+         alt="{{ est_nome }}" 
+         class="estabelecimento-logo">
     {% else %}
-      <p>{{ mensagem }}</p>
+    <img src="{{ url_for('static', filename='imgs/default-establishment.jpg') }}" 
+         alt="Imagem padrão" 
+         class="estabelecimento-logo">
     {% endif %}
-  </div>
-  
-
-  <div class="servicos">
-    {% for servico in servicos %}
-    <div class="servico">
-      <div class="corte">
-        <h3>{{ servico.ser_nome }}</h3>
-        <p>Valor: {{ servico.ser_preco }} R$</p>
-      </div>
+    
+    <div class="estabelecimento-info">
+      <h1>{{ est_nome }}</h1>
+      {% if est_descricao %}
+      <p class="estabelecimento-descricao">{{ est_descricao }}</p>
+      {% endif %}
+      
       <div class="rating">
-        <input type="radio" />
-        <input type="radio" />
-        <input type="radio" />
-        <input type="radio" />
-        <input type="radio" />
+        <!-- Sistema de avaliação -->
+        {% for i in range(5) %}
+        <span class="star">★</span>
+        {% endfor %}
+        <span class="rating-text">4.8 (128 avaliações)</span>
       </div>
-      <button><a href="{{ url_for('agendamento.agendar', ser_id=servico.ser_id, data=data) }}">Agendar</a></button>
+    </div>
+  </section>
 
-
+  {% if servicos %}
+  <section class="servicos-list">
+    <h2>Serviços Disponíveis</h2>
+    
+    {% for servico in servicos %}
+    <div class="servico-card">
+      <div class="servico-info">
+        <h3>{{ servico.ser_nome }}</h3>
+        <p class="servico-preco">R$ {{ "%.2f"|format(servico.ser_preco) }}</p>
+        <p class="servico-duracao">{{ servico.ser_duracao }} minutos</p>
+      </div>
+      
+      <div class="servico-actions">
+        <a href="{{ url_for('agendamento.agendar', ser_id=servico.ser_id, data=data) }}" 
+           class="btn-agendar">
+          Agendar
+        </a>
+      </div>
     </div>
     {% endfor %}
-  </div>
+  </section>
+  {% endif %}
 </main>
 {% endblock %}
