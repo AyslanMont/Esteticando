@@ -4,26 +4,37 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Esteticando</title>
-    <link rel="stylesheet" href="../static/styles/normalize.css" />
-    <link rel="stylesheet" href="../static/styles/base_notlogged.css" />
+
+    <!-- CSS base -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/normalize.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/base_notlogged.css') }}" />
+
+    <!-- Ícone -->
     <link
       rel="shortcut icon"
-      href="../static/imgs/favicon.png"
+      href="{{ url_for('static', filename='imgs/favicon.png') }}"
       type="image/x-icon"
     />
+
+    <!-- Fontes Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Comfortaa:wght@300..700&display=swap"
       rel="stylesheet"
     />
-    {% block links %} {% endblock %}
+    
+    <!-- Flash -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/flash.css') }}">
+
+    {% block links %}{% endblock %}
+  
   </head>
   <body>
     <header class="navbar">
       <menu>
         <img
-          src="../static/imgs/favicon.png"
+          src="{{ url_for('static', filename='imgs/favicon.png') }}"
           alt="logo barbearia"
           id="img-navbar"
         />
@@ -32,10 +43,42 @@
         <a href="#">Serviços</a>
         <a href="#">Contato</a>
         <div id="btn-navbar">
-          <button class="btn-navbar">Sair</button>
+          <a href="{{ url_for('auth.logout') }}">
+            <button class="btn-navbar">Sair</button>
+          </a>
         </div>
       </menu>
     </header>
-    {% block content %} {% endblock %}
+
+    <!-- Bloco para mensagens flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    <script>
+      setTimeout(() => {
+      document.querySelectorAll('.alert').forEach(alert => {
+        alert.classList.add('fade-out'); 
+        setTimeout(() => {
+          alert.style.display = 'none';
+        }, 400);
+      });
+    }, 2000);
+    </script>
+    
+    <script>
+       window.onload = function() {
+        window.scrollTo(0, 0);
+      }
+    </script>
+
   </body>
 </html>
