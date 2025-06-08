@@ -2,16 +2,13 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required,current_user
 from esteticando.database.database import mysql
 from datetime import datetime, date
+import re
 
 estabelecimento_bp = Blueprint('estabelecimento', __name__, url_prefix='/estabelecimento', template_folder='templates')
-
-
 
 @estabelecimento_bp.route('/')
 def estabelecimento():
     return render_template('estabelecimento.html')
-
-
 
 @estabelecimento_bp.route('/filtrar_estabelecimento', methods=['GET', 'POST'])
 def filtrar_estabelecimento():
@@ -295,3 +292,111 @@ def cadastrar_estabelecimento():
     finally:
         if cur is not None:  # Verifica se o cursor existe antes de tentar fechar
             cur.close()
+
+@estabelecimento_bp.route('/editar_estabelecimento', methods=['GET', 'POST'])
+@login_required
+def editar_estabelecimento():
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT pro_est_id FROM tb_profissional 
+        WHERE pro_id = %s AND pro_est_id IS NOT NULL
+    """, (current_user.id,))
+    resultado = cur.fetchone()
+    
+    if not resultado:
+        flash('Você não é dono de nenhum estabelecimento', 'danger')
+        return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
+    
+    est_id = resultado['pro_est_id']
+
+    if request.method == 'POST':
+        try:
+            # Pegar dados atuais - Correção: incluir e.est_id na consulta
+            cur.execute("""
+            SELECT est_id, est_nome, est_descricao, est_email, est_telefone,
+            end_id, end_numero, end_complemento, end_bairro, 
+            end_rua, end_cidade, end_estado, end_cep
+            FROM tb_estabelecimento
+            JOIN tb_endereco_estabelecimento ON tb_estabelecimento.est_id = tb_endereco_estabelecimento.end_est_id
+            WHERE tb_estabelecimento.est_id = %s
+            """, (est_id,))
+            dados_atuais = cur.fetchone()
+
+ # Processar dados do formulário
+            est_nome = request.form.get('est_nome', dados_atuais['est_nome'])
+            est_descricao = request.form.get('est_descricao', dados_atuais['est_descricao'])
+            est_email = request.form.get('est_email', dados_atuais['est_email'])
+            est_telefone = request.form.get('est_telefone', dados_atuais['est_telefone'])
+            
+            
+            # Validar email
+            if not re.match(r'^[^@]+@[^@]+\.[^@]+$', est_email):
+                flash('Formato de email inválido', 'danger')
+                return redirect(url_for('estabelecimento.editar_estabelecimento'))
+
+            # Validar telefone
+            if not re.match(r'^\(\d{2}\) \d{4,5}-\d{4}$', est_telefone):
+                flash('Formato de telefone inválido. Use (XX) XXXX-XXXX ou (XX) XXXXX-XXXX', 'danger')
+                return redirect(url_for('estabelecimento.editar_estabelecimento'))
+
+            # Atualizar estabelecimento
+            cur.execute("""
+                UPDATE tb_estabelecimento 
+                SET est_nome = %s, est_descricao = %s, est_email = %s, est_telefone = %s
+                WHERE est_id = %s
+            """, (est_nome, est_descricao, est_email, est_telefone, est_id))
+
+                
+            # Processar dados do endereço
+            end_numero = request.form.get('end_numero', dados_atuais['end_numero'])
+            end_complemento = request.form.get('end_complemento', dados_atuais['end_complemento'] or '')
+            end_bairro = request.form.get('end_bairro', dados_atuais['end_bairro'])
+            end_rua = request.form.get('end_rua', dados_atuais['end_rua'])
+            end_cidade = request.form.get('end_cidade', dados_atuais['end_cidade'])
+            end_estado = request.form.get('end_estado', dados_atuais['end_estado'])
+            end_cep = request.form.get('end_cep', dados_atuais['end_cep'])
+            
+            # Validar CEP
+            if not re.match(r'^\d{8}$', end_cep):
+                flash('CEP deve conter 8 dígitos', 'danger')
+                return redirect(url_for('estabelecimento.editar_estabelecimento'))
+
+            # Atualizar endereço
+            cur.execute("""
+                UPDATE tb_endereco_estabelecimento
+                SET end_numero = %s, end_complemento = %s, end_bairro = %s,
+                    end_rua = %s, end_cidade = %s, end_estado = %s, end_cep = %s
+                WHERE end_est_id = %s
+            """, (end_numero, end_complemento, end_bairro, end_rua, 
+                 end_cidade, end_estado, end_cep, est_id))
+
+            mysql.connection.commit()
+            flash('Dados atualizados com sucesso!', 'success')
+
+
+        except Exception as e:
+            mysql.connection.rollback()
+            flash(f'Erro ao atualizar: {str(e)}', 'danger')
+            return redirect(url_for('estabelecimento.editar_estabelecimento'))
+        
+        finally:
+            cur.close()
+
+    # Método GET - Correção na consulta
+    cur = mysql.connection.cursor()
+    cur.execute("""
+    SELECT est_nome, est_descricao, est_email, est_telefone,
+    end_numero, end_complemento, end_bairro, end_rua,  
+    end_cidade, end_estado, end_cep
+    FROM tb_estabelecimento
+    JOIN tb_endereco_estabelecimento ON tb_estabelecimento.est_id = tb_endereco_estabelecimento.end_est_id
+    WHERE tb_estabelecimento.est_id = %s
+    """, (est_id,))
+    estabelecimento = cur.fetchone()
+    cur.close()
+
+    if not estabelecimento:
+        flash('Estabelecimento não encontrado', 'danger')
+        return redirect(url_for('profissional.dashboard'))
+
+    return render_template('editar_estabelecimento.html', estabelecimento=estabelecimento)

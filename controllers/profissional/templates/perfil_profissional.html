@@ -1,25 +1,68 @@
-<!-- templates/perfil_profissional.html -->
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Editar Perfil</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block links %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/perfil_profissional.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="container mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
     <h1>Editar Perfil Profissional</h1>
 
     <form method="POST" action="{{ url_for('profissional.editar_perfil') }}">
-        <label for="nome">Nome:</label><br />
-        <input type="text" id="nome" name="nome" /><br /><br />
+        <div class="form-section">
+            <h2>Informações Pessoais</h2>
 
-        <label for="senha">Senha:</label><br />
-        <input type="password" id="senha" name="senha"/><br /><br />
+            <div class="form-group">
+                <label for="nome">Nome*:</label>
+                <input type="text" class="form-control" id="nome" name="nome" required maxlength="100">
+            </div>
+        </div>
 
-        <label for="telefone">Telefone:</label><br />
-        <input type="text" id="telefone" name="telefone"/><br /><br />
+        <div class="form-section">
+            <h2>Alteração de Senha</h2>
 
-        <button type="submit">Salvar</button>
+            <div class="form-group">
+                <label for="senha_atual">Senha Atual*:</label>
+                <input type="password" class="form-control" id="senha_atual" name="senha_atual" required>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">Nova Senha*:</label>
+                <input type="password" class="form-control" id="senha" name="senha" required>
+            </div>
+
+            <div class="form-group">
+                <label for="check_senha">Verificar Senha*:</label>
+                <input type="password" class="form-control" id="check_senha" name="check_senha" required>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Contato</h2>
+
+            <div class="form-group">
+                <label for="telefone">Telefone*:</label>
+                <input type="text" class="form-control" id="telefone" name="telefone" required maxlength="15">
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            <small class="text-muted">* Campos obrigatórios</small>
+        </div>
     </form>
-</body>
-</html>
+</div>
+{% endblock %}
