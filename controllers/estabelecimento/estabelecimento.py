@@ -181,17 +181,23 @@ def confirmar_agendamento():
     try:
         cur = mysql.connection.cursor()
         
-        # 1. Busca informações básicas do estabelecimento (incluindo imagem)
+        # 1. Busca informações básicas do estabelecimento (incluindo imagem e dono)
         cur.execute("""
-            SELECT est_nome, est_imagem, est_descricao 
-            FROM tb_estabelecimento 
+            SELECT est_id, est_nome, est_descricao, est_imagem, est_dono_id,
+                   pro_id, pro_nome
+            FROM tb_estabelecimento
+            LEFT JOIN tb_profissional ON est_dono_id = pro_id
             WHERE est_id = %s
         """, (est_id,))
         estabelecimento = cur.fetchone()
         
+        if not estabelecimento:
+            flash("Estabelecimento não encontrado.", "danger")
+            return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
+        
         # Converter imagem binária para base64 se existir
         imagem_base64 = None
-        if estabelecimento and estabelecimento['est_imagem']:
+        if estabelecimento['est_imagem']:
             import base64
             imagem_base64 = base64.b64encode(estabelecimento['est_imagem']).decode('utf-8')
         
@@ -203,48 +209,37 @@ def confirmar_agendamento():
         """, (est_id,))
         servicos = cur.fetchall()
         
-        # 3. Busca informações do profissional dono
-        cur.execute("""
-            SELECT pro_id, pro_nome 
-            FROM tb_profissional 
-            WHERE pro_est_id = %s 
-            LIMIT 1
-        """, (est_id,))
-        profissional = cur.fetchone()
-        
-        # 4. Verifica se o usuário atual é o dono
-        dono = False
-        pro_id = None
-        if profissional:
-            pro_id = profissional['pro_id']
-            dono = current_user.is_authenticated and (current_user.id == pro_id)
-        
-        # 5. Formatação dos dados
-        data_atual = datetime.now().strftime('%Y-%m-%d')
-        
-        # 6. Verifica se há serviços para exibir
+        # 3. Verifica se o usuário atual é o dono
+        is_dono = False
+        if (current_user.is_authenticated and 
+            current_user.tipo_usuario == 'profissional' and 
+            estabelecimento['est_dono_id'] and 
+            estabelecimento['est_dono_id'] == current_user.id):
+            is_dono = True
+    
+
+        # 5. Verifica se há serviços para exibir
         if not servicos:
-            if dono:
+            if is_dono:
                 return redirect(url_for('servico.adicionar_servico', est_id=est_id))
             else:
                 return render_template('selecionar_servico.html',
                                     mensagem="Este estabelecimento não possui serviços cadastrados.",
                                     est_id=est_id,
-                                    est_nome=estabelecimento['est_nome'] if estabelecimento else 'Estabelecimento',
-                                    est_descricao=estabelecimento['est_descricao'] if estabelecimento else '',
+                                    est_nome=estabelecimento['est_nome'],
+                                    est_descricao=estabelecimento['est_descricao'],
                                     imagem_base64=imagem_base64,
-                                    pro_id=pro_id)
+                                    is_dono=is_dono)
         
-        # 7. Renderiza template com todos os dados
+        # 6. Renderiza template com todos os dados
         return render_template('selecionar_servico.html',
                             servicos=servicos,
                             data=data_atual,
                             est_id=est_id,
-                            est_nome=estabelecimento['est_nome'] if estabelecimento else 'Estabelecimento',
-                            est_descricao=estabelecimento['est_descricao'] if estabelecimento else '',
+                            est_nome=estabelecimento['est_nome'],
+                            est_descricao=estabelecimento['est_descricao'],
                             imagem_base64=imagem_base64,
-                            pro_id=pro_id,
-                            dono=dono)
+                            is_dono=is_dono)
             
     except Exception as e:
 <<<<<<< HEAD
@@ -340,10 +335,10 @@ def cadastrar_estabelecimento():
             # Insere estabelecimento
             cur.execute(
                 """INSERT INTO tb_estabelecimento 
-                (est_dataCriacao, est_nome, est_descricao, est_cnpj, est_email, est_telefone, est_imagem, est_cat_id) 
-                VALUES (CURDATE(), %s, %s, %s, %s, %s, %s, %s)""",
+                (est_dataCriacao, est_nome, est_descricao, est_cnpj, est_email, est_telefone, est_imagem, est_cat_id, est_dono_id) 
+                VALUES (CURDATE(), %s, %s, %s, %s, %s, %s, %s, %s)""",
                 (est_data['nome'], est_data['descricao'], est_data['cnpj'], 
-                 est_data['email'], est_data['telefone'], est_data['foto'], est_data['cat_id'])
+                est_data['email'], est_data['telefone'], est_data['foto'], est_data['cat_id'], pro_id)
             )
             est_id = cur.lastrowid
 
