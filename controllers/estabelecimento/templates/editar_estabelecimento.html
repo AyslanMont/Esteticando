@@ -8,33 +8,44 @@
 <div class="container">
     <h1>Editar Estabelecimento</h1>
 
-    <form method="POST" action="{{url_for('estabelecimento.editar_estabelecimento')}}">
+    <form method="GET" action="{{ url_for('estabelecimento.editar_estabelecimento') }}" class="mb-4">
+        <label for="est_id_select">Selecione o estabelecimento:</label>
+        <select id="est_id_select" name="est_id" class="form-control" onchange="this.form.submit()">
+            <option value="" disabled>-- Selecione --</option>
+            {% for est in estabelecimentos %}
+                <option value="{{ est.est_id }}" {% if est.est_id == est_id %}selected{% endif %}>{{ est.est_nome }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <form method="POST" action="{{ url_for('estabelecimento.editar_estabelecimento') }}">
+        <input type="hidden" name="est_id" value="{{ est_id }}">
+
         <div class="form-section">
             <h2>Informações do Estabelecimento</h2>
 
             <div class="form-group">
                 <label for="est_nome">Nome do Estabelecimento*:</label>
                 <input type="text" class="form-control" id="est_nome" name="est_nome"
-                       value="{{ estabelecimento[0] }}" maxlength="100">
+                       value="{{ estabelecimento['est_nome'] }}" maxlength="100">
             </div>
 
             <div class="form-group">
                 <label for="est_descricao">Descrição*:</label>
-                <textarea class="form-control" id="est_descricao" name="est_descricao"
-                          maxlength="45">{{ estabelecimento[1] }}</textarea>
+                <textarea class="form-control" id="est_descricao" name="est_descricao" maxlength="45">{{ estabelecimento['est_descricao'] }}</textarea> 
                 <small class="text-muted">Máximo de 45 caracteres</small>
             </div>
 
             <div class="form-group">
                 <label for="est_email">Email*:</label>
                 <input type="email" class="form-control" id="est_email" name="est_email"
-                       value="{{ estabelecimento[2] }}" maxlength="100">
+                       value="{{ estabelecimento['est_email'] }}" maxlength="100">
             </div>
 
             <div class="form-group">
                 <label for="est_telefone">Telefone*:</label>
                 <input type="text" class="form-control" id="est_telefone" name="est_telefone"
-                       value="{{ estabelecimento[3] }}" maxlength="15">
+                       value="{{ estabelecimento['est_telefone'] }}" maxlength="15">
             </div>
         </div>
 
@@ -44,71 +55,71 @@
             <div class="form-group">
                 <label for="end_numero">Número*:</label>
                 <input type="text" class="form-control" id="end_numero" name="end_numero"
-                       value="{{ estabelecimento[4] }}" maxlength="10">
+                       value="{{ estabelecimento['end_numero'] }}" maxlength="10">
             </div>
 
             <div class="form-group">
                 <label for="end_complemento">Complemento:</label>
                 <input type="text" class="form-control" id="end_complemento" name="end_complemento"
-                       value="{{ estabelecimento[5] or '' }}" maxlength="100">
+                       value="{{ estabelecimento['end_complemento'] }}" maxlength="100">
             </div>
 
             <div class="form-group">
                 <label for="end_bairro">Bairro*:</label>
                 <input type="text" class="form-control" id="end_bairro" name="end_bairro"
-                       value="{{ estabelecimento[6] }}" maxlength="100">
+                       value="{{ estabelecimento['end_bairro'] }}" maxlength="100">
             </div>
 
             <div class="form-group">
                 <label for="end_rua">Rua*:</label>
                 <input type="text" class="form-control" id="end_rua" name="end_rua"
-                       value="{{ estabelecimento[7] }}" maxlength="45">
+                       value="{{ estabelecimento['end_rua'] }}" maxlength="45">
             </div>
 
             <div class="form-group">
                 <label for="end_cidade">Cidade*:</label>
                 <input type="text" class="form-control" id="end_cidade" name="end_cidade"
-                       value="{{ estabelecimento[8] }}" maxlength="100">
+                       value="{{ estabelecimento['end_cidade'] }}" maxlength="100">
             </div>
 
-           <div class="form-group">
+            <div class="form-group">
                 <label for="end_estado">UF*:</label>
                 <select class="form-control" id="end_estado" name="end_estado" >
                     <option value="">Selecione</option>
-                    <option value="AC" {% if estabelecimento[9] == "AC" %}selected{% endif %}>Acre</option>
-                    <option value="AL" {% if estabelecimento[9] == "AL" %}selected{% endif %}>Alagoas</option>
-                    <option value="AP" {% if estabelecimento[9] == "AP" %}selected{% endif %}>Amapá</option>
-                    <option value="AM" {% if estabelecimento[9] == "AM" %}selected{% endif %}>Amazonas</option>
-                    <option value="BA" {% if estabelecimento[9] == "BA" %}selected{% endif %}>Bahia</option>
-                    <option value="CE" {% if estabelecimento[9] == "CE" %}selected{% endif %}>Ceará</option>
-                    <option value="DF" {% if estabelecimento[9] == "DF" %}selected{% endif %}>Distrito Federal</option>
-                    <option value="ES" {% if estabelecimento[9] == "ES" %}selected{% endif %}>Espírito Santo</option>
-                    <option value="GO" {% if estabelecimento[9] == "GO" %}selected{% endif %}>Goiás</option>
-                    <option value="MA" {% if estabelecimento[9] == "MA" %}selected{% endif %}>Maranhão</option>
-                    <option value="MT" {% if estabelecimento[9] == "MT" %}selected{% endif %}>Mato Grosso</option>
-                    <option value="MS" {% if estabelecimento[9] == "MS" %}selected{% endif %}>Mato Grosso do Sul</option>
-                    <option value="MG" {% if estabelecimento[9] == "MG" %}selected{% endif %}>Minas Gerais</option>
-                    <option value="PA" {% if estabelecimento[9] == "PA" %}selected{% endif %}>Pará</option>
-                    <option value="PB" {% if estabelecimento[9] == "PB" %}selected{% endif %}>Paraíba</option>
-                    <option value="PR" {% if estabelecimento[9] == "PR" %}selected{% endif %}>Paraná</option>
-                    <option value="PE" {% if estabelecimento[9] == "PE" %}selected{% endif %}>Pernambuco</option>
-                    <option value="PI" {% if estabelecimento[9] == "PI" %}selected{% endif %}>Piauí</option>
-                    <option value="RJ" {% if estabelecimento[9] == "RJ" %}selected{% endif %}>Rio de Janeiro</option>
-                    <option value="RN" {% if estabelecimento[9] == "RN" %}selected{% endif %}>Rio Grande do Norte</option>
-                    <option value="RS" {% if estabelecimento[9] == "RS" %}selected{% endif %}>Rio Grande do Sul</option>
-                    <option value="RO" {% if estabelecimento[9] == "RO" %}selected{% endif %}>Rondônia</option>
-                    <option value="RR" {% if estabelecimento[9] == "RR" %}selected{% endif %}>Roraima</option>
-                    <option value="SC" {% if estabelecimento[9] == "SC" %}selected{% endif %}>Santa Catarina</option>
-                    <option value="SP" {% if estabelecimento[9] == "SP" %}selected{% endif %}>São Paulo</option>
-                    <option value="SE" {% if estabelecimento[9] == "SE" %}selected{% endif %}>Sergipe</option>
-                    <option value="TO" {% if estabelecimento[9] == "TO" %}selected{% endif %}>Tocantins</option>
+                    <option value="AC" {% if estabelecimento['end_estado'] == "AC" %}selected{% endif %}>Acre</option>
+                    <option value="AL" {% if estabelecimento['end_estado'] == "AL" %}selected{% endif %}>Alagoas</option>
+                    <option value="AP" {% if estabelecimento['end_estado'] == "AP" %}selected{% endif %}>Amapá</option>
+                    <option value="AM" {% if estabelecimento['end_estado'] == "AM" %}selected{% endif %}>Amazonas</option>
+                    <option value="BA" {% if estabelecimento['end_estado'] == "BA" %}selected{% endif %}>Bahia</option>
+                    <option value="CE" {% if estabelecimento['end_estado'] == "CE" %}selected{% endif %}>Ceará</option>
+                    <option value="DF" {% if estabelecimento['end_estado'] == "DF" %}selected{% endif %}>Distrito Federal</option>
+                    <option value="ES" {% if estabelecimento['end_estado'] == "ES" %}selected{% endif %}>Espírito Santo</option>
+                    <option value="GO" {% if estabelecimento['end_estado'] == "GO" %}selected{% endif %}>Goiás</option>
+                    <option value="MA" {% if estabelecimento['end_estado'] == "MA" %}selected{% endif %}>Maranhão</option>
+                    <option value="MT" {% if estabelecimento['end_estado'] == "MT" %}selected{% endif %}>Mato Grosso</option>
+                    <option value="MS" {% if estabelecimento['end_estado'] == "MS" %}selected{% endif %}>Mato Grosso do Sul</option>
+                    <option value="MG" {% if estabelecimento['end_estado'] == "MG" %}selected{% endif %}>Minas Gerais</option>
+                    <option value="PA" {% if estabelecimento['end_estado'] == "PA" %}selected{% endif %}>Pará</option>
+                    <option value="PB" {% if estabelecimento['end_estado'] == "PB" %}selected{% endif %}>Paraíba</option>
+                    <option value="PR" {% if estabelecimento['end_estado'] == "PR" %}selected{% endif %}>Paraná</option>
+                    <option value="PE" {% if estabelecimento['end_estado'] == "PE" %}selected{% endif %}>Pernambuco</option>
+                    <option value="PI" {% if estabelecimento['end_estado'] == "PI" %}selected{% endif %}>Piauí</option>
+                    <option value="RJ" {% if estabelecimento['end_estado'] == "RJ" %}selected{% endif %}>Rio de Janeiro</option>
+                    <option value="RN" {% if estabelecimento['end_estado'] == "RN" %}selected{% endif %}>Rio Grande do Norte</option>
+                    <option value="RS" {% if estabelecimento['end_estado'] == "RS" %}selected{% endif %}>Rio Grande do Sul</option>
+                    <option value="RO" {% if estabelecimento['end_estado'] == "RO" %}selected{% endif %}>Rondônia</option>
+                    <option value="RR" {% if estabelecimento['end_estado'] == "RR" %}selected{% endif %}>Roraima</option>
+                    <option value="SC" {% if estabelecimento['end_estado'] == "SC" %}selected{% endif %}>Santa Catarina</option>
+                    <option value="SP" {% if estabelecimento['end_estado'] == "SP" %}selected{% endif %}>São Paulo</option>
+                    <option value="SE" {% if estabelecimento['end_estado'] == "SE" %}selected{% endif %}>Sergipe</option>
+                    <option value="TO" {% if estabelecimento['end_estado'] == "TO" %}selected{% endif %}>Tocantins</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="end_cep">CEP*:</label>
                 <input type="text" class="form-control" id="end_cep" name="end_cep"
-                       value="{{ estabelecimento[10] }}" pattern="\d{8}" title="8 dígitos">
+                       value="{{ estabelecimento['end_cep'] }}" pattern="\d{8}" title="8 dígitos" maxlength="8">
             </div>
         </div>
 
@@ -118,4 +129,5 @@
         </div>
     </form>
 </div>
+
 {% endblock %}

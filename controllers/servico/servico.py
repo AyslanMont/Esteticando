@@ -23,7 +23,7 @@ def adicionar_servico(est_id):
         dono = cur.fetchone()
 
         # Carregar categorias disponíveis
-        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria")
+        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria_servico")
         categorias = cur.fetchall()
 
     if not dono:
@@ -63,5 +63,4 @@ def adicionar_servico(est_id):
         return redirect(url_for('agendamento.agendar', ser_id=last_id))
 
     return render_template('adicionar_servico.html',est_id=est_id,est_nome=est_nome,categorias=categorias)
-
 

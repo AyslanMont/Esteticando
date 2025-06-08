@@ -4,29 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Esteticando</title>
-    <link rel="stylesheet" href="../static/styles/normalize.css" />
-    <link rel="stylesheet" href="../static/styles/base_notlogged.css" />
-    <link
-      rel="shortcut icon"
-      href="../static/imgs/favicon.png"
-      type="image/x-icon"
-    />
+
+    <!-- Seus estilos -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/normalize.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/base_notlogged.css') }}" />
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='imgs/favicon.png') }}" type="image/x-icon" />
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Comfortaa:wght@300..700&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Flash card -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/flash.css') }}">
+
     {% block links %} {% endblock %}
   </head>
   <body>
     <header class="navbar">
       <menu>
-        <img
-          src="../static/imgs/favicon.png"
-          alt="logo barbearia"
-          id="img-navbar"
-        />
+        <img src="{{ url_for('static', filename='imgs/favicon.png') }}" alt="logo barbearia" id="img-navbar" />
         <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Página Inicial</a>
         <a href="#">Sobre</a>
         <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Serviços</a>
@@ -34,10 +36,41 @@
         <div id="btn-navbar">
           <a href="{{ url_for('auth.register') }}"><button class="btn-navbar">Inscreva-se</button></a>
           <a href="{{ url_for('auth.login') }}"><button class="btn-navbar">Entrar</button></a>
-          
         </div>
       </menu>
     </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+
     {% block content %} {% endblock %}
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => {
+          alert.classList.add('fade-out'); 
+          setTimeout(() => {
+            alert.style.display = 'none';
+          }, 400); 
+        });
+      }, 2000);
+    });
+    </script>
+
+    <script>
+      window.onload = function() {
+        window.scrollTo(0, 0);
+      }
+    </script>
   </body>
 </html>

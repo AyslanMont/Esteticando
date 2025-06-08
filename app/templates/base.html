@@ -18,15 +18,19 @@
       href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Comfortaa:wght@300..700&display=swap"
       rel="stylesheet"
     />
+
+     <!-- Flash -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/flash.css') }}">
+    
     {% block links %} {% endblock %}
   </head>
   <body>
     <header class="navbar">
       <menu>
         <img src="{{ url_for('static', filename='imgs/favicon.png') }}" alt="logo barbearia" id="img-navbar" />
-        <a href="{{url_for('estabelecimento.cadastrar_estabelecimento')}}">cadastrar</a>
+        <a href="{{url_for('estabelecimento.cadastrar_estabelecimento')}}">Cadastrar</a>
         <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Página Inicial</a>
-        <a href="{{url_for('estabelecimento.editar_estabelecimento')}}">editar</a>
+        <a href="{{url_for('estabelecimento.editar_estabelecimento')}}">Editar</a>
         <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Serviços</a>
         <a href="#">Contato</a>
         {% if current_user.is_authenticated %}
@@ -36,6 +40,40 @@
         {% endif %}
       </menu>
     </header>
+
+     <!-- FLASH ALERT sem container extra -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+            <button class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+
     {% block content %} {% endblock %}
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => {
+          alert.classList.add('fade-out'); // adiciona a animação de saída
+          // depois da duração da animação, remove o alert da tela
+          setTimeout(() => {
+            alert.style.display = 'none';
+          }, 400); // 400ms = tempo do fadeOut no CSS
+        });
+      }, 2000); // espera 2 segundos antes de começar o fade out
+    });
+    </script>
+
+    <script>
+      window.onload = function() {
+        window.scrollTo(0, 0);
+      }
+    </script>
   </body>
 </html>

@@ -75,109 +75,10 @@ def filtrar_estabelecimento():
     return render_template('filtrar_estabelecimento.html', result_est=result_est)
 
 
-<<<<<<< HEAD
 @estabelecimento_bp.route('/estabelecimento/<int:est_id>')
 @login_required
 def perfil_estabelecimento(est_id):
     cur = None
-=======
-@estabelecimento_bp.route('/estabelecimento/<int:est_id>/servicos')
-@login_required
-def perfil_estabelecimento(est_id):
-    cur = mysql.connection.cursor()
-    query_servicos = """
-        SELECT est_nome, ser_nome, ser_preco, ser_id 
-        FROM tb_estabelecimento 
-        JOIN tb_servico ON ser_est_id = est_id
-        WHERE est_id = %s
-    """
-    cur.execute(query_servicos, (est_id,))
-    servicos = cur.fetchall()
-    cur.close()
-    # Verifica se não há serviços
-    if not servicos:
-        return render_template('selecionar_servico.html', servicos=servicos, est_id=est_id, mensagem="Esse estabelecimento não tem serviços disponíveis.")
-
-    data_atual = datetime.now().strftime('%Y-%m-%d') 
-    
-    return render_template('selecionar_servico.html', servicos=servicos, data=data_atual, est_id=est_id)
-
-HORARIOS_DISPONIVEIS = [
-    "08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"
-]
-
-#primeira rota serve para carregar a pagina sem data
-@estabelecimento_bp.route('/agendar/<int:ser_id>', methods=['GET', 'POST'])
-#segunda rota serve para carregar a lista de horários já filtrada pela data selecionada
-@estabelecimento_bp.route('/agendar/<int:ser_id>/<data>', methods=['GET', 'POST'])
-
-#aqui ele esta apenas registrando os nomes de CLIENTES não esta de PROFISSIONAIS
-def agendar(ser_id, data=None):
-    if request.method == 'POST':
-        selected_date = request.form.get('data')
-        if not selected_date:
-            flash("Selecione uma data válida.", "warning")
-            return redirect(url_for('estabelecimento.agendar', ser_id=ser_id))
-        return redirect(url_for('estabelecimento.agendar', ser_id=ser_id, data=selected_date))
-
-    if not data:
-        data = date.today().isoformat()
-
-    with mysql.connection.cursor() as cur:
-        cur.execute("""
-            SELECT TIME_FORMAT(age_horario, '%%H:%%i') AS horario, cli_nome
-            FROM tb_agendamento
-            JOIN tb_cliente ON age_cli_id = cli_id
-            WHERE DATE(age_data) = %s AND age_ser_id = %s
-        """, (data, ser_id))
-        resultados = cur.fetchall()
-
-    # Normaliza cada linha em dict {'horario': ..., 'cli_nome': ...}
-    flat = []
-    for row in resultados:
-        if isinstance(row, dict):
-            flat.append(row)
-        elif isinstance(row, tuple) and len(row) == 1 and isinstance(row[0], dict):
-            flat.append(row[0])
-        else:
-            horario, nome = row
-            flat.append({'horario': horario, 'cli_nome': nome})
-
-    ocupados = {r['horario']: r['cli_nome'] for r in flat}
-
-    agendamentos = []
-    for hora in HORARIOS_DISPONIVEIS:
-        agendamentos.append({
-            'hora': hora,
-            'status': 'Indisponível' if hora in ocupados else 'Disponível',
-            'cliente_nome': ocupados.get(hora),
-            'disponivel': hora not in ocupados
-        })
-
-    return render_template('agendar.html',
-                           ser_id=ser_id,
-                           data=data,
-                           agendamentos=agendamentos)
-
-
-@estabelecimento_bp.route('/confirmar_agendamento', methods=['POST'])
-@login_required
-def confirmar_agendamento():
-    form = request.form.to_dict()
-    ser_id = form.get('ser_id')
-    data = form.get('data')
-    horario = form.get('horario')
-
-    if not ser_id or not data or not horario:
-        flash("Dados insuficientes.", "danger")
-        return redirect(url_for('estabelecimento.agendar',
-                                ser_id=int(ser_id) if ser_id else 0,
-                                data=data or date.today().isoformat()))
-
-    ser_id = int(ser_id)
-    horario_completo = horario + ":00"
-
->>>>>>> davi
     try:
         cur = mysql.connection.cursor()
         
@@ -242,20 +143,12 @@ def confirmar_agendamento():
                             is_dono=is_dono)
             
     except Exception as e:
-<<<<<<< HEAD
         print(f"Erro ao carregar perfil do estabelecimento: {str(e)}")
         flash("Ocorreu um erro ao carregar o perfil do estabelecimento.", "danger")
         return redirect(url_for('principal.index'))
     finally:
         if cur:
             cur.close()
-=======
-        mysql.connection.rollback()
-        flash(f"Erro ao confirmar agendamento: {e}", "danger")
-
-    return redirect(url_for('estabelecimento.agendar', ser_id=ser_id, data=data))
->>>>>>> davi
-
 
 @estabelecimento_bp.route('/cadastrar_estabelecimento', methods=['POST', 'GET'])
 @login_required
@@ -379,7 +272,7 @@ def cadastrar_estabelecimento():
     # Método GET
     try:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria")
+        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria_estabelecimento")
         categorias = cur.fetchall()
         estados = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 
                   'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 
@@ -398,57 +291,71 @@ def cadastrar_estabelecimento():
 @login_required
 def editar_estabelecimento():
     cur = mysql.connection.cursor()
+
+    # Buscar todos os estabelecimentos do profissional logado
     cur.execute("""
-        SELECT pro_est_id FROM tb_profissional 
-        WHERE pro_id = %s AND pro_est_id IS NOT NULL
+        SELECT est.est_id, est.est_nome
+        FROM tb_estabelecimento est
+        JOIN tb_profissional pro ON pro.pro_est_id = est.est_id
+        WHERE pro.pro_id = %s
     """, (current_user.id,))
-    resultado = cur.fetchone()
-    
-    if not resultado:
+    estabelecimentos = cur.fetchall()
+
+    if not estabelecimentos:
         flash('Você não é dono de nenhum estabelecimento', 'danger')
+        cur.close()
         return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
-    
-    est_id = resultado['pro_est_id']
+
+    # Pegar o est_id da query string ou pegar o primeiro da lista para mostrar
+    est_id = request.args.get('est_id')
+    if est_id is None and estabelecimentos:
+        est_id = estabelecimentos[0]['est_id']
+
+    # Se for POST, usar est_id do form, senão o de query string
+    if request.method == 'POST':
+        est_id = request.form.get('est_id')
+
+    # Pega os dados atuais do estabelecimento selecionado
+    cur.execute("""
+        SELECT est.est_id, est.est_nome, est.est_descricao, est.est_email, est.est_telefone,
+               end.end_numero, end.end_complemento, end.end_bairro, end.end_rua,  
+               end.end_cidade, end.end_estado, end.end_cep
+        FROM tb_estabelecimento est
+        JOIN tb_endereco_estabelecimento end ON est.est_id = end.end_est_id
+        WHERE est.est_id = %s
+    """, (est_id,))
+    dados_atuais = cur.fetchone()
+
+    if not dados_atuais:
+        flash('Estabelecimento não encontrado', 'danger')
+        cur.close()
+        return redirect(url_for('profissional.dashboard'))
 
     if request.method == 'POST':
         try:
-            # Pegar dados atuais - Correção: incluir e.est_id na consulta
-            cur.execute("""
-            SELECT est_id, est_nome, est_descricao, est_email, est_telefone,
-            end_id, end_numero, end_complemento, end_bairro, 
-            end_rua, end_cidade, end_estado, end_cep
-            FROM tb_estabelecimento
-            JOIN tb_endereco_estabelecimento ON tb_estabelecimento.est_id = tb_endereco_estabelecimento.end_est_id
-            WHERE tb_estabelecimento.est_id = %s
-            """, (est_id,))
-            dados_atuais = cur.fetchone()
-
- # Processar dados do formulário
             est_nome = request.form.get('est_nome', dados_atuais['est_nome'])
             est_descricao = request.form.get('est_descricao', dados_atuais['est_descricao'])
-            est_email = request.form.get('est_email', dados_atuais['est_email'])
-            est_telefone = request.form.get('est_telefone', dados_atuais['est_telefone'])
-            
-            
-            # Validar email
-            if not re.match(r'^[^@]+@[^@]+\.[^@]+$', est_email):
-                flash('Formato de email inválido', 'danger')
-                return redirect(url_for('estabelecimento.editar_estabelecimento'))
+            est_email = request.form.get('est_email', dados_atuais['est_email']).strip()
+            est_telefone = request.form.get('est_telefone', dados_atuais['est_telefone']).strip()
 
-            # Validar telefone
-            if not re.match(r'^\(\d{2}\) \d{4,5}-\d{4}$', est_telefone):
+            if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$', est_email):
+                flash('Formato de email inválido', 'danger')   
+                cur.close()
+                return redirect(url_for('estabelecimento.editar_estabelecimento', est_id=est_id))
+
+
+            regex = r'^\(?\d{2}\)?\s?\d{4,5}-\d{4}$'
+            if not re.match(regex, est_telefone):
                 flash('Formato de telefone inválido. Use (XX) XXXX-XXXX ou (XX) XXXXX-XXXX', 'danger')
-                return redirect(url_for('estabelecimento.editar_estabelecimento'))
-
-            # Atualizar estabelecimento
+                cur.close()
+                return redirect(url_for('estabelecimento.editar_estabelecimento', est_id=est_id))
+            
             cur.execute("""
                 UPDATE tb_estabelecimento 
                 SET est_nome = %s, est_descricao = %s, est_email = %s, est_telefone = %s
                 WHERE est_id = %s
             """, (est_nome, est_descricao, est_email, est_telefone, est_id))
 
-                
-            # Processar dados do endereço
             end_numero = request.form.get('end_numero', dados_atuais['end_numero'])
             end_complemento = request.form.get('end_complemento', dados_atuais['end_complemento'] or '')
             end_bairro = request.form.get('end_bairro', dados_atuais['end_bairro'])
@@ -456,48 +363,35 @@ def editar_estabelecimento():
             end_cidade = request.form.get('end_cidade', dados_atuais['end_cidade'])
             end_estado = request.form.get('end_estado', dados_atuais['end_estado'])
             end_cep = request.form.get('end_cep', dados_atuais['end_cep'])
-            
-            # Validar CEP
+
             if not re.match(r'^\d{8}$', end_cep):
                 flash('CEP deve conter 8 dígitos', 'danger')
-                return redirect(url_for('estabelecimento.editar_estabelecimento'))
+                cur.close()
+                return redirect(url_for('estabelecimento.editar_estabelecimento', est_id=est_id))
 
-            # Atualizar endereço
             cur.execute("""
                 UPDATE tb_endereco_estabelecimento
                 SET end_numero = %s, end_complemento = %s, end_bairro = %s,
                     end_rua = %s, end_cidade = %s, end_estado = %s, end_cep = %s
                 WHERE end_est_id = %s
             """, (end_numero, end_complemento, end_bairro, end_rua, 
-                 end_cidade, end_estado, end_cep, est_id))
+                  end_cidade, end_estado, end_cep, est_id))
 
             mysql.connection.commit()
             flash('Dados atualizados com sucesso!', 'success')
-
+            cur.close()
+            return redirect(url_for('estabelecimento.editar_estabelecimento', est_id=est_id))
 
         except Exception as e:
             mysql.connection.rollback()
             flash(f'Erro ao atualizar: {str(e)}', 'danger')
-            return redirect(url_for('estabelecimento.editar_estabelecimento'))
-        
-        finally:
             cur.close()
+            return redirect(url_for('estabelecimento.editar_estabelecimento', est_id=est_id))
 
-    # Método GET - Correção na consulta
-    cur = mysql.connection.cursor()
-    cur.execute("""
-    SELECT est_nome, est_descricao, est_email, est_telefone,
-    end_numero, end_complemento, end_bairro, end_rua,  
-    end_cidade, end_estado, end_cep
-    FROM tb_estabelecimento
-    JOIN tb_endereco_estabelecimento ON tb_estabelecimento.est_id = tb_endereco_estabelecimento.end_est_id
-    WHERE tb_estabelecimento.est_id = %s
-    """, (est_id,))
-    estabelecimento = cur.fetchone()
     cur.close()
 
-    if not estabelecimento:
-        flash('Estabelecimento não encontrado', 'danger')
-        return redirect(url_for('profissional.dashboard'))
-
-    return render_template('editar_estabelecimento.html', estabelecimento=estabelecimento)
+    # Passar dados para o template (notar que dados_atuais é um dict)
+    return render_template('editar_estabelecimento.html', 
+                           estabelecimentos=estabelecimentos, 
+                           est_id=int(est_id), 
+                           estabelecimento=dados_atuais)
