@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block links %}
+<<<<<<< HEAD
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/perfil_profissional.css') }}">
 {% endblock %}
 
@@ -66,3 +67,36 @@
     </form>
 </div>
 {% endblock %}
+=======
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/agendar.css') }}">
+{% endblock %}
+
+{% block content %}
+<main>
+  <h2>Editar Perfil</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul>
+        {% for category, message in messages %}
+          <li style="color: {{ 'green' if category == 'success' else 'red' }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST">
+    <label for="nome">Nome:</label><br>
+    <input type="text" id="nome" name="nome" value="{{ user.pro_nome if user else '' }}" required><br><br>
+
+    <label for="telefone">Telefone:</label><br>
+    <input type="text" id="telefone" name="telefone" value="{{ user.pro_telefone if user else '' }}" required><br><br>
+
+    <label for="senha">Nova Senha:</label><br>
+    <input type="password" id="senha" name="senha" required><br><br>
+
+    <button type="submit">Salvar alterações</button>
+  </form>
+</main>
+{% endblock %}
+>>>>>>> davi

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, redirect, render_template, flash, url_for
-import datetime
+from flask_login import login_required,current_user
 from esteticando.database.database import mysql
 from flask_login import current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,6 +12,7 @@ profissional_bp = Blueprint('profissional', __name__, url_prefix="/profissional"
 @login_required
 def editar_perfil():
     if request.method == 'POST':
+<<<<<<< HEAD
         cur = mysql.connection.cursor()
         cur.execute("""
             SELECT pro_nome, pro_senha, pro_telefone 
@@ -74,6 +75,21 @@ def editar_perfil():
         finally:
             cur.close()
 
+=======
+        nome = request.form['nome']
+        senha = request.form['senha']
+        telefone = request.form['telefone']
+        
+        cur = mysql.connection.cusor()
+        query_update = """
+            UPDATE tb_profissional 
+            SET  pro_nome = %s, pro_senha = %s, pro_telefone = %s
+            WHERE pro_id = %s
+        """
+        cur.execute(query_update, (nome, senha, telefone, current_user.id))
+        mysql.connection.commit()
+        cur.close()
+>>>>>>> davi
         return redirect(url_for('profissional.editar_perfil'))
     
     cur = mysql.connection.cursor()

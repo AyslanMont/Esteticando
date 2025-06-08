@@ -132,7 +132,12 @@ def register():
             flash('Cadastro realizado com sucesso!', 'success')
             return redirect(url_for('auth.login'))
 
+<<<<<<< HEAD
     return render_template('user/register.html')
+=======
+        return render_template('user/register.html')
+
+>>>>>>> davi
 
 @auth_bp.route('/esqueci-senha', methods=['POST'])
 def esqueci_senha():

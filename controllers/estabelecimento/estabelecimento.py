@@ -75,10 +75,109 @@ def filtrar_estabelecimento():
     return render_template('filtrar_estabelecimento.html', result_est=result_est)
 
 
+<<<<<<< HEAD
 @estabelecimento_bp.route('/estabelecimento/<int:est_id>')
 @login_required
 def perfil_estabelecimento(est_id):
     cur = None
+=======
+@estabelecimento_bp.route('/estabelecimento/<int:est_id>/servicos')
+@login_required
+def perfil_estabelecimento(est_id):
+    cur = mysql.connection.cursor()
+    query_servicos = """
+        SELECT est_nome, ser_nome, ser_preco, ser_id 
+        FROM tb_estabelecimento 
+        JOIN tb_servico ON ser_est_id = est_id
+        WHERE est_id = %s
+    """
+    cur.execute(query_servicos, (est_id,))
+    servicos = cur.fetchall()
+    cur.close()
+    # Verifica se não há serviços
+    if not servicos:
+        return render_template('selecionar_servico.html', servicos=servicos, est_id=est_id, mensagem="Esse estabelecimento não tem serviços disponíveis.")
+
+    data_atual = datetime.now().strftime('%Y-%m-%d') 
+    
+    return render_template('selecionar_servico.html', servicos=servicos, data=data_atual, est_id=est_id)
+
+HORARIOS_DISPONIVEIS = [
+    "08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"
+]
+
+#primeira rota serve para carregar a pagina sem data
+@estabelecimento_bp.route('/agendar/<int:ser_id>', methods=['GET', 'POST'])
+#segunda rota serve para carregar a lista de horários já filtrada pela data selecionada
+@estabelecimento_bp.route('/agendar/<int:ser_id>/<data>', methods=['GET', 'POST'])
+
+#aqui ele esta apenas registrando os nomes de CLIENTES não esta de PROFISSIONAIS
+def agendar(ser_id, data=None):
+    if request.method == 'POST':
+        selected_date = request.form.get('data')
+        if not selected_date:
+            flash("Selecione uma data válida.", "warning")
+            return redirect(url_for('estabelecimento.agendar', ser_id=ser_id))
+        return redirect(url_for('estabelecimento.agendar', ser_id=ser_id, data=selected_date))
+
+    if not data:
+        data = date.today().isoformat()
+
+    with mysql.connection.cursor() as cur:
+        cur.execute("""
+            SELECT TIME_FORMAT(age_horario, '%%H:%%i') AS horario, cli_nome
+            FROM tb_agendamento
+            JOIN tb_cliente ON age_cli_id = cli_id
+            WHERE DATE(age_data) = %s AND age_ser_id = %s
+        """, (data, ser_id))
+        resultados = cur.fetchall()
+
+    # Normaliza cada linha em dict {'horario': ..., 'cli_nome': ...}
+    flat = []
+    for row in resultados:
+        if isinstance(row, dict):
+            flat.append(row)
+        elif isinstance(row, tuple) and len(row) == 1 and isinstance(row[0], dict):
+            flat.append(row[0])
+        else:
+            horario, nome = row
+            flat.append({'horario': horario, 'cli_nome': nome})
+
+    ocupados = {r['horario']: r['cli_nome'] for r in flat}
+
+    agendamentos = []
+    for hora in HORARIOS_DISPONIVEIS:
+        agendamentos.append({
+            'hora': hora,
+            'status': 'Indisponível' if hora in ocupados else 'Disponível',
+            'cliente_nome': ocupados.get(hora),
+            'disponivel': hora not in ocupados
+        })
+
+    return render_template('agendar.html',
+                           ser_id=ser_id,
+                           data=data,
+                           agendamentos=agendamentos)
+
+
+@estabelecimento_bp.route('/confirmar_agendamento', methods=['POST'])
+@login_required
+def confirmar_agendamento():
+    form = request.form.to_dict()
+    ser_id = form.get('ser_id')
+    data = form.get('data')
+    horario = form.get('horario')
+
+    if not ser_id or not data or not horario:
+        flash("Dados insuficientes.", "danger")
+        return redirect(url_for('estabelecimento.agendar',
+                                ser_id=int(ser_id) if ser_id else 0,
+                                data=data or date.today().isoformat()))
+
+    ser_id = int(ser_id)
+    horario_completo = horario + ":00"
+
+>>>>>>> davi
     try:
         cur = mysql.connection.cursor()
         
@@ -148,12 +247,19 @@ def perfil_estabelecimento(est_id):
                             dono=dono)
             
     except Exception as e:
+<<<<<<< HEAD
         print(f"Erro ao carregar perfil do estabelecimento: {str(e)}")
         flash("Ocorreu um erro ao carregar o perfil do estabelecimento.", "danger")
         return redirect(url_for('principal.index'))
     finally:
         if cur:
             cur.close()
+=======
+        mysql.connection.rollback()
+        flash(f"Erro ao confirmar agendamento: {e}", "danger")
+
+    return redirect(url_for('estabelecimento.agendar', ser_id=ser_id, data=data))
+>>>>>>> davi
 
 
 @estabelecimento_bp.route('/cadastrar_estabelecimento', methods=['POST', 'GET'])
