@@ -81,7 +81,8 @@ def perfil_estabelecimento(est_id):
     cur = None
     try:
         cur = mysql.connection.cursor()
-        
+        data_atual = datetime.now().strftime("%d/%m/%Y")
+
         # 1. Busca informações básicas do estabelecimento (incluindo imagem e dono)
         cur.execute("""
             SELECT est_id, est_nome, est_descricao, est_imagem, est_dono_id,
@@ -91,57 +92,57 @@ def perfil_estabelecimento(est_id):
             WHERE est_id = %s
         """, (est_id,))
         estabelecimento = cur.fetchone()
-        
+
         if not estabelecimento:
             flash("Estabelecimento não encontrado.", "danger")
             return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
-        
-        # Converter imagem binária para base64 se existir
+
+        # Converte imagem para base64, se houver
         imagem_base64 = None
         if estabelecimento['est_imagem']:
             import base64
             imagem_base64 = base64.b64encode(estabelecimento['est_imagem']).decode('utf-8')
-        
-        # 2. Busca serviços do estabelecimento
+
+        # 2. Busca os serviços do estabelecimento
         cur.execute("""
             SELECT ser_id, ser_nome, ser_preco, ser_duracao 
             FROM tb_servico 
             WHERE ser_est_id = %s
         """, (est_id,))
         servicos = cur.fetchall()
-        
-        # 3. Verifica se o usuário atual é o dono
+
+        # 3. Verifica se o usuário atual é o dono do estabelecimento
         is_dono = False
         if (current_user.is_authenticated and 
             current_user.tipo_usuario == 'profissional' and 
             estabelecimento['est_dono_id'] and 
             estabelecimento['est_dono_id'] == current_user.id):
             is_dono = True
-    
 
-        # 5. Verifica se há serviços para exibir
+        # 4. Se não há serviços cadastrados
         if not servicos:
             if is_dono:
                 return redirect(url_for('servico.adicionar_servico', est_id=est_id))
             else:
                 return render_template('selecionar_servico.html',
-                                    mensagem="Este estabelecimento não possui serviços cadastrados.",
-                                    est_id=est_id,
-                                    est_nome=estabelecimento['est_nome'],
-                                    est_descricao=estabelecimento['est_descricao'],
-                                    imagem_base64=imagem_base64,
-                                    is_dono=is_dono)
-        
-        # 6. Renderiza template com todos os dados
+                                       mensagem="Este estabelecimento não possui serviços cadastrados.",
+                                       est_id=est_id,
+                                       est_nome=estabelecimento['est_nome'],
+                                       est_descricao=estabelecimento['est_descricao'],
+                                       imagem_base64=imagem_base64,
+                                       is_dono=is_dono,
+                                       data=data_atual)
+
+        # 5. Exibe página com os serviços disponíveis
         return render_template('selecionar_servico.html',
-                            servicos=servicos,
-                            data=data_atual,
-                            est_id=est_id,
-                            est_nome=estabelecimento['est_nome'],
-                            est_descricao=estabelecimento['est_descricao'],
-                            imagem_base64=imagem_base64,
-                            is_dono=is_dono)
-            
+                               servicos=servicos,
+                               est_id=est_id,
+                               est_nome=estabelecimento['est_nome'],
+                               est_descricao=estabelecimento['est_descricao'],
+                               imagem_base64=imagem_base64,
+                               is_dono=is_dono,
+                               data=data_atual)
+
     except Exception as e:
         print(f"Erro ao carregar perfil do estabelecimento: {str(e)}")
         flash("Ocorreu um erro ao carregar o perfil do estabelecimento.", "danger")
@@ -290,6 +291,10 @@ def cadastrar_estabelecimento():
 @estabelecimento_bp.route('/editar_estabelecimento', methods=['GET', 'POST'])
 @login_required
 def editar_estabelecimento():
+    if getattr(current_user, 'tipo_usuario', None) != 'profissional':
+        flash('Você precisa estar logado como profissional para cadastrar um estabelecimento.', 'danger')
+        return redirect(url_for('auth.login'))
+    
     cur = mysql.connection.cursor()
 
     # Buscar todos os estabelecimentos do profissional logado

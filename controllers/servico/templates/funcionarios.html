@@ -1,30 +1,32 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Funcionários</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Funcionários do Estabelecimento</h1>
-        
-        <div class="list-group">
-            {% for funcionario in funcionarios %}
-                <div class="list-group-item">
-                    <h5>{{ funcionario.pro_nome }}</h5>
-                    <p class="mb-1">Telefone: {{ funcionario.pro_telefone }}</p>
-                </div>
-            {% else %}
-                <div class="alert alert-info">Nenhum funcionário cadastrado.</div>
-            {% endfor %}
-        </div>
-        
-        <a href="{{ url_for('estabelecimento_cliente.listar_estabelecimentos') }}" 
-           class="btn btn-secondary mt-3">Voltar</a>
+{% extends "base.html" %}
+
+{% block links %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/funcionario.css') }}">
+{% endblock %}
+
+{% block title %}Funcionários do Estabelecimento{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Funcionários do Estabelecimento</h1>
+    
+    <div class="list-group">
+        {% for funcionario in funcionarios %}
+            <div class="list-group-item">
+                <h5>{{ funcionario.pro_nome }}</h5>
+                <p class="mb-1">Telefone: {{ funcionario.pro_telefone }}</p>
+            </div>
+        {% else %}
+            <div class="alert alert-info">Nenhum funcionário cadastrado.</div>
+        {% endfor %}
+    </div>
+
+    <div class="container-links">
+        <a href="{{ url_for('servico.adicionar_funcionario', est_id=est_id) }}" class="btn-acao">Cadastrar Funcionário</a>
+
+        <a href="{{ url_for('estabelecimento.perfil_estabelecimento', est_id=est_id) }}" 
+            class="btn btn-secondary mt-3">Voltar</a>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block links %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/adicionar_funcionario.css') }}">
+{% endblock %}
+
+{% block title %}Adicionar Funcionário{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h1>Adicionar Funcionário</h1>
+
+  <form method="POST" action="{{ url_for('servico.adicionar_funcionario', est_id=est_id) }}">
+    <div class="mb-3">
+      <label for="pro_nome" class="form-label">Nome do Funcionário</label>
+      <input type="text" class="form-control" id="pro_nome" name="nome" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="pro_telefone" class="form-label">Telefone</label>
+      <input type="tel" class="form-control" id="pro_telefone" name="telefone" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Cadastrar</button>
+    <a href="{{ url_for('servico.listar_funcionarios', est_id=est_id) }}" class="btn btn-secondary ms-2">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

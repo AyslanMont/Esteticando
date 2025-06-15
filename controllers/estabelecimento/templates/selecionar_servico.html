@@ -32,8 +32,9 @@
       {% if is_dono %}
         <div class="acoes-dono">
           <a href="{{ url_for('servico.adicionar_servico', est_id=est_id) }}" class="btn-acao">Cadastrar Serviço</a>
-          <a href="#" class="btn-acao">Editar Estabelecimento</a>
-          <a href="#" class="btn-acao">Cadastrar Funcionário</a>
+          <a href="{{ url_for('estabelecimento.editar_estabelecimento')}}" class="btn-acao">Editar Estabelecimento</a>
+          <a href="{{ url_for('servico.listar_funcionarios', est_id=est_id) }}" class="btn-acao">Cadastrar Funcionário</a>
+
         </div>
       {% endif %}
     </div>
@@ -48,6 +49,7 @@
         <h3>{{ servico.ser_nome }}</h3>
         <p class="servico-preco">R$ {{ "%.2f"|format(servico.ser_preco) }}</p>
         <p class="servico-duracao">{{ servico.ser_duracao }} minutos</p>
+        
       </div>
       <div class="servico-actions">
         <a href="{{ url_for('agendamento.agendar', ser_id=servico.ser_id, data=data) }}" 
