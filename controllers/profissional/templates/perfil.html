@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block links %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/perfil.css') }}">
+{% endblock %}
+
+{% block content %}
+<body>
+    <div class="container">
+        {% if user %}
+        <div class="perfil_usuario">
+            <h1>{{ user.pro_nome }}</h1>
+            <h3>{{ user.pro_email }}</h3>
+            <h4>{{ user.pro_telefone }}</h4>
+            <button>
+                <a href="{{ url_for('profissional_bp.editar_perfil') }}">
+                    Editar Perfil
+                </a>
+            </button>
+        </div>
+        {% endif %}
+
+        <div class="estabelecimentos">
+            <h2>Seus Estabelecimentos</h2>
+            {% if estabelecimentos %}
+                {% for est in estabelecimentos %}
+                <div class="estabelecimento">
+                    <h3>{{ est.est_nome }}</h3>
+                    <p>{{ est.est_email }}</p>
+                    <button>
+                        <a href="{{ url_for('estabelecimento_bp.editar_estabelecimento', id=est.est_id) }}">
+                            Editar Estabelecimento
+                        </a>
+                    </button>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Você ainda não possui estabelecimentos cadastrados.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+{% endblock %}

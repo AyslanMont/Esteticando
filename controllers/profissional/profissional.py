@@ -8,6 +8,42 @@ from werkzeug.security import generate_password_hash, check_password_hash
 # Cria um Blueprint para as rotas relacionadas a profissionais
 profissional_bp = Blueprint('profissional', __name__, url_prefix="/profissional", template_folder="templates")
 
+@profissional_bp.route('/perfil', methods=['GET', 'POST'])
+@login_required
+def perfil():
+    dados_user = None
+    estabelecimentos = []
+
+    if request.method == 'POST':
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            SELECT 
+                pro_id, pro_nome, pro_email, pro_telefone,
+                est_id, est_nome, est_email
+            FROM tb_profissional
+            LEFT JOIN tb_estabelecimento ON est_dono_id = pro_id
+            WHERE pro_id = %s
+        """, (current_user.id,))
+        resultados = cur.fetchall()
+
+        if resultados:
+            dados_user = {
+                'pro_id': resultados[0]['pro_id'],
+                'pro_nome': resultados[0]['pro_nome'],
+                'pro_email': resultados[0]['pro_email'],
+                'pro_telefone': resultados[0]['pro_telefone']
+            }
+            estabelecimentos = [
+                {
+                    'est_id': row['est_id'],
+                    'est_nome': row['est_nome'],
+                    'est_email': row['est_email']
+                }
+                for row in resultados if row['est_id'] is not None
+            ]
+
+    return render_template('perfil.html', user=dados_user, estabelecimentos=estabelecimentos)
+
 @profissional_bp.route('/editar_perfil', methods = ['GET','POST'])
 @login_required
 def editar_perfil():
@@ -82,4 +118,4 @@ def editar_perfil():
     user = cur.fetchone()
     cur.close()
 
-    return render_template('perfil_profissional.html', user = user)
+    return render_template('perfil_editar.html', user = user)

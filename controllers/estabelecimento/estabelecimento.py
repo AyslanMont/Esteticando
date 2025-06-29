@@ -400,3 +400,8 @@ def editar_estabelecimento():
                            estabelecimentos=estabelecimentos, 
                            est_id=int(est_id), 
                            estabelecimento=dados_atuais)
+
+@estabelecimento_bp.route("/gerenciar_estabelecimento", methods=["GET","POST"])
+@login_required
+def gerenciar_estabelecimento():
+    
