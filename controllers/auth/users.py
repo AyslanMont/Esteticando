@@ -217,61 +217,58 @@ def redefinir_senha(token):
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    tipo_usuario = request.form.get("tipo_usuario")
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        tipo_usuario = request.form.get("tipo_usuario", "cliente")
 
-    if tipo_usuario == "profissional":
-        if request.method == 'POST':
-            email = request.form['email']
-            password = request.form['password']
+        cur = mysql.connection.cursor()
+        
+        try:
+            if tipo_usuario == "profissional":
+                cur.execute("""
+                    SELECT 
+                        pro_id as id, 
+                        pro_nome as nome, 
+                        pro_email as email, 
+                        pro_senha as senha 
+                    FROM tb_profissional 
+                    WHERE pro_email = %s
+                """, (email,))
+            else:
+                cur.execute("""
+                    SELECT 
+                        cli_id as id, 
+                        cli_nome as nome, 
+                        cli_email as email, 
+                        cli_senha as senha 
+                    FROM tb_cliente 
+                    WHERE cli_email = %s
+                """, (email,))
 
-            cur = mysql.connection.cursor()
-            cur.execute("SELECT pro_id, pro_nome, pro_email, pro_senha FROM tb_profissional WHERE pro_email = %s", (email,))
             user_data = cur.fetchone()
-            cur.close()
 
-            if user_data and check_password_hash(user_data['pro_senha'], password):
+            if user_data and check_password_hash(user_data['senha'], password):
                 user = User(
-                    user_data['pro_id'], 
-                    user_data['pro_nome'], 
-                    user_data['pro_email'], 
-                    tipo_usuario='profissional'
+                    id=user_data['id'],
+                    nome=user_data['nome'],
+                    email=user_data['email'],
+                    tipo_usuario=tipo_usuario
                 )
                 login_user(user)
                 flash('Login realizado com sucesso!', 'success')
                 return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
-            else:
-                flash('E-mail ou senha incorretos', 'danger')
-                print("Senha incorreta ou e-mail não encontrado")
-
-        return render_template('user/login.html')
-    
-    # cliente
-    else:
-        if request.method == 'POST':
-            email = request.form['email']
-            password = request.form['password']
-
-            cur = mysql.connection.cursor()
-            cur.execute("SELECT cli_id, cli_nome, cli_email, cli_senha FROM tb_cliente WHERE cli_email = %s", (email,))
-            user_data = cur.fetchone()
+            
+            flash('E-mail ou senha incorretos', 'danger')
+        
+        except Exception as e:
+            flash('Erro ao processar login', 'danger')
+            print(f"Erro no login: {str(e)}")
+        
+        finally:
             cur.close()
 
-            if user_data and check_password_hash(user_data['cli_senha'], password):
-                user = User(
-                    user_data['cli_id'], 
-                    user_data['cli_nome'], 
-                    user_data['cli_email'], 
-                    tipo_usuario='cliente'
-                )
-                login_user(user)
-                flash('Login realizado com sucesso!', 'success')
-                return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
-            else:
-                flash('E-mail ou senha incorretos', 'danger')
-                print("Senha incorreta ou e-mail não encontrado")
-
-        return render_template('user/login.html')
-
+    return render_template('user/login.html')
 
 @auth_bp.route('/endereco', methods=["GET", "POST"])
 def endereco():

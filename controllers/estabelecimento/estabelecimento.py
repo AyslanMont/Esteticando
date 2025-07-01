@@ -151,15 +151,16 @@ def perfil_estabelecimento(est_id):
         if cur:
             cur.close()
 
+
 @estabelecimento_bp.route('/cadastrar_estabelecimento', methods=['POST', 'GET'])
 @login_required
 def cadastrar_estabelecimento():
-    if getattr(current_user, 'tipo_usuario', None) != 'profissional':
+    if not hasattr(current_user, 'tipo_usuario') or current_user.tipo_usuario != 'profissional':
         flash('Você precisa estar logado como profissional para cadastrar um estabelecimento.', 'danger')
         return redirect(url_for('auth.login'))
-
+    
     pro_id = current_user.id
-    cur = None  # Declara a variável no início da função
+    cur = None
 
     if request.method == 'POST':
         try:
@@ -273,7 +274,7 @@ def cadastrar_estabelecimento():
     # Método GET
     try:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria_estabelecimento")
+        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria")
         categorias = cur.fetchall()
         estados = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 
                   'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 
@@ -285,7 +286,7 @@ def cadastrar_estabelecimento():
         flash(f'Erro ao carregar categorias: {str(e)}', 'danger')
         return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
     finally:
-        if cur is not None:  # Verifica se o cursor existe antes de tentar fechar
+        if cur is not None:
             cur.close()
 
 @estabelecimento_bp.route('/editar_estabelecimento', methods=['GET', 'POST'])
@@ -404,4 +405,5 @@ def editar_estabelecimento():
 @estabelecimento_bp.route("/gerenciar_estabelecimento", methods=["GET","POST"])
 @login_required
 def gerenciar_estabelecimento():
+    pass
     

@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from flask_login import LoginManager
+from flask_login import LoginManager,current_user
 from flask_mail import Mail
 from esteticando.database.database import init_db, mysql
 from esteticando.models.user import User
@@ -39,32 +39,39 @@ app.register_blueprint(servico_bp, url_prefix='/servico')
 
 @login_manager.user_loader
 def load_user(user_id):
+    try:
+        tipo_usuario, id = user_id.split('_', 1)
+        id = int(id)
+    except (ValueError, AttributeError):
+        return None
+
     cur = mysql.connection.cursor()
-    cur.execute("SELECT cli_id, cli_nome, cli_email FROM tb_cliente WHERE cli_id = %s", (user_id,))
-    user_data = cur.fetchone()
-
-    tipo_usuario = None
-
-    if user_data:
-        tipo_usuario = 'cliente'
-    else:
-        cur.execute("SELECT pro_id, pro_nome, pro_email FROM tb_profissional WHERE pro_id = %s", (user_id,))
-        user_data = cur.fetchone()
-        if user_data:
-            tipo_usuario = 'profissional'
-
-    cur.close()
-
-    if user_data and tipo_usuario:
-        return User(
-            user_data['cli_id'] if tipo_usuario == 'cliente' else user_data['pro_id'],
-            user_data['cli_nome'] if tipo_usuario == 'cliente' else user_data['pro_nome'],
-            user_data['cli_email'] if tipo_usuario == 'cliente' else user_data['pro_email'],
-            tipo_usuario=tipo_usuario
-        )
     
-    return None
+    try:
+        if tipo_usuario == 'cliente':
+            cur.execute("""
+                        SELECT cli_id as id, cli_nome as nome, cli_email as email FROM tb_cliente WHERE cli_id = %s""", (id,))
 
+        elif tipo_usuario == 'profissional':
+            cur.execute("""
+                        SELECT pro_id as id, pro_nome as nome, pro_email as email FROM tb_profissional WHERE pro_id = %s""", (id,))
+        else:
+            return None
+
+        user_data = cur.fetchone()
+        
+        if user_data:
+            return User(
+                id=user_data['id'],
+                nome=user_data['nome'],
+                email=user_data['email'],
+                tipo_usuario=tipo_usuario
+            )
+        
+        return None
+    
+    finally:
+        cur.close()
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -76,3 +83,15 @@ def gerenciar_perfil():
 @app.route('/confirmar-agendamento')
 def confirmar_agendamento():
     return render_template('confirmar_agendamento.html')
+
+@app.route('/debug-user')
+def debug_user():
+    return {
+        "id": current_user.id,
+        "nome": current_user.nome,
+        "email": current_user.email,
+        "tipo_usuario": current_user.tipo_usuario,
+        "is_authenticated": current_user.is_authenticated,
+        "is_active": current_user.is_active,
+        "is_anonymous": current_user.is_anonymous
+    }

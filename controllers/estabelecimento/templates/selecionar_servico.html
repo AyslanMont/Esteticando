@@ -52,10 +52,7 @@
         
       </div>
       <div class="servico-actions">
-        <a href="{{ url_for('agendamento.agendar', ser_id=servico.ser_id, data=data) }}" 
-           class="btn-agendar">
-          Agendar
-        </a>
+        <a href="{{ url_for('agendamento.agendar', est_id=est_id, ser_id=servico.ser_id) }}" class="btn-agendar">Agendar</a>
       </div>
     </div>
     {% endfor %}
