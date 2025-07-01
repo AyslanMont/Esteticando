@@ -13,7 +13,7 @@
             <h3>{{ user.pro_email }}</h3>
             <h4>{{ user.pro_telefone }}</h4>
             <button>
-                <a href="{{ url_for('profissional_bp.editar_perfil') }}">
+                <a href="{{ url_for('profissional.editar_perfil') }}">
                     Editar Perfil
                 </a>
             </button>
@@ -23,19 +23,19 @@
         <div class="estabelecimentos">
             <h2>Seus Estabelecimentos</h2>
             {% if estabelecimentos %}
-                {% for est in estabelecimentos %}
-                <div class="estabelecimento">
-                    <h3>{{ est.est_nome }}</h3>
-                    <p>{{ est.est_email }}</p>
-                    <button>
-                        <a href="{{ url_for('estabelecimento_bp.editar_estabelecimento', id=est.est_id) }}">
-                            Editar Estabelecimento
-                        </a>
-                    </button>
-                </div>
+            <ul>
+                {% for estabelecimento in estabelecimentos %}
+                <li>
+                    <strong>{{ estabelecimento['est_nome'] }}</strong><br>
+                    <p>{{ estabelecimento['est_descricao'] }}</p>
+                    <a href="{{ url_for('estabelecimento.perfil_estabelecimento', est_id=estabelecimento.est_id) }}">
+                        Ver Detalhes
+                    </a>
+                </li>
                 {% endfor %}
+            </ul>
             {% else %}
-                <p>Você ainda não possui estabelecimentos cadastrados.</p>
+            <p>Você ainda não possui estabelecimentos cadastrados.</p>
             {% endif %}
         </div>
     </div>

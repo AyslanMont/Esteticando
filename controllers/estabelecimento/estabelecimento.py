@@ -402,8 +402,28 @@ def editar_estabelecimento():
                            est_id=int(est_id), 
                            estabelecimento=dados_atuais)
 
-@estabelecimento_bp.route("/gerenciar_estabelecimento", methods=["GET","POST"])
+@estabelecimento_bp.route('/meus_estabelecimentos')
 @login_required
-def gerenciar_estabelecimento():
-    pass
-    
+def meus_estabelecimentos():
+    if getattr(current_user, 'tipo_usuario', None) != 'profissional':
+        flash('Você precisa estar logado como profissional para acessar seus estabelecimentos.', 'danger')
+        return redirect(url_for('auth.login'))
+
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            SELECT est_id, est_nome, est_descricao, est_imagem
+            FROM tb_estabelecimento
+            WHERE est_dono_id = %s
+        """, (current_user.id,))
+        estabelecimentos = cur.fetchall()
+        cur.close()
+
+        if not estabelecimentos:
+            flash('Você ainda não possui estabelecimentos cadastrados.', 'info')
+
+        return render_template('meus_estabelecimentos.html', estabelecimentos=estabelecimentos)
+
+    except Exception as e:
+        flash(f'Erro ao carregar seus estabelecimentos: {str(e)}', 'danger')
+        return redirect(url_for('estabelecimento.filtrar_estabelecimento'))

@@ -1,54 +1,57 @@
 from flask import Blueprint, request, redirect, render_template, flash, url_for
-from flask_login import login_required,current_user
+from flask_login import login_required, current_user
 from esteticando.database.database import mysql
-from flask_login import current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-# Cria um Blueprint para as rotas relacionadas a profissionais
 profissional_bp = Blueprint('profissional', __name__, url_prefix="/profissional", template_folder="templates")
 
-@profissional_bp.route('/perfil', methods=['GET', 'POST'])
+
+@profissional_bp.route('/perfil', methods=['GET'])
 @login_required
 def perfil():
     dados_user = None
     estabelecimentos = []
 
-    if request.method == 'POST':
-        cur = mysql.connection.cursor()
-        cur.execute("""
-            SELECT 
-                pro_id, pro_nome, pro_email, pro_telefone,
-                est_id, est_nome, est_email
-            FROM tb_profissional
-            LEFT JOIN tb_estabelecimento ON est_dono_id = pro_id
-            WHERE pro_id = %s
-        """, (current_user.id,))
-        resultados = cur.fetchall()
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT 
+            pro_id, pro_nome, pro_email, pro_telefone,
+            est_id, est_nome, est_email, est_descricao
+        FROM tb_profissional
+        LEFT JOIN tb_estabelecimento ON est_dono_id = pro_id
+        WHERE pro_id = %s
+    """, (current_user.id,))
+    resultados = cur.fetchall()
+    cur.close()
 
-        if resultados:
-            dados_user = {
-                'pro_id': resultados[0]['pro_id'],
-                'pro_nome': resultados[0]['pro_nome'],
-                'pro_email': resultados[0]['pro_email'],
-                'pro_telefone': resultados[0]['pro_telefone']
+    if resultados:
+        dados_user = {
+            'pro_id': resultados[0]['pro_id'],
+            'pro_nome': resultados[0]['pro_nome'],
+            'pro_email': resultados[0]['pro_email'],
+            'pro_telefone': resultados[0]['pro_telefone']
+        }
+        estabelecimentos = [
+            {
+                'est_id': row['est_id'],
+                'est_nome': row['est_nome'],
+                'est_email': row['est_email'],
+                'est_descricao': row['est_descricao']
             }
-            estabelecimentos = [
-                {
-                    'est_id': row['est_id'],
-                    'est_nome': row['est_nome'],
-                    'est_email': row['est_email']
-                }
-                for row in resultados if row['est_id'] is not None
-            ]
+            for row in resultados if row['est_id'] is not None
+        ]
 
     return render_template('perfil.html', user=dados_user, estabelecimentos=estabelecimentos)
 
-@profissional_bp.route('/editar_perfil', methods = ['GET','POST'])
+
+@profissional_bp.route('/editar_perfil', methods=['GET', 'POST'])
 @login_required
 def editar_perfil():
+    cur = mysql.connection.cursor()
+
     if request.method == 'POST':
-        cur = mysql.connection.cursor()
+        # Busca os dados atuais
         cur.execute("""
             SELECT pro_nome, pro_senha, pro_telefone 
             FROM tb_profissional 
@@ -58,64 +61,56 @@ def editar_perfil():
 
         if not dados_atuais:
             flash('Usuário não encontrado', 'danger')
+            cur.close()
             return redirect(url_for('profissional.editar_perfil'))
-        
-        nome = request.form['nome', dados_atuais[0]]
-        senha_atual = request.form['senha_atual']
-        senha = request.form['senha']
-        check_senha = request.form['check_senha']
-        telefone = request.form['telefone', dados_atuais]
-        
+
+        nome = request.form.get('nome', dados_atuais['pro_nome'])
+        senha_atual = request.form.get('senha_atual')
+        nova_senha = request.form.get('senha')
+        check_senha = request.form.get('check_senha')
+        telefone = request.form.get('telefone', dados_atuais['pro_telefone'])
+
         try:
-            cur = mysql.connection.cursor()
-            query = "SELECT pro_senha FROM tb_profissional WHERE pro_id = %s"
-            cur.execute(query,(current_user))
-            resultado = cur.fetchone() 
+            senha_db = dados_atuais['pro_senha']
 
-            if not resultado:
-                flash('usuario não encontrado', 'danger')
-                return redirect(url_for(profissional.editar_perfil))
-            
-            senha_db = resultado[0]
-
-            if senha:
+            # Se usuário preencheu nova senha
+            if nova_senha:
                 if not check_password_hash(senha_db, senha_atual):
                     flash('Senha atual incorreta', 'danger')
                     return redirect(url_for('profissional.editar_perfil'))
-                
-                if senha != check_senha:
+
+                if nova_senha != check_senha:
                     flash('As novas senhas não coincidem', 'danger')
                     return redirect(url_for('profissional.editar_perfil'))
-                
-                senha_hash = generate_password_hash(check_senha)
-            else:
-                senha_hash = senha_db  
 
-            cur = mysql.connection.cusor()
-            query_update = """
+                senha_hash = generate_password_hash(nova_senha)
+            else:
+                senha_hash = senha_db  # Mantém senha antiga
+
+            # Atualiza dados no banco
+            cur.execute("""
                 UPDATE tb_profissional 
-                SET  pro_nome = %s, pro_senha = %s, pro_telefone = %s
+                SET pro_nome = %s, pro_senha = %s, pro_telefone = %s
                 WHERE pro_id = %s
-            """
-            cur.execute(query_update, (nome, senha_hash, telefone, current_user.id))
+            """, (nome, senha_hash, telefone, current_user.id))
             mysql.connection.commit()
-            cur.close()
-            flash('perfil atualizado com sucesso', 'success')
-        
-         
+            flash('Perfil atualizado com sucesso', 'success')
+
         except Exception as e:
             mysql.connection.rollback()
             flash(f'Erro ao atualizar perfil: {str(e)}', 'danger')
-            
         finally:
             cur.close()
 
         return redirect(url_for('profissional.editar_perfil'))
-    
-    cur = mysql.connection.cursor()
-    query = "SELECT pro_nome, pro_cpf, pro_email, pro_senha, pro_telefone FROM tb_profissional WHERE pro_id = %s"
-    cur.execute(query,(current_user.id,))
+
+    # Método GET: Carrega dados para o formulário
+    cur.execute("""
+        SELECT pro_nome, pro_cpf, pro_email, pro_telefone 
+        FROM tb_profissional 
+        WHERE pro_id = %s
+    """, (current_user.id,))
     user = cur.fetchone()
     cur.close()
 
-    return render_template('perfil_editar.html', user = user)
+    return render_template('perfil_editar.html', user=user)
