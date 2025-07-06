@@ -75,7 +75,7 @@ def filtrar_estabelecimento():
     return render_template('filtrar_estabelecimento.html', result_est=result_est)
 
 
-@estabelecimento_bp.route('/estabelecimento/<int:est_id>')
+@estabelecimento_bp.route('/perfil/<int:est_id>')  # Corrigido aqui
 @login_required
 def perfil_estabelecimento(est_id):
     cur = None
@@ -152,9 +152,11 @@ def perfil_estabelecimento(est_id):
             cur.close()
 
 
+
 @estabelecimento_bp.route('/cadastrar_estabelecimento', methods=['POST', 'GET'])
 @login_required
 def cadastrar_estabelecimento():
+    # Só profissional pode cadastrar estabelecimento
     if not hasattr(current_user, 'tipo_usuario') or current_user.tipo_usuario != 'profissional':
         flash('Você precisa estar logado como profissional para cadastrar um estabelecimento.', 'danger')
         return redirect(url_for('auth.login'))
@@ -188,6 +190,13 @@ def cadastrar_estabelecimento():
                 
             imagem_binaria = imagem_arquivo.read()
 
+            # Validação do telefone antes de limpar os dígitos
+            telefone_bruto = request.form['est_telefone'].strip()
+            regex_telefone = r'^\(?\d{2}\)?\s?\d{4,5}-\d{4}$'
+            if not re.match(regex_telefone, telefone_bruto):
+                flash('Formato de telefone inválido. Use (XX) XXXX-XXXX ou (XX) XXXXX-XXXX', 'danger')
+                return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
+
             # Preparação dos dados
             est_data = {
                 'nome': request.form['est_nome'].strip(),
@@ -195,7 +204,7 @@ def cadastrar_estabelecimento():
                 'foto': imagem_binaria,
                 'cnpj': ''.join(filter(str.isdigit, request.form['est_cnpj'])),
                 'email': request.form['est_email'].strip().lower(),
-                'telefone': ''.join(filter(str.isdigit, request.form['est_telefone'])),
+                'telefone': ''.join(filter(str.isdigit, telefone_bruto)),
                 'cat_id': int(request.form['est_cat_id'])
             }
 
@@ -209,7 +218,7 @@ def cadastrar_estabelecimento():
                 'cep': ''.join(filter(str.isdigit, request.form['end_cep']))
             }
 
-            # Validações
+            # Validações adicionais
             if len(est_data['cnpj']) != 14:
                 flash('CNPJ deve conter 14 dígitos', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
@@ -218,7 +227,7 @@ def cadastrar_estabelecimento():
                 flash('CEP deve conter 8 dígitos', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
 
-            # Conexão com o banco de dados
+            # Inserção no banco
             cur = mysql.connection.cursor()
 
             # Verifica se CNPJ já existe
@@ -233,7 +242,7 @@ def cadastrar_estabelecimento():
                 (est_dataCriacao, est_nome, est_descricao, est_cnpj, est_email, est_telefone, est_imagem, est_cat_id, est_dono_id) 
                 VALUES (CURDATE(), %s, %s, %s, %s, %s, %s, %s, %s)""",
                 (est_data['nome'], est_data['descricao'], est_data['cnpj'], 
-                est_data['email'], est_data['telefone'], est_data['foto'], est_data['cat_id'], pro_id)
+                 est_data['email'], est_data['telefone'], est_data['foto'], est_data['cat_id'], pro_id)
             )
             est_id = cur.lastrowid
 
@@ -247,19 +256,18 @@ def cadastrar_estabelecimento():
                  end_data['cep'], est_id)
             )
 
-            # Atualiza o profissional
+            # Atualiza o profissional para linkar com o estabelecimento
             cur.execute(
                 "UPDATE tb_profissional SET pro_est_id = %s WHERE pro_id = %s",
                 (est_id, pro_id)
             )
 
-            # Commit das alterações
             mysql.connection.commit()
 
             flash("Estabelecimento cadastrado com sucesso! Agora você pode adicionar serviços.", "success")
             return redirect(url_for('servico.adicionar_servico', est_id=est_id))
 
-        except ValueError as e:
+        except ValueError:
             mysql.connection.rollback()
             flash('Dados inválidos fornecidos!', 'danger')
             return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
@@ -268,20 +276,20 @@ def cadastrar_estabelecimento():
             flash(f'Erro ao cadastrar estabelecimento: {str(e)}', 'danger')
             return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
         finally:
-            if cur is not None:  # Verifica se o cursor existe antes de tentar fechar
+            if cur is not None:
                 cur.close()
 
-    # Método GET
+    # GET: exibe formulário de cadastro
     try:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria")
+        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria_estabelecimento")
         categorias = cur.fetchall()
         estados = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 
                   'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 
                   'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
         return render_template('cadastrar_estabelecimento.html', 
-                            categorias=categorias,
-                            estados=estados)
+                               categorias=categorias,
+                               estados=estados)
     except Exception as e:
         flash(f'Erro ao carregar categorias: {str(e)}', 'danger')
         return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
