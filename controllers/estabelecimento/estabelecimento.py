@@ -152,14 +152,12 @@ def perfil_estabelecimento(est_id):
             cur.close()
 
 
-
 @estabelecimento_bp.route('/cadastrar_estabelecimento', methods=['POST', 'GET'])
 @login_required
 def cadastrar_estabelecimento():
     # Só profissional pode cadastrar estabelecimento
     if not hasattr(current_user, 'tipo_usuario') or current_user.tipo_usuario != 'profissional':
-        flash('Você precisa estar logado como profissional para cadastrar um estabelecimento.', 'danger')
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
     
     pro_id = current_user.id
     cur = None
@@ -282,7 +280,7 @@ def cadastrar_estabelecimento():
     # GET: exibe formulário de cadastro
     try:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria_estabelecimento")
+        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria")
         categorias = cur.fetchall()
         estados = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 
                   'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 

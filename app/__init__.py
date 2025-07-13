@@ -33,7 +33,7 @@ login_manager.login_view = 'auth.login'
 app.register_blueprint(auth_bp)
 app.register_blueprint(estabelecimento_bp)
 app.register_blueprint(profissional_bp)
-app.register_blueprint(cli_est_bp, url_prefix='/cli_est')
+app.register_blueprint(cli_est_bp, url_prefix='/cliente')
 app.register_blueprint(agendamento_bp, url_prefix='/agendamento')
 app.register_blueprint(servico_bp, url_prefix='/servico')
 

@@ -1,0 +1,22 @@
+<h2>Cadastrar Disponibilidade</h2>
+<form method="POST">
+  <label for="dia">Dia da semana:</label>
+  <select name="dia" required>
+    <option value="">Selecione</option>
+    <option value="segunda-feira">Segunda-feira</option>
+    <option value="terça-feira">Terça-feira</option>
+    <option value="quarta-feira">Quarta-feira</option>
+    <option value="quinta-feira">Quinta-feira</option>
+    <option value="sexta-feira">Sexta-feira</option>
+    <option value="sabado">Sábado</option>
+    <option value="domingo">Domingo</option>
+  </select><br><br>
+
+  <label for="horario_inicio">Horário de Início:</label>
+  <input type="time" name="horario_inicio" required><br><br>
+
+  <label for="horario_fim">Horário de Fim:</label>
+  <input type="time" name="horario_fim" required><br><br>
+
+  <button type="submit">Salvar</button>
+</form>

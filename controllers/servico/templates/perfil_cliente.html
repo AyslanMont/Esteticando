@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block links %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/perfil.css') }}">
+{% endblock %}
+
+{% block content %}
+<body>
+    <div class="container">
+        {% if user %}
+        <div class="perfil_usuario">
+            <h1>{{ user.cli_nome }}</h1>
+            <h3>{{ user.cli_email }}</h3>
+            <h4>{{ user.cli_telefone }}</h4>
+            <button>
+                <a href="{{ url_for('cliente.editar_perfil') }}">
+                    Editar Perfil
+                </a>
+            </button>
+        </div>
+        {% endif %}
+
+    </div>
+</body>
+{% endblock %}

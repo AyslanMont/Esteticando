@@ -3,13 +3,18 @@ from flask_login import login_required, current_user
 from esteticando.database.database import mysql
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
 profissional_bp = Blueprint('profissional', __name__, url_prefix="/profissional", template_folder="templates")
-
 
 @profissional_bp.route('/perfil', methods=['GET'])
 @login_required
 def perfil():
+    if not hasattr(current_user, 'tipo_usuario') or current_user.tipo_usuario != 'profissional':
+        flash('Você precisa estar logado como profissional para cadastrar um estabelecimento.', 'danger')
+        return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
+    
+    pro_id = current_user.id
+    cur = None
+
     dados_user = None
     estabelecimentos = []
 
@@ -114,3 +119,41 @@ def editar_perfil():
     cur.close()
 
     return render_template('perfil_editar.html', user=user)
+
+@profissional_bp.route('/disponibilidade', methods=['GET','POST'])
+def disponibilidade():
+    if not hasattr(current_user, 'tipo_usuario') or current_user.tipo_usuario != 'profissional':
+        return redirect(url_for('index'))  # ou outra rota pública
+
+    if request.method == 'POST':
+        dia = request.form.get('dia')
+        horario_inicio = request.form.get('horario_inicio')
+        horario_fim = request.form.get('horario_fim')
+
+        if not dia or not horario_inicio or not horario_fim:
+            flash('Preencha todos os campos.', 'warning')
+            return redirect(url_for('profissional.disponibilidade'))
+
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("""
+                INSERT INTO tb_disponibilidade_profissional 
+                (dip_pro_id, dip_dia, dip_horarioInicio, dip_horarioFim)
+                VALUES (%s, %s, %s, %s)
+            """, (current_user.id, dia, horario_inicio, horario_fim))
+            mysql.connection.commit()
+            flash('Disponibilidade cadastrada com sucesso!', 'success')
+        except Exception as e:
+            mysql.connection.rollback()
+            flash(f'Erro ao cadastrar: {str(e)}', 'danger')
+        finally:
+            cur.close()
+
+        return redirect(url_for('profissional.disponibilidade'))
+
+    return render_template('disponibilidade.html')
+
+@profissional_bp.route('/agendamentos', methods=['GET','POST'])
+def agendamentos():
+    pass
+
