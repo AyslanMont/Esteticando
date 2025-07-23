@@ -214,7 +214,6 @@ def redefinir_senha(token):
 
     return render_template('redefinir_senha.html', token=token)
 
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':

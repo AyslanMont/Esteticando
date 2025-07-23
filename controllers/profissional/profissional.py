@@ -49,7 +49,6 @@ def perfil():
 
     return render_template('perfil.html', user=dados_user, estabelecimentos=estabelecimentos)
 
-
 @profissional_bp.route('/editar_perfil', methods=['GET', 'POST'])
 @login_required
 def editar_perfil():
@@ -111,7 +110,7 @@ def editar_perfil():
 
     # Método GET: Carrega dados para o formulário
     cur.execute("""
-        SELECT pro_nome, pro_cpf, pro_email, pro_telefone 
+        SELECT pro_nome, pro_telefone 
         FROM tb_profissional 
         WHERE pro_id = %s
     """, (current_user.id,))
@@ -119,6 +118,7 @@ def editar_perfil():
     cur.close()
 
     return render_template('perfil_editar.html', user=user)
+
 
 @profissional_bp.route('/disponibilidade', methods=['GET','POST'])
 def disponibilidade():

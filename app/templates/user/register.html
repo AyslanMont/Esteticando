@@ -1,25 +1,31 @@
-{% extends "base_notlogged.html" %} {% block links %}
-<link rel="stylesheet" href="../../../static/styles/auth/register.css" />
-{% endblock %} {% block content %}
+{% extends "base_notlogged.html" %}
 
+{% block links %}
+<link rel="stylesheet" href="../../../static/styles/auth/register.css" />
+{% endblock %}
+
+{% block content %}
 <main>
   <div class="container">
     <div class="form">
       <h2>Registrar</h2>
       <form action="{{ url_for('auth.register') }}" method="POST">
+
         <label for="register-nome" id="label-login">Nome</label>
-        <input type="text" name="nome" id="register-nome" placeholder="Nome" required />
+        <input type="text" name="nome" id="register-nome" placeholder="Digite seu nome completo" required />
+
         <label for="register-email" id="label-login">Email</label>
-        <input type="email" name="email" id="register-email" placeholder="Email" required />
+        <input type="email" name="email" id="register-email" placeholder="exemplo@dominio.com" required />
+
         <label for="register-cpf" id="label-login">CPF</label>
-        <input type="text" name="cpf" id="register-cpf"   required   maxlength="11" pattern="\d{11}" title="Digite 11 números para o CPF"placeholder="CPF" />
+        <input type="text" name="cpf" id="register-cpf" placeholder="Somente números, ex: 12345678901" required maxlength="11" pattern="\d{11}" title="Digite 11 números para o CPF" />
 
         <label for="register-telefone" id="label-login">Telefone</label>
-        <input type="text" name="telefone" id="register-telefone" placeholder="Telefone" required maxlength="15" pattern="\d{15}"
-        title="Digite um telefone válido com 10 ou 11 dígitos"/>
+        <input type="text" name="telefone" id="register-telefone" placeholder="(XX) XXXXX-XXXX" required maxlength="15" title="Digite um telefone válido com 10 ou 11 dígitos" />
 
         <label for="register-senha" id="label-login">Senha</label>
-        <input type="password" name="password" id="register-senha" placeholder="Senha" required />
+        <input type="password" name="password" id="register-senha" placeholder="Crie uma senha segura" required />
+
         <div class="select-servico">
           <select name="tipo_usuario" id="tipo_usuario" required>
             <option value="" disabled selected>Selecione um serviço</option>
@@ -27,15 +33,18 @@
             <option value="profissional">Sou um Profissional</option>
           </select>          
         </div>
+
         <div class="termos">
           <label for="register-termos" id="label-login">
             Eu li e concordo com os termos de uso
           </label>
           <input type="checkbox" id="register-termos" name="termos" required />
         </div>        
+
         <button>Avançar</button>
       </form>
     </div>
+
     <div class="redirect">
       <h2>Bem vindo ao register</h2>
       <p>Já tem uma conta?</p>
@@ -44,4 +53,27 @@
   </div>
 </main>
 
+<script>
+  const input = document.getElementById('register-telefone');
+  
+  input.addEventListener('input', function(e) {
+    let v = input.value;
+  
+    // Remove tudo que não for número
+    v = v.replace(/\D/g, '');
+  
+    // Formata conforme a quantidade de dígitos
+    if (v.length > 0) {
+      v = '(' + v;
+    }
+    if (v.length > 3) {
+      v = v.slice(0, 3) + ') ' + v.slice(3);
+    }
+    if (v.length > 10) {
+      v = v.slice(0, 10) + '-' + v.slice(10, 14);
+    }
+  
+    input.value = v;
+  });
+</script>
 {% endblock %}

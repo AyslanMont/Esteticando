@@ -318,16 +318,13 @@ def editar_estabelecimento():
         cur.close()
         return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
 
-    # Pegar o est_id da query string ou pegar o primeiro da lista para mostrar
     est_id = request.args.get('est_id')
     if est_id is None and estabelecimentos:
         est_id = estabelecimentos[0]['est_id']
 
-    # Se for POST, usar est_id do form, senão o de query string
     if request.method == 'POST':
         est_id = request.form.get('est_id')
 
-    # Pega os dados atuais do estabelecimento selecionado
     cur.execute("""
         SELECT est.est_id, est.est_nome, est.est_descricao, est.est_email, est.est_telefone,
                end.end_numero, end.end_complemento, end.end_bairro, end.end_rua,  
@@ -343,6 +340,18 @@ def editar_estabelecimento():
         cur.close()
         return redirect(url_for('profissional.dashboard'))
 
+    def formatar_telefone(telefone):
+        nums = re.sub(r'\D', '', telefone or '')
+        if len(nums) == 10:
+            return f"({nums[:2]}) {nums[2:6]}-{nums[6:]}"
+        elif len(nums) == 11:
+            return f"({nums[:2]}) {nums[2:7]}-{nums[7:]}"
+        else:
+            return telefone
+
+    # Formatar telefone para exibir no input já formatado
+    dados_atuais['est_telefone'] = formatar_telefone(dados_atuais['est_telefone'])
+
     if request.method == 'POST':
         try:
             est_nome = request.form.get('est_nome', dados_atuais['est_nome'])
@@ -350,11 +359,10 @@ def editar_estabelecimento():
             est_email = request.form.get('est_email', dados_atuais['est_email']).strip()
             est_telefone = request.form.get('est_telefone', dados_atuais['est_telefone']).strip()
 
-            if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$', est_email):
+            if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})?$', est_email):
                 flash('Formato de email inválido', 'danger')   
                 cur.close()
                 return redirect(url_for('estabelecimento.editar_estabelecimento', est_id=est_id))
-
 
             regex = r'^\(?\d{2}\)?\s?\d{4,5}-\d{4}$'
             if not re.match(regex, est_telefone):
@@ -402,7 +410,6 @@ def editar_estabelecimento():
 
     cur.close()
 
-    # Passar dados para o template (notar que dados_atuais é um dict)
     return render_template('editar_estabelecimento.html', 
                            estabelecimentos=estabelecimentos, 
                            est_id=int(est_id), 

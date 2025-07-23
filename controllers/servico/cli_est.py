@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
 from esteticando.database.database import mysql
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 cli_est_bp = Blueprint('cliente', __name__, url_prefix='/cliente', template_folder='templates')
 
@@ -115,12 +117,19 @@ def editar_perfil():
     if not hasattr(current_user, 'tipo_usuario') or current_user.tipo_usuario != 'cliente':
         return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
     
-    dados_user = None
+    def formatar_telefone(telefone):
+        if not telefone or len(telefone) < 10:
+            return telefone
+        telefone = ''.join(filter(str.isdigit, telefone))
+        if len(telefone) == 10:
+            return f"({telefone[:2]}) {telefone[2:6]}-{telefone[6:]}"
+        elif len(telefone) == 11:
+            return f"({telefone[:2]}) {telefone[2:7]}-{telefone[7:]}"
+        return telefone
 
     cur = mysql.connection.cursor()
 
     if request.method == 'POST':
-        # Busca os dados atuais
         cur.execute("""
             SELECT cli_nome, cli_senha, cli_telefone 
             FROM tb_cliente 
@@ -142,7 +151,6 @@ def editar_perfil():
         try:
             senha_db = dados_atuais['cli_senha']
 
-            # Se usuário preencheu nova senha
             if nova_senha:
                 if not check_password_hash(senha_db, senha_atual):
                     flash('Senha atual incorreta', 'danger')
@@ -154,9 +162,8 @@ def editar_perfil():
 
                 senha_hash = generate_password_hash(nova_senha)
             else:
-                senha_hash = senha_db  # Mantém senha antiga
+                senha_hash = senha_db
 
-            # Atualiza dados no banco
             cur.execute("""
                 UPDATE tb_cliente 
                 SET cli_nome = %s, cli_senha = %s, cli_telefone = %s
@@ -173,7 +180,6 @@ def editar_perfil():
 
         return redirect(url_for('cliente.editar_perfil'))
 
-    # Método GET: Carrega dados para o formulário
     cur.execute("""
         SELECT cli_nome, cli_cpf, cli_email, cli_telefone 
         FROM tb_cliente 
@@ -182,5 +188,7 @@ def editar_perfil():
     user = cur.fetchone()
     cur.close()
 
-    return render_template('editar_perfilCliente.html', user=user)
+    if user:
+        user['cli_telefone'] = formatar_telefone(user['cli_telefone'])
 
+    return render_template('editar_perfilCliente.html', user=user)

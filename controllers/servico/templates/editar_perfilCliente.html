@@ -7,16 +7,16 @@
 {% block content %}
 <div class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="container mt-3">
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {% if messages %}
+        <div class="container mt-3">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
+        {% endif %}
     {% endwith %}
 
     <h1>Editar Perfil</h1>
@@ -27,7 +27,9 @@
 
             <div class="form-group">
                 <label for="nome">Nome*:</label>
-                <input type="text" class="form-control" id="nome" name="nome" required maxlength="100">
+                <input type="text" class="form-control" id="nome" name="nome" required maxlength="100"
+                       value="{{ user.cli_nome if user else '' }}"
+                       placeholder="Nome completo">
             </div>
         </div>
 
@@ -55,7 +57,9 @@
 
             <div class="form-group">
                 <label for="telefone">Telefone*:</label>
-                <input type="text" class="form-control" id="telefone" name="telefone" required maxlength="15">
+                <input type="text" class="form-control" id="telefone" name="telefone" required maxlength="15"
+                       value="{{ user.cli_telefone if user else '' }}"
+                       placeholder="(XX) XXXXX-XXXX">
             </div>
         </div>
 
@@ -65,4 +69,28 @@
         </div>
     </form>
 </div>
+
+<script>
+    const input = document.getElementById('telefone');
+    
+    input.addEventListener('input', function(e) {
+      let v = input.value;
+    
+      // Remove tudo que não for número
+      v = v.replace(/\D/g, '');
+    
+      // Formata conforme a quantidade de dígitos
+      if (v.length > 0) {
+        v = '(' + v;
+      }
+      if (v.length > 3) {
+        v = v.slice(0, 3) + ') ' + v.slice(3);
+      }
+      if (v.length > 10) {
+        v = v.slice(0, 10) + '-' + v.slice(10, 14);
+      }
+    
+      input.value = v;
+    });
+</script>
 {% endblock %}

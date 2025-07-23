@@ -1,6 +1,10 @@
-{% extends "base_notlogged.html" %} {% block links %}
+{% extends "base_notlogged.html" %}
+
+{% block links %}
 <link rel="stylesheet" href="../../../static/styles/auth/login.css" />
-{% endblock %} {% block content %}
+{% endblock %}
+
+{% block content %}
 
 <main>
   <div class="container">
@@ -12,7 +16,7 @@
           type="email"
           name="email"
           id="login-email"
-          placeholder="Email"
+          placeholder="Digite seu email"
           required
         />
         <label for="login-senha" id="label-login">Senha</label>
@@ -20,12 +24,12 @@
           type="password"
           name="password"
           id="login-senha"
-          placeholder="Senha"
+          placeholder="Digite sua senha"
           required
         />
         <div class="select-servico">
           <select name="tipo_usuario" id="tipo_usuario" required>
-            <option value="">Selecione um serviço</option>
+            <option value="" disabled selected>Selecione um serviço</option>
             <option value="cliente">Sou Cliente</option>
             <option value="profissional">Sou um Profissional</option>
           </select>
@@ -39,9 +43,9 @@
     <div class="redirect">
       <h2>Bem vindo ao login</h2>
       <p>Não tem uma conta?</p>
-      <a href="{{ url_for('auth.register') }}"
-        ><button type="submit">Registra-se</button></a
-      >
+      <a href="{{ url_for('auth.register') }}">
+        <button type="submit">Registre-se</button>
+      </a>
     </div>
   </div>
 </main>
@@ -59,12 +63,11 @@
         type="email"
         name="email"
         id="redefinir-email"
-        placeholder="Email"
+        placeholder="Digite seu email"
         required
       />
       <button class="button-redefinir" type="submit">REDEFINIR SENHA</button>
     </form>
-    
   </div>
 </div>
 

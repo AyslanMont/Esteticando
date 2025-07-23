@@ -27,7 +27,8 @@
 
             <div class="form-group">
                 <label for="nome">Nome*:</label>
-                <input type="text" class="form-control" id="nome" name="nome" required maxlength="100">
+                <input type="text" class="form-control" id="nome" name="nome" required maxlength="100"
+                       placeholder="Digite seu nome completo" value="{{ user.pro_nome }}">
             </div>
         </div>
 
@@ -36,17 +37,20 @@
 
             <div class="form-group">
                 <label for="senha_atual">Senha Atual*:</label>
-                <input type="password" class="form-control" id="senha_atual" name="senha_atual" required>
+                <input type="password" class="form-control" id="senha_atual" name="senha_atual" required
+                       placeholder="Digite sua senha atual">
             </div>
 
             <div class="form-group">
                 <label for="senha">Nova Senha*:</label>
-                <input type="password" class="form-control" id="senha" name="senha" required>
+                <input type="password" class="form-control" id="senha" name="senha" required
+                       placeholder="Digite a nova senha">
             </div>
 
             <div class="form-group">
                 <label for="check_senha">Verificar Senha*:</label>
-                <input type="password" class="form-control" id="check_senha" name="check_senha" required>
+                <input type="password" class="form-control" id="check_senha" name="check_senha" required
+                       placeholder="Digite a nova senha novamente">
             </div>
         </div>
 
@@ -55,7 +59,8 @@
 
             <div class="form-group">
                 <label for="telefone">Telefone*:</label>
-                <input type="text" class="form-control" id="telefone" name="telefone" required maxlength="15">
+                <input type="text" class="form-control" id="telefone" name="telefone" required maxlength="15"
+                       placeholder="(XX) XXXX-XXXX" value="{{ user.pro_telefone }}">
             </div>
         </div>
 
@@ -65,4 +70,28 @@
         </div>
     </form>
 </div>
+
+<script>
+    const input = document.getElementById('telefone');
+    
+    input.addEventListener('input', function(e) {
+      let v = input.value;
+    
+      // Remove tudo que não for número
+      v = v.replace(/\D/g, '');
+    
+      // Formata conforme a quantidade de dígitos
+      if (v.length > 0) {
+        v = '(' + v;
+      }
+      if (v.length > 3) {
+        v = v.slice(0, 3) + ') ' + v.slice(3);
+      }
+      if (v.length > 10) {
+        v = v.slice(0, 10) + '-' + v.slice(10, 14);
+      }
+    
+      input.value = v;
+    });
+</script>
 {% endblock %}
