@@ -3,8 +3,6 @@ from flask_login import login_required,current_user
 from esteticando.database.database import mysql
 from datetime import datetime, date
 
-
-
 agendamento_bp = Blueprint('agendamento', __name__, url_prefix='/agendamento')
 
 HORARIOS_DISPONIVEIS = [

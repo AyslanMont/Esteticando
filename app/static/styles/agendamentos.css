@@ -1,0 +1,86 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f9f9f9;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+form {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+input[type="date"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+button {
+  padding: 8px 12px;
+  margin-left: 10px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #145ca8;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background-color: #1976d2;
+  color: white;
+}
+
+td {
+  color: #333;
+}
+
+.status-concluído {
+  color: green;
+  font-weight: bold;
+}
+
+.status-cancelado {
+  color: red;
+  font-weight: bold;
+}
+
+button.cancelar {
+  background-color: #e53935;
+}
+
+button.cancelar:hover {
+  background-color: #c62828;
+}
+
+button.concluir {
+  background-color: #43a047;
+}
+
+button.concluir:hover {
+  background-color: #2e7d32;
+}

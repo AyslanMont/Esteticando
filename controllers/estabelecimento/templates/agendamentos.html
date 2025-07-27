@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block links %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/agendamentos.css') }}">
+{% endblock %}
+
+{% block content %}
+<h1>Agendamentos</h1>
+
+<form method="POST">
+  <label for="data">Filtrar por data:</label>
+  <input type="date" name="data" value="{{ data_selecionada }}">
+  <button type="submit">Filtrar</button>
+</form>
+
+<table>
+  <tr>
+    <th>Cliente</th>
+    <th>Serviço</th>
+    <th>Preço</th>
+    <th>Data</th>
+    <th>Horário</th>
+    <th>Duração</th>
+    <th>Status</th>
+    <th>Ações</th>
+  </tr>
+  {% for ag in agendamentos %}
+  <tr>
+    <td>{{ ag.cli_nome }}</td>
+    <td>{{ ag.ser_nome }}</td>
+    <td>R$ {{ ag.ser_preco }}</td>
+    <td>{{ ag.age_data }}</td>
+    <td>{{ ag.age_horario }}</td>
+    <td>{{ ag.age_duracao }} min</td>
+    <td class="status-{{ ag.age_status }}">{{ ag.age_status }}</td>
+    <td>
+      {% if ag.age_status != 'concluído' %}
+      <form method="POST" style="display:inline;">
+        <input type="hidden" name="id" value="{{ ag.age_id }}">
+        <input type="hidden" name="data" value="{{ data_selecionada }}">
+        <input type="hidden" name="acao" value="concluir">
+        <button type="submit" class="concluir">Concluir</button>
+      </form>
+      {% endif %}
+      {% if ag.age_status != 'cancelado' %}
+      <form method="POST" style="display:inline;">
+        <input type="hidden" name="id" value="{{ ag.age_id }}">
+        <input type="hidden" name="data" value="{{ data_selecionada }}">
+        <input type="hidden" name="acao" value="cancelar">
+        <button type="submit" class="cancelar">Cancelar</button>
+      </form>
+      {% endif %}
+    </td>
+  </tr>
+{% endfor %}
+
+</table>
+{% endblock %}

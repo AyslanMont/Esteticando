@@ -440,3 +440,53 @@ def meus_estabelecimentos():
     except Exception as e:
         flash(f'Erro ao carregar seus estabelecimentos: {str(e)}', 'danger')
         return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
+
+@estabelecimento_bp.route('/agendamentos', methods=['GET', 'POST'])
+@login_required
+def agendamentos():
+    if getattr(current_user, 'tipo_usuario', None) != 'profissional':
+        flash('Você precisa estar logado como profissional para acessar essa página.', 'danger')
+        return redirect(url_for('auth.login'))
+
+    filtro_data = request.form.get('data') or date.today().strftime('%Y-%m-%d')
+
+    # Buscar o ID do estabelecimento onde o profissional trabalha
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT pro_est_id FROM tb_profissional WHERE pro_id = %s', (current_user.id,))
+    resultado = cur.fetchone()
+    if not resultado:
+        cur.close()
+        flash('Estabelecimento não encontrado para este profissional.', 'danger')
+        return redirect(url_for('dashboard'))  # ou outra rota apropriada
+    est_id = resultado['pro_est_id']
+
+
+    # Atualizar status se for um POST com ação
+    if request.form.get('acao') in ['concluir', 'cancelar']:
+        agendamento_id = request.form.get('id')
+        novo_status = 'concluído' if request.form.get('acao') == 'concluir' else 'cancelado'
+
+        cur.execute("UPDATE tb_agendamento SET age_status = %s WHERE age_id = %s", (novo_status, agendamento_id))
+        mysql.connection.commit()
+        flash(f'Agendamento {novo_status} com sucesso.', 'success')
+        return redirect(url_for('estabelecimento.agendamentos'))
+
+    # Buscar agendamentos do estabelecimento na data
+    cur.execute('''
+        SELECT 
+            age_id, age_data, age_horario, age_status, cli_nome,
+            ser_nome, ser_preco, age_duracao
+        FROM tb_agendamento 
+        JOIN tb_cliente cli ON age_cli_id = cli_id
+        JOIN tb_profissional pro ON age_pro_id = pro_id
+        JOIN tb_servico ser ON age_ser_id = ser_id
+        JOIN tb_estabelecimento est ON ser_est_id = est_id
+        WHERE est_id = %s AND DATE(age_data) = %s
+        ORDER BY age_data, age_horario;
+    ''', (est_id, filtro_data))
+
+    agendamentos = cur.fetchall()
+    cur.close()
+
+    return render_template('agendamentos.html', agendamentos=agendamentos, data_selecionada=filtro_data)
+
