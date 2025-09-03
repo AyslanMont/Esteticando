@@ -27,13 +27,15 @@
   <body>
     <header class="navbar">
       <menu>
-        <img src="{{ url_for('static', filename='imgs/favicon.png') }}" alt="logo barbearia" id="img-navbar" />
+        <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">
+          <img src="{{ url_for('static', filename='imgs/favicon.png') }}" alt="logo barbearia" id="img-navbar" />
+        </a>
+
 
         {% if current_user.is_authenticated and current_user.tipo_usuario == 'profissional' %}
             <a href="{{ url_for('estabelecimento.cadastrar_estabelecimento')}}">Cadastrar</a>
             <a href="{{ url_for('estabelecimento.editar_estabelecimento')}}">Editar</a>
         {% endif %}
-        <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Página Inicial</a>
 
         {% if current_user.is_authenticated and current_user.tipo_usuario == 'profissional' %}
         <a href="{{ url_for('profissional.perfil')}}">Perfil</a>
