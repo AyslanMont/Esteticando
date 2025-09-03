@@ -1,69 +1,53 @@
-{% extends "base.html" %} {% block links %}
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='styles/filtrar_estabelecimento.css') }}"
-/>
+{% extends "base.html" %}
 
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search"
-/>
-{% endblock %} {% block content %}
+{% block links %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/filtrar_estabelecimento.css') }}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+{% endblock %}
 
+{% block content %}
 <main>
   <div class="filtros">
     <div class="search">
       <form action="{{ url_for('estabelecimento.filtrar_estabelecimento') }}" method="POST">
         <label for="estado">Selecione seu estado:</label>
         <select id="estado" name="estado">
-            <option value="AC">Acre</option>
-            <option value="AL">Alagoas</option>
-            <option value="AP">Amapá</option>
-            <option value="AM">Amazonas</option>
-            <option value="BA">Bahia</option>
-            <option value="CE">Ceará</option>
-            <option value="DF">Distrito Federal</option>
-            <option value="ES">Espírito Santo</option>
-            <option value="GO">Goiás</option>
-            <option value="MA">Maranhão</option>
-            <option value="MT">Mato Grosso</option>
-            <option value="MS">Mato Grosso do Sul</option>
-            <option value="MG">Minas Gerais</option>
-            <option value="PA">Pará</option>
-            <option value="PB">Paraíba</option>
-            <option value="PR">Paraná</option>
-            <option value="PE">Pernambuco</option>
-            <option value="PI">Piauí</option>
-            <option value="RJ">Rio de Janeiro</option>
-            <option value="RN">Rio Grande do Norte</option>
-            <option value="RS">Rio Grande do Sul</option>
-            <option value="RO">Rondônia</option>
-            <option value="RR">Roraima</option>
-            <option value="SC">Santa Catarina</option>
-            <option value="SP">São Paulo</option>
-            <option value="SE">Sergipe</option>
-            <option value="TO">Tocantins</option>
+          <!-- opções de estados -->
         </select>
         <input type="text" name="cidade" placeholder="Cidade">
         <input type="text" name="bairro" placeholder="Bairro">
         <input type="text" name="nome" placeholder="Nome do estabelecimento">
-        <input type="submit" >
+        <input type="submit" value="Filtrar">
       </form>
     </div>
-    <!-- Lista de Estabelecimentos -->
+
     <div class="resultados">
       {% if result_est %}
         {% for estabelecimento in result_est %}
         <div class="estabelecimento">
-          <div class="foto"></div>
+          <!-- Imagem pequena no quadrado à esquerda -->
+          <div class="foto">
+            {% if estabelecimento.imagem_base64 %}
+              <img src="data:image/jpeg;base64,{{ estabelecimento.imagem_base64 }}" 
+                   alt="Imagem do {{ estabelecimento.est_nome }}">
+            {% else %}
+              <img src="{{ url_for('static', filename='imgs/sem_imagem.png') }}" 
+                   alt="Sem imagem disponível">
+            {% endif %}
+          </div>
+
           <div class="interacao">
             <div class="informacoes">
               <h3>{{ estabelecimento.est_nome }}</h3>
               <p>{{ estabelecimento.end_bairro }}, {{ estabelecimento.end_cidade }} - {{ estabelecimento.end_estado }}</p>
             </div>
             <div class="interecao-buttons">
-              <img src="/static/imgs/favorito.png" alt="Favorito" />
-              <button><a href="{{ url_for('estabelecimento.perfil_estabelecimento', est_id=estabelecimento.est_id) }}">Agenda</a></button>
+              <img src="{{ url_for('static', filename='imgs/favorito.png') }}" alt="Favorito" />
+              <button>
+                <a href="{{ url_for('estabelecimento.perfil_estabelecimento', est_id=estabelecimento.est_id) }}">
+                  Agenda
+                </a>
+              </button>
             </div>
           </div>
         </div>
@@ -73,8 +57,5 @@
       {% endif %}
     </div>
   </div>
-  
-  
 </main>
-
 {% endblock %}

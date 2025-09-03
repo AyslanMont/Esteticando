@@ -3,6 +3,7 @@ from flask_login import login_required,current_user
 from esteticando.database.database import mysql
 from datetime import datetime, date
 import re
+import base64
 
 estabelecimento_bp = Blueprint('estabelecimento', __name__, url_prefix='/estabelecimento', template_folder='templates')
 
@@ -12,9 +13,8 @@ def estabelecimento():
 
 @estabelecimento_bp.route('/filtrar_estabelecimento', methods=['GET', 'POST'])
 def filtrar_estabelecimento():
-
     result_est = []
-    
+
     if request.method == 'POST':
         end_estado = request.form.get('estado', '').strip()
         end_cidade = request.form.get('cidade', '').strip()
@@ -26,23 +26,20 @@ def filtrar_estabelecimento():
             return render_template('filtrar_estabelecimento.html', result_est=result_est)
 
         query_est = """
-            SELECT est_id, est_nome, est_descricao, est_imagem, est_email, est_telefone, end_rua, end_numero, end_bairro, end_cidade, end_estado 
+            SELECT est_id, est_nome, est_descricao, est_imagem, est_email, est_telefone,
+                   end_rua, end_numero, end_bairro, end_cidade, end_estado 
             FROM tb_endereco_estabelecimento 
             JOIN tb_estabelecimento ON est_id = end_est_id 
             WHERE end_estado = %s
         """
-
-        
         parametros = [end_estado]
 
         if end_cidade:
             query_est += " AND end_cidade = %s"
             parametros.append(end_cidade)
-        
         if end_bairro:
             query_est += " AND end_bairro = %s"
             parametros.append(end_bairro)
-
         if est_nome:
             query_est += " AND est_nome LIKE %s"
             parametros.append(f"%{est_nome}%")
@@ -50,30 +47,41 @@ def filtrar_estabelecimento():
         cur = mysql.connection.cursor()
         try:
             cur.execute(query_est, tuple(parametros))
-            result_est = cur.fetchall()
+            rows = cur.fetchall()
+            result_est = []
+            for row in rows:
+                if row['est_imagem']:
+                    row['imagem_base64'] = base64.b64encode(row['est_imagem']).decode('utf-8')
+                else:
+                    row['imagem_base64'] = None
+                result_est.append(row)
         finally:
             cur.close()
 
-        if not result_est:
-            flash('Nenhum estabelecimento encontrado com esses filtros.', 'info')
-
-    else:  # Método GET
+    else:  # GET
         cur = mysql.connection.cursor()
         try:
             query = """
-                SELECT est_id, est_nome, est_descricao, est_email, est_telefone,est_imagem, end_rua, end_numero, end_bairro, end_cidade, end_estado
+                SELECT est_id, est_nome, est_descricao, est_email, est_telefone, est_imagem,
+                       end_rua, end_numero, end_bairro, end_cidade, end_estado
                 FROM tb_endereco_estabelecimento 
                 JOIN tb_estabelecimento ON est_id = end_est_id 
                 ORDER BY est_nome
                 LIMIT 20
             """
             cur.execute(query)
-            result_est = cur.fetchall()
+            rows = cur.fetchall()
+            result_est = []
+            for row in rows:
+                if row['est_imagem']:
+                    row['imagem_base64'] = base64.b64encode(row['est_imagem']).decode('utf-8')
+                else:
+                    row['imagem_base64'] = None
+                result_est.append(row)
         finally:
             cur.close()
 
     return render_template('filtrar_estabelecimento.html', result_est=result_est)
-
 
 @estabelecimento_bp.route('/perfil/<int:est_id>')  # Corrigido aqui
 @login_required
@@ -227,6 +235,7 @@ def cadastrar_estabelecimento():
 
             # Inserção no banco
             cur = mysql.connection.cursor()
+
 
             # Verifica se CNPJ já existe
             cur.execute("SELECT est_id FROM tb_estabelecimento WHERE est_cnpj = %s", (est_data['cnpj'],))
