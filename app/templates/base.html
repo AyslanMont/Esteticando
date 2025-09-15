@@ -42,7 +42,7 @@
         {% else %}
         <a href="{{ url_for('cliente.perfil')}}">Perfil</a>
         {% endif %}
-        <a href="#">Contato</a>
+        <!-- <a href="#">Contato</a> -->
         {% if current_user.is_authenticated %}
         <div id="btn-navbar">
           <a href="{{ url_for('auth.logout') }}"><button class="btn-navbar">Sair</button></a>
