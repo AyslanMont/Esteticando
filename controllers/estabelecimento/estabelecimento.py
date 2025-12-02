@@ -154,7 +154,7 @@ def perfil_estabelecimento(est_id):
     except Exception as e:
         print(f"Erro ao carregar perfil do estabelecimento: {str(e)}")
         flash("Ocorreu um erro ao carregar o perfil do estabelecimento.", "danger")
-        return redirect(url_for('principal.index'))
+        return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
     finally:
         if cur:
             cur.close()

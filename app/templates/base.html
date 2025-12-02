@@ -12,6 +12,7 @@
       href="../static/imgs/favicon.png"
       type="image/x-icon"
     />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -84,6 +85,48 @@
       window.onload = function() {
         window.scrollTo(0, 0);
       }
+
+      document.addEventListener("DOMContentLoaded", function () {
+
+        const stars = document.querySelectorAll("#stars .star");
+        const notaInput = document.getElementById("notaSelecionada");
+        let selectedRating = 0;
+
+        // Quando o mouse passa por cima
+        stars.forEach(star => {
+            star.addEventListener("mouseenter", function () {
+                const value = parseInt(this.getAttribute("data-value"));
+                highlightStars(value);
+            });
+        });
+
+        // Quando o mouse sai do bloco
+        document.getElementById("stars").addEventListener("mouseleave", function () {
+            highlightStars(selectedRating);
+        });
+
+        // Quando clica
+        stars.forEach(star => {
+            star.addEventListener("click", function () {
+                selectedRating = parseInt(this.getAttribute("data-value"));
+                notaInput.value = selectedRating;
+                highlightStars(selectedRating);
+            });
+        });
+
+        // Função para colorir as estrelas
+        function highlightStars(value) {
+            stars.forEach(star => {
+                const starValue = parseInt(star.getAttribute("data-value"));
+                if (starValue <= value) {
+                    star.classList.add("selected");
+                } else {
+                    star.classList.remove("selected");
+                }
+            });
+        }
+
+        });
     </script>
   </body>
 </html>
