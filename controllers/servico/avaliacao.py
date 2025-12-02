@@ -6,77 +6,40 @@ from datetime import datetime
 avaliacao_bp = Blueprint('avaliacao', __name__, url_prefix='/avaliacao')
 
 # --- ROTA PARA REGISTRAR AVALIAÇÃO ---
+
+
 @avaliacao_bp.route('/cadastrar', methods=['POST'])
 @login_required
 def cadastrar_avaliacao():
-    agendamento_id = request.form.get('agendamento_id')
-    nota = request.form.get('nota')
-    comentario = request.form.get('comentario', '').strip()
+    nota = request.form.get("nota")
+    comentario = request.form.get("comentario")
+    ser_id = request.form.get("ser_id")
+    age_id = request.form.get("agendamento_id")
 
-    if not agendamento_id or not nota:
-        flash("Preencha todos os campos obrigatórios.", "danger")
-        return redirect(request.referrer)
+    if not age_id:
+        age_id = None
 
-    nota = int(nota)
-
-    # valida nota
-    if nota < 1 or nota > 5:
-        flash("A nota deve ser entre 1 e 5 estrelas.", "danger")
+    if not nota:
+        flash("Selecione uma nota para avaliar o serviço.", "danger")
         return redirect(request.referrer)
 
     try:
         with mysql.connection.cursor() as cur:
-
-            # verifica se o agendamento existe e pertence ao cliente
             cur.execute("""
-                SELECT age_id, age_cli_id, age_status 
-                FROM tb_agendamento 
-                WHERE age_id=%s
-            """, (agendamento_id,))
-            agendamento = cur.fetchone()
-
-            if not agendamento:
-                flash("Agendamento não encontrado.", "danger")
-                return redirect(request.referrer)
-
-            if agendamento["age_cli_id"] != current_user.id:
-                flash("Você não pode avaliar um agendamento que não lhe pertence.", "danger")
-                return redirect(request.referrer)
-
-            # (opcional) só permite avaliar agendamento concluído
-            # if agendamento["age_status"] != "Concluído":
-            #     flash("Você só pode avaliar serviços concluídos.", "warning")
-            #     return redirect(request.referrer)
-
-            # verificar se o usuário já avaliou esse agendamento
-            cur.execute("""
-                SELECT ava_id 
-                FROM tb_avaliacao 
-                WHERE ava_age_id=%s AND ava_cli_id=%s
-            """, (agendamento_id, current_user.id))
-            avaliacao_existente = cur.fetchone()
-
-            if avaliacao_existente:
-                flash("Você já avaliou este atendimento.", "warning")
-                return redirect(request.referrer)
-
-            # inserir avaliação
-            cur.execute("""
-                INSERT INTO tb_avaliacao 
-                    (ava_nota, ava_comentario, ava_dataCriacao, 
-                     ava_cli_id, ava_age_id)
-                VALUES (%s, %s, NOW(), %s, %s)
-            """, (nota, comentario, current_user.id, agendamento_id))
+            INSERT INTO tb_avaliacao
+            (ava_dataCriacao, ava_nota, ava_comentario, ava_cli_id, ava_age_id)
+            VALUES (CURDATE(), %s, %s, %s, %s)
+""", (nota, comentario, current_user.id, age_id))
 
             mysql.connection.commit()
 
         flash("Avaliação registrada com sucesso!", "success")
+        return redirect(request.referrer)
 
     except Exception as e:
         mysql.connection.rollback()
-        flash(f"Erro ao enviar avaliação: {e}", "danger")
-
-    return redirect(request.referrer)
+        flash(f"Erro ao registrar avaliação: {e}", "danger")
+        return redirect(request.referrer)
 
 
 # --- ROTA PARA LISTAR AVALIAÇÕES DE UM SERVIÇO ---

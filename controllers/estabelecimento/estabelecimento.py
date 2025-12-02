@@ -1,15 +1,18 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
-from flask_login import login_required,current_user
+from flask_login import login_required, current_user
 from esteticando.database.database import mysql
 from datetime import datetime, date
 import re
 import base64
 
-estabelecimento_bp = Blueprint('estabelecimento', __name__, url_prefix='/estabelecimento', template_folder='templates')
+estabelecimento_bp = Blueprint('estabelecimento', __name__,
+                               url_prefix='/estabelecimento', template_folder='templates')
+
 
 @estabelecimento_bp.route('/')
 def estabelecimento():
     return render_template('estabelecimento.html')
+
 
 @estabelecimento_bp.route('/filtrar_estabelecimento', methods=['GET', 'POST'])
 def filtrar_estabelecimento():
@@ -51,7 +54,8 @@ def filtrar_estabelecimento():
             result_est = []
             for row in rows:
                 if row['est_imagem']:
-                    row['imagem_base64'] = base64.b64encode(row['est_imagem']).decode('utf-8')
+                    row['imagem_base64'] = base64.b64encode(
+                        row['est_imagem']).decode('utf-8')
                 else:
                     row['imagem_base64'] = None
                 result_est.append(row)
@@ -74,7 +78,8 @@ def filtrar_estabelecimento():
             result_est = []
             for row in rows:
                 if row['est_imagem']:
-                    row['imagem_base64'] = base64.b64encode(row['est_imagem']).decode('utf-8')
+                    row['imagem_base64'] = base64.b64encode(
+                        row['est_imagem']).decode('utf-8')
                 else:
                     row['imagem_base64'] = None
                 result_est.append(row)
@@ -82,6 +87,7 @@ def filtrar_estabelecimento():
             cur.close()
 
     return render_template('filtrar_estabelecimento.html', result_est=result_est)
+
 
 @estabelecimento_bp.route('/perfil/<int:est_id>')  # Corrigido aqui
 @login_required
@@ -109,7 +115,8 @@ def perfil_estabelecimento(est_id):
         imagem_base64 = None
         if estabelecimento['est_imagem']:
             import base64
-            imagem_base64 = base64.b64encode(estabelecimento['est_imagem']).decode('utf-8')
+            imagem_base64 = base64.b64encode(
+                estabelecimento['est_imagem']).decode('utf-8')
 
         # 2. Busca os serviços do estabelecimento
         cur.execute("""
@@ -121,11 +128,27 @@ def perfil_estabelecimento(est_id):
 
         # 3. Verifica se o usuário atual é o dono do estabelecimento
         is_dono = False
-        if (current_user.is_authenticated and 
-            current_user.tipo_usuario == 'profissional' and 
-            estabelecimento['est_dono_id'] and 
-            estabelecimento['est_dono_id'] == current_user.id):
+        if (current_user.is_authenticated and
+            current_user.tipo_usuario == 'profissional' and
+            estabelecimento['est_dono_id'] and
+                estabelecimento['est_dono_id'] == current_user.id):
             is_dono = True
+
+        # 4. Buscar média e quantidade de avaliações do estabelecimento
+        cur.execute("""
+            SELECT 
+            AVG(ava_nota) AS media,
+            COUNT(*) AS quantidade
+            FROM tb_avaliacao a
+            JOIN tb_agendamento ag ON a.ava_age_id = ag.age_id
+            JOIN tb_servico s ON ag.age_ser_id = s.ser_id
+            WHERE s.ser_est_id = %s""", (est_id,))
+
+        avaliacao_info = cur.fetchone()
+
+        media_avaliacao = round(
+            avaliacao_info['media'], 1) if avaliacao_info['media'] else 0
+        qtd_avaliacoes = avaliacao_info['quantidade'] if avaliacao_info['quantidade'] else 0
 
         # 4. Se não há serviços cadastrados
         if not servicos:
@@ -149,6 +172,8 @@ def perfil_estabelecimento(est_id):
                                est_descricao=estabelecimento['est_descricao'],
                                imagem_base64=imagem_base64,
                                is_dono=is_dono,
+                               media_avaliacao=media_avaliacao,
+                               qtd_avaliacoes=qtd_avaliacoes,
                                data=data_atual)
 
     except Exception as e:
@@ -166,7 +191,7 @@ def cadastrar_estabelecimento():
     # Só profissional pode cadastrar estabelecimento
     if not hasattr(current_user, 'tipo_usuario') or current_user.tipo_usuario != 'profissional':
         return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
-    
+
     pro_id = current_user.id
     cur = None
 
@@ -177,7 +202,7 @@ def cadastrar_estabelecimento():
                 'est_telefone', 'est_cat_id', 'end_numero', 'end_bairro',
                 'end_rua', 'end_cidade', 'end_estado', 'end_cep'
             ]
-            
+
             # Verificação dos campos obrigatórios
             for field in required_fields:
                 if not request.form.get(field):
@@ -188,19 +213,20 @@ def cadastrar_estabelecimento():
             if 'est_imagem' not in request.files:
                 flash('A imagem do estabelecimento é obrigatória', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
-                
+
             imagem_arquivo = request.files['est_imagem']
             if imagem_arquivo.filename == '':
                 flash('Nenhuma imagem selecionada', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
-                
+
             imagem_binaria = imagem_arquivo.read()
 
             # Validação do telefone antes de limpar os dígitos
             telefone_bruto = request.form['est_telefone'].strip()
             regex_telefone = r'^\(?\d{2}\)?\s?\d{4,5}-\d{4}$'
             if not re.match(regex_telefone, telefone_bruto):
-                flash('Formato de telefone inválido. Use (XX) XXXX-XXXX ou (XX) XXXXX-XXXX', 'danger')
+                flash(
+                    'Formato de telefone inválido. Use (XX) XXXX-XXXX ou (XX) XXXXX-XXXX', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
 
             # Preparação dos dados
@@ -236,9 +262,9 @@ def cadastrar_estabelecimento():
             # Inserção no banco
             cur = mysql.connection.cursor()
 
-
             # Verifica se CNPJ já existe
-            cur.execute("SELECT est_id FROM tb_estabelecimento WHERE est_cnpj = %s", (est_data['cnpj'],))
+            cur.execute(
+                "SELECT est_id FROM tb_estabelecimento WHERE est_cnpj = %s", (est_data['cnpj'],))
             if cur.fetchone():
                 flash('CNPJ já cadastrado!', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
@@ -248,7 +274,7 @@ def cadastrar_estabelecimento():
                 """INSERT INTO tb_estabelecimento 
                 (est_dataCriacao, est_nome, est_descricao, est_cnpj, est_email, est_telefone, est_imagem, est_cat_id, est_dono_id) 
                 VALUES (CURDATE(), %s, %s, %s, %s, %s, %s, %s, %s)""",
-                (est_data['nome'], est_data['descricao'], est_data['cnpj'], 
+                (est_data['nome'], est_data['descricao'], est_data['cnpj'],
                  est_data['email'], est_data['telefone'], est_data['foto'], est_data['cat_id'], pro_id)
             )
             est_id = cur.lastrowid
@@ -258,8 +284,8 @@ def cadastrar_estabelecimento():
                 """INSERT INTO tb_endereco_estabelecimento 
                 (end_numero, end_complemento, end_bairro, end_rua, end_cidade, end_estado, end_cep, end_est_id) 
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                (end_data['numero'], end_data['complemento'], end_data['bairro'], 
-                 end_data['rua'], end_data['cidade'], end_data['estado'], 
+                (end_data['numero'], end_data['complemento'], end_data['bairro'],
+                 end_data['rua'], end_data['cidade'], end_data['estado'],
                  end_data['cep'], est_id)
             )
 
@@ -271,7 +297,8 @@ def cadastrar_estabelecimento():
 
             mysql.connection.commit()
 
-            flash("Estabelecimento cadastrado com sucesso! Agora você pode adicionar serviços.", "success")
+            flash(
+                "Estabelecimento cadastrado com sucesso! Agora você pode adicionar serviços.", "success")
             return redirect(url_for('servico.adicionar_servico', est_id=est_id))
 
         except ValueError:
@@ -291,10 +318,10 @@ def cadastrar_estabelecimento():
         cur = mysql.connection.cursor()
         cur.execute("SELECT cat_id, cat_nome FROM tb_categoria")
         categorias = cur.fetchall()
-        estados = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 
-                  'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 
-                  'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
-        return render_template('cadastrar_estabelecimento.html', 
+        estados = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
+                   'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
+                   'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
+        return render_template('cadastrar_estabelecimento.html',
                                categorias=categorias,
                                estados=estados)
     except Exception as e:
@@ -304,13 +331,14 @@ def cadastrar_estabelecimento():
         if cur is not None:
             cur.close()
 
+
 @estabelecimento_bp.route('/editar_estabelecimento', methods=['GET', 'POST'])
 @login_required
 def editar_estabelecimento():
     if getattr(current_user, 'tipo_usuario', None) != 'profissional':
         flash('Você precisa estar logado como profissional para cadastrar um estabelecimento.', 'danger')
         return redirect(url_for('auth.login'))
-    
+
     cur = mysql.connection.cursor()
 
     # Buscar todos os estabelecimentos do profissional logado
@@ -359,38 +387,48 @@ def editar_estabelecimento():
             return telefone
 
     # Formatar telefone para exibir no input já formatado
-    dados_atuais['est_telefone'] = formatar_telefone(dados_atuais['est_telefone'])
+    dados_atuais['est_telefone'] = formatar_telefone(
+        dados_atuais['est_telefone'])
 
     if request.method == 'POST':
         try:
             est_nome = request.form.get('est_nome', dados_atuais['est_nome'])
-            est_descricao = request.form.get('est_descricao', dados_atuais['est_descricao'])
-            est_email = request.form.get('est_email', dados_atuais['est_email']).strip()
-            est_telefone = request.form.get('est_telefone', dados_atuais['est_telefone']).strip()
+            est_descricao = request.form.get(
+                'est_descricao', dados_atuais['est_descricao'])
+            est_email = request.form.get(
+                'est_email', dados_atuais['est_email']).strip()
+            est_telefone = request.form.get(
+                'est_telefone', dados_atuais['est_telefone']).strip()
 
             if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})?$', est_email):
-                flash('Formato de email inválido', 'danger')   
+                flash('Formato de email inválido', 'danger')
                 cur.close()
                 return redirect(url_for('estabelecimento.editar_estabelecimento', est_id=est_id))
 
             regex = r'^\(?\d{2}\)?\s?\d{4,5}-\d{4}$'
             if not re.match(regex, est_telefone):
-                flash('Formato de telefone inválido. Use (XX) XXXX-XXXX ou (XX) XXXXX-XXXX', 'danger')
+                flash(
+                    'Formato de telefone inválido. Use (XX) XXXX-XXXX ou (XX) XXXXX-XXXX', 'danger')
                 cur.close()
                 return redirect(url_for('estabelecimento.editar_estabelecimento', est_id=est_id))
-            
+
             cur.execute("""
                 UPDATE tb_estabelecimento 
                 SET est_nome = %s, est_descricao = %s, est_email = %s, est_telefone = %s
                 WHERE est_id = %s
             """, (est_nome, est_descricao, est_email, est_telefone, est_id))
 
-            end_numero = request.form.get('end_numero', dados_atuais['end_numero'])
-            end_complemento = request.form.get('end_complemento', dados_atuais['end_complemento'] or '')
-            end_bairro = request.form.get('end_bairro', dados_atuais['end_bairro'])
+            end_numero = request.form.get(
+                'end_numero', dados_atuais['end_numero'])
+            end_complemento = request.form.get(
+                'end_complemento', dados_atuais['end_complemento'] or '')
+            end_bairro = request.form.get(
+                'end_bairro', dados_atuais['end_bairro'])
             end_rua = request.form.get('end_rua', dados_atuais['end_rua'])
-            end_cidade = request.form.get('end_cidade', dados_atuais['end_cidade'])
-            end_estado = request.form.get('end_estado', dados_atuais['end_estado'])
+            end_cidade = request.form.get(
+                'end_cidade', dados_atuais['end_cidade'])
+            end_estado = request.form.get(
+                'end_estado', dados_atuais['end_estado'])
             end_cep = request.form.get('end_cep', dados_atuais['end_cep'])
 
             if not re.match(r'^\d{8}$', end_cep):
@@ -403,7 +441,7 @@ def editar_estabelecimento():
                 SET end_numero = %s, end_complemento = %s, end_bairro = %s,
                     end_rua = %s, end_cidade = %s, end_estado = %s, end_cep = %s
                 WHERE end_est_id = %s
-            """, (end_numero, end_complemento, end_bairro, end_rua, 
+            """, (end_numero, end_complemento, end_bairro, end_rua,
                   end_cidade, end_estado, end_cep, est_id))
 
             mysql.connection.commit()
@@ -419,10 +457,11 @@ def editar_estabelecimento():
 
     cur.close()
 
-    return render_template('editar_estabelecimento.html', 
-                           estabelecimentos=estabelecimentos, 
-                           est_id=int(est_id), 
+    return render_template('editar_estabelecimento.html',
+                           estabelecimentos=estabelecimentos,
+                           est_id=int(est_id),
                            estabelecimento=dados_atuais)
+
 
 @estabelecimento_bp.route('/meus_estabelecimentos')
 @login_required
@@ -450,6 +489,7 @@ def meus_estabelecimentos():
         flash(f'Erro ao carregar seus estabelecimentos: {str(e)}', 'danger')
         return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
 
+
 @estabelecimento_bp.route('/agendamentos', methods=['GET', 'POST'])
 @login_required
 def agendamentos():
@@ -461,7 +501,8 @@ def agendamentos():
 
     # Buscar o ID do estabelecimento onde o profissional trabalha
     cur = mysql.connection.cursor()
-    cur.execute('SELECT pro_est_id FROM tb_profissional WHERE pro_id = %s', (current_user.id,))
+    cur.execute(
+        'SELECT pro_est_id FROM tb_profissional WHERE pro_id = %s', (current_user.id,))
     resultado = cur.fetchone()
     if not resultado:
         cur.close()
@@ -469,13 +510,14 @@ def agendamentos():
         return redirect(url_for('dashboard'))  # ou outra rota apropriada
     est_id = resultado['pro_est_id']
 
-
     # Atualizar status se for um POST com ação
     if request.form.get('acao') in ['concluir', 'cancelar']:
         agendamento_id = request.form.get('id')
-        novo_status = 'concluído' if request.form.get('acao') == 'concluir' else 'cancelado'
+        novo_status = 'concluído' if request.form.get(
+            'acao') == 'concluir' else 'cancelado'
 
-        cur.execute("UPDATE tb_agendamento SET age_status = %s WHERE age_id = %s", (novo_status, agendamento_id))
+        cur.execute("UPDATE tb_agendamento SET age_status = %s WHERE age_id = %s",
+                    (novo_status, agendamento_id))
         mysql.connection.commit()
         flash(f'Agendamento {novo_status} com sucesso.', 'success')
         return redirect(url_for('estabelecimento.agendamentos'))
@@ -498,4 +540,3 @@ def agendamentos():
     cur.close()
 
     return render_template('agendamentos.html', agendamentos=agendamentos, data_selecionada=filtro_data)
-

@@ -142,3 +142,41 @@ INSERT INTO tb_categoria (cat_nome) VALUES
 ('Saúde'),
 ('Estética'),
 ('Bem-estar');
+
+ALTER TABLE tb_avaliacao 
+MODIFY ava_age_id INT NULL;
+
+ALTER TABLE tb_avaliacao
+DROP FOREIGN KEY tb_avaliacao_ibfk_2;
+
+ALTER TABLE tb_avaliacao
+ADD CONSTRAINT tb_avaliacao_ibfk_2
+  FOREIGN KEY (ava_age_id) REFERENCES tb_agendamento(age_id)
+  ON DELETE SET NULL;
+
+
+SHOW CREATE TABLE tb_avaliacao;
+SHOW CREATE TABLE tb_agendamento;
+
+ALTER TABLE tb_avaliacao 
+DROP FOREIGN KEY tb_avaliacao_ibfk_2;
+
+SELECT CONSTRAINT_NAME 
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE TABLE_NAME = 'tb_avaliacao'
+AND REFERENCED_TABLE_NAME = 'tb_agendamento';
+
+
+
+ALTER TABLE tb_avaliacao 
+MODIFY ava_age_id INT NULL;
+
+ALTER TABLE tb_avaliacao
+ADD CONSTRAINT fk_avaliacao_agendamento
+FOREIGN KEY (ava_age_id) REFERENCES tb_agendamento(age_id)
+ON DELETE SET NULL
+ON UPDATE CASCADE;
+
+SHOW CREATE TABLE tb_avaliacao;
+
+select * from tb_avaliacao;

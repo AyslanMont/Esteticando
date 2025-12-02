@@ -8,56 +8,64 @@
 <main class="container">
   <section class="estabelecimento-header">
     {% if imagem_base64 %}
-    <img src="data:image/jpeg;base64,{{ imagem_base64 }}" 
-         alt="{{ est_nome }}" 
-         class="estabelecimento-logo">
+    <img src="data:image/jpeg;base64,{{ imagem_base64 }}" alt="{{ est_nome }}" class="estabelecimento-logo">
     {% else %}
-    <img src="{{ url_for('static', filename='imgs/default-establishment.jpg') }}" 
-         alt="Imagem padrão" 
-         class="estabelecimento-logo">
+    <img src="{{ url_for('static', filename='imgs/default-establishment.jpg') }}" alt="Imagem padrão"
+      class="estabelecimento-logo">
     {% endif %}
-    
+
     <div class="estabelecimento-info">
       <h1>{{ est_nome }}</h1>
       {% if est_descricao %}
       <p class="estabelecimento-descricao">{{ est_descricao }}</p>
       {% endif %}
-      <div class="rating">
-        <!-- Sistema de avaliação -->
-        {% for i in range(5) %}
-        <span class="star">★</span>
+      <div class="rating d-flex align-items-center gap-1">
+
+        {% for i in range(1, 6) %}
+        {% if media_avaliacao >= i %}
+        <i class="bi bi-star-fill text-warning"></i> {# estrela cheia #}
+        {% elif media_avaliacao >= i - 0.5 %}
+        <i class="bi bi-star-half text-warning"></i> {# meia estrela #}
+        {% else %}
+        <i class="bi bi-star text-warning"></i> {# estrela vazia #}
+        {% endif %}
         {% endfor %}
-        <span class="rating-text">4.8 (128 avaliações)</span>
+
+        <span class="rating-text">
+          {{ media_avaliacao }} ({{ qtd_avaliacoes }} avaliações)
+        </span>
       </div>
       {% if is_dono %}
-        <div class="acoes-dono">
-          <a href="{{ url_for('servico.adicionar_servico', est_id=est_id) }}" class="btn-acao">Cadastrar Serviço</a>
-          <a href="{{ url_for('estabelecimento.editar_estabelecimento')}}" class="btn-acao">Editar Estabelecimento</a>
-          <a href="{{ url_for('servico.listar_funcionarios', est_id=est_id) }}" class="btn-acao">Cadastrar Funcionário</a>
-          <a href="{{ url_for('estabelecimento.agendamentos')}}" class="btn-acao">agendamentos</a>
+      <div class="acoes-dono">
+        <a href="{{ url_for('servico.adicionar_servico', est_id=est_id) }}" class="btn-acao">Cadastrar Serviço</a>
+        <a href="{{ url_for('estabelecimento.editar_estabelecimento')}}" class="btn-acao">Editar Estabelecimento</a>
+        <a href="{{ url_for('servico.listar_funcionarios', est_id=est_id) }}" class="btn-acao">Cadastrar Funcionário</a>
+        <a href="{{ url_for('estabelecimento.agendamentos')}}" class="btn-acao">agendamentos</a>
 
-        </div>
+      </div>
       {% endif %}
     </div>
   </section>
   {% if servicos %}
   <section class="servicos-list">
     <h2>Serviços Disponíveis</h2>
-    
+
     {% for servico in servicos %}
     <div class="servico-card">
       <div class="servico-info">
         <h3>{{ servico.ser_nome }}</h3>
         <p class="servico-preco">R$ {{ "%.2f"|format(servico.ser_preco) }}</p>
         <p class="servico-duracao">{{ servico.ser_duracao }} minutos</p>
-        
+
       </div>
       <div class="servico-actions">
-        <a href="{{ url_for('agendamento.agendar', est_id=est_id, ser_id=servico.ser_id) }}" class="btn-agendar">Agendar</a>
-        <button class="btn btn-primary btn-avaliar" data-ser-id="{{ servico.ser_id }}" data-bs-toggle="modal" data-bs-target="#modalAvaliacao">
+        <a href="{{ url_for('agendamento.agendar', est_id=est_id, ser_id=servico.ser_id) }}"
+          class="btn-agendar">Agendar</a>
+        <button class="btn btn-primary btn-avaliar" data-ser-id="{{ servico.ser_id }}" data-bs-toggle="modal"
+          data-bs-target="#modalAvaliacao">
           Avaliar Serviço
         </button>
-        
+
       </div>
     </div>
     {% endfor %}
@@ -74,7 +82,6 @@
 
           <div class="modal-body">
 
-            <input type="hidden" name="agendamento_id" value="{{ agendamento_id }}">
             <input type="hidden" name="nota" id="notaSelecionada">
 
             <label class="form-label">Nota:</label>
@@ -103,4 +110,66 @@
   </div>
   {% endif %}
 </main>
+{% endblock %}
+
+{% block scripts %}
+
+<!-- BOOTSTRAP JS (ESSENCIAL PARA MODAL FUNCIONAR) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    const stars = document.querySelectorAll("#stars .star");
+    const notaInput = document.getElementById("notaSelecionada");
+    let selectedRating = 0;
+
+    function highlightStars(value) {
+      stars.forEach(star => {
+        const starValue = parseInt(star.getAttribute("data-value"));
+        if (starValue <= value) {
+          // estrela preenchida
+          star.classList.remove("bi-star");
+          star.classList.add("bi-star-fill");
+        } else {
+          // estrela vazia
+          star.classList.add("bi-star");
+          star.classList.remove("bi-star-fill");
+        }
+      });
+    }
+
+    stars.forEach(star => {
+      star.addEventListener("mouseenter", function () {
+        highlightStars(parseInt(this.dataset.value));
+      });
+
+      star.addEventListener("click", function () {
+        selectedRating = parseInt(this.dataset.value);
+        notaInput.value = selectedRating;
+      });
+    });
+
+    document.getElementById("stars").addEventListener("mouseleave", function () {
+      highlightStars(selectedRating);
+    });
+
+  });
+
+  /*
+  =====================================================================
+      PREENCHE O MODAL COM O ID DO SERVIÇO (ou AGENDAMENTO)
+  =====================================================================
+  */
+  const botoesAvaliar = document.querySelectorAll(".btn-avaliar");
+  const inputServico = document.getElementById("idServicoInput");
+
+  botoesAvaliar.forEach(botao => {
+    botao.addEventListener("click", () => {
+      const id = botao.dataset.serId;   // vem do data-ser-id
+      inputServico.value = id;
+    });
+  });
+</script>
+
 {% endblock %}
