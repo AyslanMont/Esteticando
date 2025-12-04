@@ -139,16 +139,15 @@ def perfil_estabelecimento(est_id):
             SELECT 
             AVG(ava_nota) AS media,
             COUNT(*) AS quantidade
-            FROM tb_avaliacao a
-            JOIN tb_agendamento ag ON a.ava_age_id = ag.age_id
-            JOIN tb_servico s ON ag.age_ser_id = s.ser_id
-            WHERE s.ser_est_id = %s""", (est_id,))
+            FROM tb_avaliacao
+            JOIN tb_servico ON ava_ser_id = ser_id
+            WHERE ser_est_id = %s
+        """, (est_id,))
 
-        avaliacao_info = cur.fetchone()
+        resultado_avaliacao = cur.fetchone()
 
-        media_avaliacao = round(
-            avaliacao_info['media'], 1) if avaliacao_info['media'] else 0
-        qtd_avaliacoes = avaliacao_info['quantidade'] if avaliacao_info['quantidade'] else 0
+        media_avaliacao = round(resultado_avaliacao['media'], 1) if resultado_avaliacao['media'] else 0
+        qtd_avaliacoes = resultado_avaliacao['quantidade']
 
         # 4. Se não há serviços cadastrados
         if not servicos:
@@ -165,16 +164,18 @@ def perfil_estabelecimento(est_id):
                                        data=data_atual)
 
         # 5. Exibe página com os serviços disponíveis
-        return render_template('selecionar_servico.html',
-                               servicos=servicos,
-                               est_id=est_id,
-                               est_nome=estabelecimento['est_nome'],
-                               est_descricao=estabelecimento['est_descricao'],
-                               imagem_base64=imagem_base64,
-                               is_dono=is_dono,
-                               media_avaliacao=media_avaliacao,
-                               qtd_avaliacoes=qtd_avaliacoes,
-                               data=data_atual)
+        return render_template(
+            "selecionar_servico.html",
+            servicos=servicos,
+            est_id=est_id,
+            est_nome=estabelecimento['est_nome'],
+            est_descricao=estabelecimento['est_descricao'],
+            imagem_base64=imagem_base64,
+            is_dono=is_dono,
+            data=data_atual,
+            media_avaliacao=media_avaliacao,
+            qtd_avaliacoes=qtd_avaliacoes
+        )
 
     except Exception as e:
         print(f"Erro ao carregar perfil do estabelecimento: {str(e)}")

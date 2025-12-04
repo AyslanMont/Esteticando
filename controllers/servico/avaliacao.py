@@ -24,12 +24,12 @@ def cadastrar_avaliacao():
         return redirect(request.referrer)
 
     try:
+        print("DEBUG >>> SERVICO RECEBIDO:", request.form.get("ser_id"))
         with mysql.connection.cursor() as cur:
             cur.execute("""
-            INSERT INTO tb_avaliacao
-            (ava_dataCriacao, ava_nota, ava_comentario, ava_cli_id, ava_age_id)
-            VALUES (CURDATE(), %s, %s, %s, %s)
-""", (nota, comentario, current_user.id, age_id))
+                INSERT INTO tb_avaliacao (ava_dataCriacao, ava_nota, ava_comentario, ava_cli_id, ava_ser_id)
+                VALUES (CURDATE(), %s, %s, %s, %s)
+            """, (nota, comentario, current_user.id, ser_id))
 
             mysql.connection.commit()
 
@@ -43,23 +43,40 @@ def cadastrar_avaliacao():
 
 
 # --- ROTA PARA LISTAR AVALIAÇÕES DE UM SERVIÇO ---
-@avaliacao_bp.route('/listar/<int:servico_id>')
-def listar_avaliacoes(servico_id):
+@avaliacao_bp.route('/listar/<int:est_id>')
+def listar_avaliacoes(est_id):
     try:
-        with mysql.connection.cursor() as cur:
+        with mysql.connection.cursor(dictionary=True) as cur:  # importante: dictionary=True
+            # Média e total
+            cur.execute("""
+                SELECT AVG(a.ava_nota) AS media, COUNT(*) AS total
+                FROM tb_avaliacao a
+                JOIN tb_servico s ON a.ava_ser_id = s.ser_id
+                WHERE s.ser_est_id = %s
+            """, (est_id,))
+            avaliacoes = cur.fetchone()
+            media_avaliacao = float(avaliacoes['media'] or 0)
+            qtd_avaliacoes = int(avaliacoes['total'] or 0)
+
+            # Lista completa
             cur.execute("""
                 SELECT 
-                    ava_nota, ava_comentario, ava_dataCriacao,
-                    cli_nome
-                FROM tb_avaliacao
-                JOIN tb_agendamento ON ava_age_id = age_id
-                JOIN tb_cliente ON ava_cli_id = cli_id
-                WHERE age_ser_id=%s
-                ORDER BY ava_dataCriacao DESC
-            """, (servico_id,))
-            avaliacoes = cur.fetchall()
+                    a.ava_nota,
+                    a.ava_comentario,
+                    cli.cli_nome,
+                    s.ser_nome
+                FROM tb_avaliacao a
+                JOIN tb_cliente cli ON a.ava_cli_id = cli.cli_id
+                JOIN tb_servico s ON a.ava_ser_id = s.ser_id
+                WHERE s.ser_est_id = %s
+                ORDER BY a.ava_id DESC
+            """, (est_id,))
+            lista_avaliacoes = cur.fetchall()
 
-        return render_template("avaliacoes.html", avaliacoes=avaliacoes)
+        return render_template("estabelecimento.html",
+                               media_avaliacao=media_avaliacao,
+                               qtd_avaliacoes=qtd_avaliacoes,
+                               lista_avaliacoes=lista_avaliacoes)
 
     except Exception as e:
         flash(f"Erro ao carregar avaliações: {e}", "danger")

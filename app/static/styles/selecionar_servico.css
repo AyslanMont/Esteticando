@@ -125,3 +125,7 @@
 .star.hovered {
   color: #FFD700;
 }
+
+#stars .star {
+  color: #f1c40f; /* amarelo */
+}
