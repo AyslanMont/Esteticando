@@ -4,7 +4,7 @@ from flask_mail import Mail
 from esteticando.database.database import init_db, mysql
 from esteticando.models.user import User
 
-# Blueprints
+
 from esteticando.controllers.auth.users import auth_bp
 from esteticando.controllers.estabelecimento.estabelecimento import estabelecimento_bp
 from esteticando.controllers.profissional.profissional import profissional_bp
@@ -12,7 +12,6 @@ from esteticando.controllers.servico.cli_est import cli_est_bp
 from esteticando.controllers.servico.agendamento import agendamento_bp
 from esteticando.controllers.servico.servico import servico_bp
 from esteticando.controllers.servico.avaliacao import avaliacao_bp
-
 
 
 app = Flask(__name__)

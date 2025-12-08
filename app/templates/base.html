@@ -17,7 +17,6 @@
     href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Comfortaa:wght@300..700&display=swap"
     rel="stylesheet" />
 
-  <!-- Flash -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/flash.css') }}">
 
   {% block links %} {% endblock %}
@@ -41,7 +40,6 @@
       {% else %}
       <a href="{{ url_for('cliente.perfil')}}">Perfil</a>
       {% endif %}
-      <!-- <a href="#">Contato</a> -->
       {% if current_user.is_authenticated %}
       <div id="btn-navbar">
         <a href="{{ url_for('auth.logout') }}"><button class="btn-navbar">Sair</button></a>
@@ -50,7 +48,6 @@
     </menu>
   </header>
 
-  <!-- FLASH ALERT sem container extra -->
   {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
   {% for category, message in messages %}
@@ -69,13 +66,12 @@
     document.addEventListener("DOMContentLoaded", function () {
       setTimeout(() => {
         document.querySelectorAll('.alert').forEach(alert => {
-          alert.classList.add('fade-out'); // adiciona a animação de saída
-          // depois da duração da animação, remove o alert da tela
+          alert.classList.add('fade-out'); 
           setTimeout(() => {
             alert.style.display = 'none';
-          }, 400); // 400ms = tempo do fadeOut no CSS
+          }, 400);
         });
-      }, 2000); // espera 2 segundos antes de começar o fade out
+      }, 2000);
     });
   </script>
 

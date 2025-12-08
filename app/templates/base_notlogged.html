@@ -5,14 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Esteticando</title>
 
-    <!-- Seus estilos -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/normalize.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/base_notlogged.css') }}" />
 
-    <!-- Favicon -->
     <link rel="shortcut icon" href="{{ url_for('static', filename='imgs/favicon.png') }}" type="image/x-icon" />
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -20,7 +17,6 @@
       rel="stylesheet"
     />
 
-    <!-- Flash card -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/flash.css') }}">
 
     {% block links %} {% endblock %}
@@ -30,9 +26,7 @@
       <menu>
         <img src="{{ url_for('static', filename='imgs/favicon.png') }}" alt="logo barbearia" id="img-navbar" />
         <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Página Inicial</a>
-        <!-- <a href="#">Sobre</a> -->
         <a href="{{ url_for('estabelecimento.filtrar_estabelecimento') }}">Serviços</a>
-        <!-- <a href="#">Contato</a> -->
         <div id="btn-navbar">
           <a href="{{ url_for('auth.register') }}"><button class="btn-navbar">Inscreva-se</button></a>
           <a href="{{ url_for('auth.login') }}"><button class="btn-navbar">Entrar</button></a>

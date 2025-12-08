@@ -15,12 +15,10 @@ def register():
     if request.method == 'POST':
         tipo_usuario = request.form.get("tipo_usuario")
 
-        # Validação do tipo de usuário
         if not tipo_usuario or tipo_usuario not in ['cliente', 'profissional']:
             flash('Você precisa selecionar se é cliente ou profissional.', 'danger')
             return redirect(url_for('auth.register'))
 
-        # Validação do checkbox de termos de uso
         termos_aceitos = request.form.get("termos")
         if not termos_aceitos:
             flash('Você precisa aceitar os termos de uso para se cadastrar.', 'danger')
@@ -32,8 +30,7 @@ def register():
         cpf_raw = request.form['cpf']
         telefone = request.form['telefone']
 
-        # Limpeza e validação de CPF e telefone
-        cpf_limpo = re.sub(r'\D', '', cpf_raw)  # só números
+        cpf_limpo = re.sub(r'\D', '', cpf_raw)
         telefone_limpo = re.sub(r'\D', '', telefone)
 
         if not cpf_limpo.isdigit() or len(cpf_limpo) != 11:
@@ -53,8 +50,7 @@ def register():
             cpf_raw = request.form['cpf']
             telefone = request.form['telefone']
 
-            # Limpeza e validação de CPF e telefone
-            cpf_limpo = re.sub(r'\D', '', cpf_raw)  # só números
+            cpf_limpo = re.sub(r'\D', '', cpf_raw)
             telefone_limpo = re.sub(r'\D', '', telefone)
 
             if not cpf_limpo.isdigit() or len(cpf_limpo) != 11:
@@ -65,7 +61,6 @@ def register():
                 flash('Telefone inválido! Verifique e tente novamente.', 'danger')
                 return redirect(url_for('auth.register'))
             
-            # Verifica se CPF já cadastrado
             cur.execute("SELECT pro_id FROM tb_profissional WHERE pro_cpf = %s", (cpf_limpo,))
             if cur.fetchone():
                 flash('CPF já cadastrado!', 'danger')
@@ -85,15 +80,14 @@ def register():
             flash('Profissional cadastrado com sucesso!', 'success')
             return redirect(url_for('auth.login'))
 
-        else:  # cliente
+        else:
             nome = request.form['nome']
             email = request.form['email']
             senha = request.form['password']
             cpf_raw = request.form['cpf']
             telefone = request.form['telefone']
 
-            # Limpeza e validação de CPF e telefone
-            cpf_limpo = re.sub(r'\D', '', cpf_raw)  # só números
+            cpf_limpo = re.sub(r'\D', '', cpf_raw)
             telefone_limpo = re.sub(r'\D', '', telefone)
 
             if not cpf_limpo.isdigit() or len(cpf_limpo) != 11:
@@ -105,14 +99,12 @@ def register():
                 return redirect(url_for('auth.register'))
             
 
-            # Verifica se email já cadastrado
             cur.execute("SELECT cli_id FROM tb_cliente WHERE cli_email = %s", (email,))
             if cur.fetchone():
                 flash('E-mail já cadastrado!', 'danger')
                 cur.close()
                 return redirect(url_for('auth.register'))
 
-            # Verifica se CPF já cadastrado
             cur.execute("SELECT cli_id FROM tb_cliente WHERE cli_cpf = %s", (cpf_limpo,))
             if cur.fetchone():
                 flash('CPF já cadastrado!', 'danger')
@@ -144,13 +136,11 @@ def esqueci_senha():
 
     cur = mysql.connection.cursor()
 
-    # Verifica se é cliente
     cur.execute("SELECT cli_id FROM tb_cliente WHERE cli_email = %s", (email,))
     user_data = cur.fetchone()
     tipo = 'cliente' if user_data else None
 
     if not user_data:
-        # Verifica se é profissional
         cur.execute("SELECT pro_id FROM tb_profissional WHERE pro_email = %s", (email,))
         user_data = cur.fetchone()
         tipo = 'profissional' if user_data else None
@@ -162,12 +152,10 @@ def esqueci_senha():
 
     token = secrets.token_urlsafe(32)
 
-    # Salva o token
     cur.execute("INSERT INTO tb_tokens_redefinicao (email, token) VALUES (%s, %s)", (email, token))
     mysql.connection.commit()
     cur.close()
 
-    # Envia o e-mail
     msg = Message('Redefinição de Senha - Esteticando',
                   recipients=[email])
     msg.body = f'''Olá!
@@ -199,12 +187,10 @@ def redefinir_senha(token):
         hashed = generate_password_hash(nova_senha)
         email = token_data['email']
 
-        # Atualiza a senha
         cur.execute("UPDATE tb_cliente SET cli_senha = %s WHERE cli_email = %s", (hashed, email))
         if cur.rowcount == 0:
             cur.execute("UPDATE tb_profissional SET pro_senha = %s WHERE pro_email = %s", (hashed, email))
 
-        # Remove o token
         cur.execute("DELETE FROM tb_tokens_redefinicao WHERE token = %s", (token,))
         mysql.connection.commit()
         cur.close()
