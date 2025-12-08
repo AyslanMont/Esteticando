@@ -129,3 +129,35 @@
 #stars .star {
   color: #f1c40f; /* amarelo */
 }
+
+/* BOTÃO PRINCIPAL (AGENDAR) – marrom claro */
+.btn-agendar {
+  background-color: #a97458 !important;
+  color: #ffffff !important;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: 0.2s ease-in-out;
+}
+
+.btn-agendar:hover {
+  background-color: #91644b !important;
+}
+
+/* BOTÕES SECUNDÁRIOS (AVALIAÇÃO / VER AVALIAÇÕES) – vinho suave */
+.btn-avaliar,
+.btn-ver-avaliacoes {
+  background-color: #8c3f3f !important;
+  color: #ffffff !important;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: 0.2s ease-in-out;
+}
+
+.btn-avaliar:hover,
+.btn-ver-avaliacoes:hover {
+  background-color: #7a3737 !important;
+}

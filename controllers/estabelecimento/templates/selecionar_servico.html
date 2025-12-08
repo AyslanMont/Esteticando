@@ -35,9 +35,10 @@
           {{ media_avaliacao }} ({{ qtd_avaliacoes }} avaliações)
         </span>
       </div>
-      <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalListaAvaliacoes">
+      <button class="btn-ver-avaliacoes" data-bs-toggle="modal" data-bs-target="#modalListaAvaliacoes">
         Ver todas as avaliações
       </button>
+      
       {% if is_dono %}
       <div class="acoes-dono">
         <a href="{{ url_for('servico.adicionar_servico', est_id=est_id) }}" class="btn-acao">Cadastrar Serviço</a>
@@ -64,10 +65,9 @@
       <div class="servico-actions">
         <a href="{{ url_for('agendamento.agendar', est_id=est_id, ser_id=servico.ser_id) }}"
           class="btn-agendar">Agendar</a>
-        <button class="btn btn-primary btn-avaliar" data-ser-id="{{ servico.ser_id }}" data-bs-toggle="modal"
-          data-bs-target="#modalAvaliacao">
-          Avaliar Serviço
-        </button>
+          <button class="btn-avaliar" data-ser-id="{{ servico.ser_id }}" data-bs-toggle="modal" data-bs-target="#modalAvaliacao">
+            Avaliar Serviço
+          </button>
 
       </div>
     </div>
@@ -226,16 +226,8 @@ document.addEventListener("DOMContentLoaded", function () {
    ***********************/
   const form = qs("#formAvaliacao");
   if (form) {
-    form.addEventListener("submit", function (ev) {
-
-      const fd = new FormData(form);
-      // monta string para console
-      const entries = {};
-      for (const [k,v] of fd.entries()) entries[k] = v;
-      console.log("DEBUG >>> Form data antes do POST:", entries);
-      fetch(form.action, { method: 'POST', body: fd, credentials: 'same-origin' })
-        .then(r => { window.location.reload(); })
-        .catch(err => console.error(err));
+    form.addEventListener("submit", function () {
+      console.log("DEBUG >>> Enviando avaliação normalmente");
     });
   } else {
     console.warn("Form #formAvaliacao não encontrado.");

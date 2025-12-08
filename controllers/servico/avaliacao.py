@@ -5,8 +5,6 @@ from datetime import datetime
 
 avaliacao_bp = Blueprint('avaliacao', __name__, url_prefix='/avaliacao')
 
-# --- ROTA PARA REGISTRAR AVALIAÇÃO ---
-
 
 @avaliacao_bp.route('/cadastrar', methods=['POST'])
 @login_required
@@ -42,12 +40,10 @@ def cadastrar_avaliacao():
         return redirect(request.referrer)
 
 
-# --- ROTA PARA LISTAR AVALIAÇÕES DE UM SERVIÇO ---
 @avaliacao_bp.route('/listar/<int:est_id>')
 def listar_avaliacoes(est_id):
     try:
-        with mysql.connection.cursor(dictionary=True) as cur:  # importante: dictionary=True
-            # Média e total
+        with mysql.connection.cursor(dictionary=True) as cur:
             cur.execute("""
                 SELECT AVG(a.ava_nota) AS media, COUNT(*) AS total
                 FROM tb_avaliacao a
@@ -58,7 +54,6 @@ def listar_avaliacoes(est_id):
             media_avaliacao = float(avaliacoes['media'] or 0)
             qtd_avaliacoes = int(avaliacoes['total'] or 0)
 
-            # Lista completa
             cur.execute("""
                 SELECT 
                     a.ava_nota,

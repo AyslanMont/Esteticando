@@ -1,5 +1,4 @@
 CREATE DATABASE IF NOT EXISTS db_esteticando;
-
 USE db_esteticando;
 
 CREATE TABLE IF NOT EXISTS tb_cliente (
@@ -18,7 +17,6 @@ CREATE TABLE IF NOT EXISTS tb_categoria (
   cat_nome VARCHAR(100) NOT NULL
 );
 
-
 CREATE TABLE IF NOT EXISTS tb_profissional (
   pro_id INT AUTO_INCREMENT PRIMARY KEY,
   pro_dataCriacao DATE NOT NULL,
@@ -29,7 +27,6 @@ CREATE TABLE IF NOT EXISTS tb_profissional (
   pro_telefone VARCHAR(15) NOT NULL,
   pro_est_id INT DEFAULT NULL,
   pro_cat_id INT DEFAULT NULL,
-  -- NÃO adiciona FK pro_est_id ainda (circular)
   FOREIGN KEY (pro_cat_id) REFERENCES tb_categoria(cat_id) ON DELETE CASCADE
 );
 
@@ -45,7 +42,6 @@ CREATE TABLE IF NOT EXISTS tb_estabelecimento (
   est_cat_id INT NOT NULL,
   est_dono_id INT DEFAULT NULL,
   FOREIGN KEY (est_cat_id) REFERENCES tb_categoria (cat_id) ON DELETE CASCADE
-  -- NÃO adiciona FK est_dono_id ainda (circular)
 );
 
 CREATE TABLE IF NOT EXISTS tb_endereco_estabelecimento (
@@ -60,7 +56,6 @@ CREATE TABLE IF NOT EXISTS tb_endereco_estabelecimento (
   end_est_id INT NOT NULL,
   FOREIGN KEY (end_est_id) REFERENCES tb_estabelecimento(est_id) ON DELETE CASCADE
 );
-
 
 CREATE TABLE IF NOT EXISTS tb_servico (
   ser_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -78,7 +73,7 @@ CREATE TABLE IF NOT EXISTS tb_servico (
 CREATE TABLE IF NOT EXISTS tb_disponibilidade_estabelecimento (
   des_id INT AUTO_INCREMENT PRIMARY KEY,
   des_est_id INT NOT NULL,
-  des_dia ENUM("segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sabado", "domingo") NOT NULL,
+  des_dia ENUM('segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sabado','domingo') NOT NULL,
   des_horarioInicio TIME NOT NULL,
   des_horarioFim TIME NOT NULL,
   FOREIGN KEY (des_est_id) REFERENCES tb_estabelecimento(est_id) ON DELETE CASCADE
@@ -87,7 +82,7 @@ CREATE TABLE IF NOT EXISTS tb_disponibilidade_estabelecimento (
 CREATE TABLE IF NOT EXISTS tb_disponibilidade_profissional (
   dip_id INT AUTO_INCREMENT PRIMARY KEY,
   dip_pro_id INT NOT NULL,
-  dip_dia ENUM("segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sabado", "domingo") NOT NULL,
+  dip_dia ENUM('segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sabado','domingo') NOT NULL,
   dip_horarioInicio TIME NOT NULL,
   dip_horarioFim TIME NOT NULL,
   FOREIGN KEY (dip_pro_id) REFERENCES tb_profissional(pro_id) ON DELETE CASCADE
@@ -113,14 +108,17 @@ CREATE TABLE IF NOT EXISTS tb_agendamento (
 CREATE TABLE IF NOT EXISTS tb_avaliacao (
   ava_id INT AUTO_INCREMENT PRIMARY KEY,
   ava_dataCriacao DATE NOT NULL,
-  ava_nota VARCHAR(45) NOT NULL, 
+  ava_nota INT NOT NULL,
   ava_comentario TEXT,
   ava_cli_id INT NOT NULL,
-  ava_age_id INT NOT NULL,
+  ava_ser_id INT NOT NULL,
+  ava_age_id INT NULL,
   FOREIGN KEY (ava_cli_id) REFERENCES tb_cliente(cli_id) ON DELETE CASCADE,
-  FOREIGN KEY (ava_age_id) REFERENCES tb_agendamento(age_id) ON DELETE CASCADE
+  FOREIGN KEY (ava_ser_id) REFERENCES tb_servico(ser_id) ON DELETE CASCADE,
+  FOREIGN KEY (ava_age_id) REFERENCES tb_agendamento(age_id) ON DELETE SET NULL ON UPDATE CASCADE
 );
-CREATE TABLE tb_tokens_redefinicao (
+
+CREATE TABLE IF NOT EXISTS tb_tokens_redefinicao (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     token VARCHAR(255) NOT NULL,
@@ -135,48 +133,8 @@ ALTER TABLE tb_profissional
 ADD CONSTRAINT fk_pro_est
 FOREIGN KEY (pro_est_id) REFERENCES tb_estabelecimento(est_id) ON DELETE SET NULL;
 
-
--- Inserir categorias
 INSERT INTO tb_categoria (cat_nome) VALUES 
 ('Beleza'),
 ('Saúde'),
 ('Estética'),
 ('Bem-estar');
-
-ALTER TABLE tb_avaliacao 
-MODIFY ava_age_id INT NULL;
-
-ALTER TABLE tb_avaliacao
-DROP FOREIGN KEY tb_avaliacao_ibfk_2;
-
-ALTER TABLE tb_avaliacao
-ADD CONSTRAINT tb_avaliacao_ibfk_2
-  FOREIGN KEY (ava_age_id) REFERENCES tb_agendamento(age_id)
-  ON DELETE SET NULL;
-
-
-SHOW CREATE TABLE tb_avaliacao;
-SHOW CREATE TABLE tb_agendamento;
-
-ALTER TABLE tb_avaliacao 
-DROP FOREIGN KEY tb_avaliacao_ibfk_2;
-
-SELECT CONSTRAINT_NAME 
-FROM information_schema.KEY_COLUMN_USAGE
-WHERE TABLE_NAME = 'tb_avaliacao'
-AND REFERENCED_TABLE_NAME = 'tb_agendamento';
-
-
-
-ALTER TABLE tb_avaliacao 
-MODIFY ava_age_id INT NULL;
-
-ALTER TABLE tb_avaliacao
-ADD CONSTRAINT fk_avaliacao_agendamento
-FOREIGN KEY (ava_age_id) REFERENCES tb_agendamento(age_id)
-ON DELETE SET NULL
-ON UPDATE CASCADE;
-
-SHOW CREATE TABLE tb_avaliacao;
-
-select * from tb_avaliacao;

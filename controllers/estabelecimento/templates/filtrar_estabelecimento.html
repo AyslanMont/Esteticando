@@ -69,7 +69,6 @@
               <p>{{ estabelecimento.end_bairro }}, {{ estabelecimento.end_cidade }} - {{ estabelecimento.end_estado }}</p>
             </div>
             <div class="interecao-buttons">
-              <img src="{{ url_for('static', filename='imgs/favorito.png') }}" alt="Favorito" />
               <button>
                 <a href="{{ url_for('estabelecimento.perfil_estabelecimento', est_id=estabelecimento.est_id) }}">
                   Agenda

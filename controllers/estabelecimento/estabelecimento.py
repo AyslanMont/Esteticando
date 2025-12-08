@@ -126,6 +126,34 @@ def perfil_estabelecimento(est_id):
         """, (est_id,))
         servicos = cur.fetchall()
 
+        cur.execute("""
+            SELECT 
+                AVG(ava_nota) AS media,
+                COUNT(*) AS quantidade
+            FROM tb_avaliacao
+            JOIN tb_servico ON ava_ser_id = ser_id
+            WHERE ser_est_id = %s
+        """, (est_id,))
+
+        dados_media = cur.fetchone()
+        media_avaliacao = float(dados_media['media']) if dados_media['media'] else 0
+        qtd_avaliacoes = int(dados_media['quantidade'])
+
+        cur.execute("""
+            SELECT 
+                ava_nota,
+                ava_comentario,
+                cli.cli_nome,
+                ser.ser_nome
+            FROM tb_avaliacao
+            JOIN tb_cliente cli ON ava_cli_id = cli_id
+            JOIN tb_servico ser ON ava_ser_id = ser_id
+            WHERE ser_est_id = %s
+            ORDER BY ava_id DESC
+        """, (est_id,))
+
+        lista_avaliacoes = cur.fetchall()
+
         # 3. Verifica se o usuário atual é o dono do estabelecimento
         is_dono = False
         if (current_user.is_authenticated and
@@ -154,14 +182,16 @@ def perfil_estabelecimento(est_id):
             if is_dono:
                 return redirect(url_for('servico.adicionar_servico', est_id=est_id))
             else:
-                return render_template('selecionar_servico.html',
-                                       mensagem="Este estabelecimento não possui serviços cadastrados.",
-                                       est_id=est_id,
-                                       est_nome=estabelecimento['est_nome'],
-                                       est_descricao=estabelecimento['est_descricao'],
-                                       imagem_base64=imagem_base64,
-                                       is_dono=is_dono,
-                                       data=data_atual)
+                return render_template(
+                    'selecionar_servico.html',
+                    servicos=servicos,
+                    est_id=est_id,
+                    est_nome=estabelecimento['est_nome'],
+                    est_descricao=estabelecimento['est_descricao'],
+                    imagem_base64=imagem_base64,
+                    is_dono=is_dono,
+                    data=data_atual
+                )
 
         # 5. Exibe página com os serviços disponíveis
         return render_template(
@@ -174,7 +204,8 @@ def perfil_estabelecimento(est_id):
             is_dono=is_dono,
             data=data_atual,
             media_avaliacao=media_avaliacao,
-            qtd_avaliacoes=qtd_avaliacoes
+            qtd_avaliacoes=qtd_avaliacoes,
+            lista_avaliacoes=lista_avaliacoes
         )
 
     except Exception as e:
