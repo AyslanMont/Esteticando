@@ -50,7 +50,7 @@ def listar_estabelecimentos():
         if not result_est:
             flash('Nenhum estabelecimento encontrado com esses filtros.', 'info')
 
-    else:  # Método GET
+    else:
         cur = mysql.connection.cursor()
         try:
             query = """
@@ -69,7 +69,6 @@ def listar_estabelecimentos():
 
 @cli_est_bp.route('/<int:est_id>/funcionarios')
 def listar_funcionarios(est_id):
-    # Busca os funcionários do estabelecimento no banco de dados
     cur = mysql.connection.cursor()
     query = """
         SELECT pro_id, pro_nome, pro_telefone

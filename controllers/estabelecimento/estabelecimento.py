@@ -62,7 +62,7 @@ def filtrar_estabelecimento():
         finally:
             cur.close()
 
-    else:  # GET
+    else:
         cur = mysql.connection.cursor()
         try:
             query = """
@@ -89,7 +89,7 @@ def filtrar_estabelecimento():
     return render_template('filtrar_estabelecimento.html', result_est=result_est)
 
 
-@estabelecimento_bp.route('/perfil/<int:est_id>')  # Corrigido aqui
+@estabelecimento_bp.route('/perfil/<int:est_id>')
 @login_required
 def perfil_estabelecimento(est_id):
     cur = None
@@ -97,7 +97,6 @@ def perfil_estabelecimento(est_id):
         cur = mysql.connection.cursor()
         data_atual = datetime.now().strftime("%d/%m/%Y")
 
-        # 1. Busca informações básicas do estabelecimento (incluindo imagem e dono)
         cur.execute("""
             SELECT est_id, est_nome, est_descricao, est_imagem, est_dono_id,
                    pro_id, pro_nome
@@ -111,14 +110,12 @@ def perfil_estabelecimento(est_id):
             flash("Estabelecimento não encontrado.", "danger")
             return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
 
-        # Converte imagem para base64, se houver
         imagem_base64 = None
         if estabelecimento['est_imagem']:
             import base64
             imagem_base64 = base64.b64encode(
                 estabelecimento['est_imagem']).decode('utf-8')
 
-        # 2. Busca os serviços do estabelecimento
         cur.execute("""
             SELECT ser_id, ser_nome, ser_preco, ser_duracao 
             FROM tb_servico 
@@ -154,7 +151,6 @@ def perfil_estabelecimento(est_id):
 
         lista_avaliacoes = cur.fetchall()
 
-        # 3. Verifica se o usuário atual é o dono do estabelecimento
         is_dono = False
         if (current_user.is_authenticated and
             current_user.tipo_usuario == 'profissional' and
@@ -162,7 +158,6 @@ def perfil_estabelecimento(est_id):
                 estabelecimento['est_dono_id'] == current_user.id):
             is_dono = True
 
-        # 4. Buscar média e quantidade de avaliações do estabelecimento
         cur.execute("""
             SELECT 
             AVG(ava_nota) AS media,
@@ -177,7 +172,6 @@ def perfil_estabelecimento(est_id):
         media_avaliacao = round(resultado_avaliacao['media'], 1) if resultado_avaliacao['media'] else 0
         qtd_avaliacoes = resultado_avaliacao['quantidade']
 
-        # 4. Se não há serviços cadastrados
         if not servicos:
             if is_dono:
                 return redirect(url_for('servico.adicionar_servico', est_id=est_id))
@@ -193,7 +187,6 @@ def perfil_estabelecimento(est_id):
                     data=data_atual
                 )
 
-        # 5. Exibe página com os serviços disponíveis
         return render_template(
             "selecionar_servico.html",
             servicos=servicos,
@@ -220,7 +213,6 @@ def perfil_estabelecimento(est_id):
 @estabelecimento_bp.route('/cadastrar_estabelecimento', methods=['POST', 'GET'])
 @login_required
 def cadastrar_estabelecimento():
-    # Só profissional pode cadastrar estabelecimento
     if not hasattr(current_user, 'tipo_usuario') or current_user.tipo_usuario != 'profissional':
         return redirect(url_for('estabelecimento.filtrar_estabelecimento'))
 
@@ -235,13 +227,11 @@ def cadastrar_estabelecimento():
                 'end_rua', 'end_cidade', 'end_estado', 'end_cep'
             ]
 
-            # Verificação dos campos obrigatórios
             for field in required_fields:
                 if not request.form.get(field):
                     flash(f'O campo {field} é obrigatório!', 'danger')
                     return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
 
-            # Verificação da imagem
             if 'est_imagem' not in request.files:
                 flash('A imagem do estabelecimento é obrigatória', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
@@ -253,7 +243,6 @@ def cadastrar_estabelecimento():
 
             imagem_binaria = imagem_arquivo.read()
 
-            # Validação do telefone antes de limpar os dígitos
             telefone_bruto = request.form['est_telefone'].strip()
             regex_telefone = r'^\(?\d{2}\)?\s?\d{4,5}-\d{4}$'
             if not re.match(regex_telefone, telefone_bruto):
@@ -261,7 +250,6 @@ def cadastrar_estabelecimento():
                     'Formato de telefone inválido. Use (XX) XXXX-XXXX ou (XX) XXXXX-XXXX', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
 
-            # Preparação dos dados
             est_data = {
                 'nome': request.form['est_nome'].strip(),
                 'descricao': request.form['est_descricao'].strip(),
@@ -282,7 +270,6 @@ def cadastrar_estabelecimento():
                 'cep': ''.join(filter(str.isdigit, request.form['end_cep']))
             }
 
-            # Validações adicionais
             if len(est_data['cnpj']) != 14:
                 flash('CNPJ deve conter 14 dígitos', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
@@ -291,17 +278,14 @@ def cadastrar_estabelecimento():
                 flash('CEP deve conter 8 dígitos', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
 
-            # Inserção no banco
             cur = mysql.connection.cursor()
 
-            # Verifica se CNPJ já existe
             cur.execute(
                 "SELECT est_id FROM tb_estabelecimento WHERE est_cnpj = %s", (est_data['cnpj'],))
             if cur.fetchone():
                 flash('CNPJ já cadastrado!', 'danger')
                 return redirect(url_for('estabelecimento.cadastrar_estabelecimento'))
 
-            # Insere estabelecimento
             cur.execute(
                 """INSERT INTO tb_estabelecimento 
                 (est_dataCriacao, est_nome, est_descricao, est_cnpj, est_email, est_telefone, est_imagem, est_cat_id, est_dono_id) 
@@ -311,7 +295,6 @@ def cadastrar_estabelecimento():
             )
             est_id = cur.lastrowid
 
-            # Insere endereço
             cur.execute(
                 """INSERT INTO tb_endereco_estabelecimento 
                 (end_numero, end_complemento, end_bairro, end_rua, end_cidade, end_estado, end_cep, end_est_id) 
@@ -321,7 +304,6 @@ def cadastrar_estabelecimento():
                  end_data['cep'], est_id)
             )
 
-            # Atualiza o profissional para linkar com o estabelecimento
             cur.execute(
                 "UPDATE tb_profissional SET pro_est_id = %s WHERE pro_id = %s",
                 (est_id, pro_id)
@@ -345,7 +327,6 @@ def cadastrar_estabelecimento():
             if cur is not None:
                 cur.close()
 
-    # GET: exibe formulário de cadastro
     try:
         cur = mysql.connection.cursor()
         cur.execute("SELECT cat_id, cat_nome FROM tb_categoria")
@@ -373,7 +354,6 @@ def editar_estabelecimento():
 
     cur = mysql.connection.cursor()
 
-    # Buscar todos os estabelecimentos do profissional logado
     cur.execute("""
         SELECT est.est_id, est.est_nome
         FROM tb_estabelecimento est
@@ -418,7 +398,6 @@ def editar_estabelecimento():
         else:
             return telefone
 
-    # Formatar telefone para exibir no input já formatado
     dados_atuais['est_telefone'] = formatar_telefone(
         dados_atuais['est_telefone'])
 
@@ -531,7 +510,6 @@ def agendamentos():
 
     filtro_data = request.form.get('data') or date.today().strftime('%Y-%m-%d')
 
-    # Buscar o ID do estabelecimento onde o profissional trabalha
     cur = mysql.connection.cursor()
     cur.execute(
         'SELECT pro_est_id FROM tb_profissional WHERE pro_id = %s', (current_user.id,))
@@ -539,10 +517,9 @@ def agendamentos():
     if not resultado:
         cur.close()
         flash('Estabelecimento não encontrado para este profissional.', 'danger')
-        return redirect(url_for('dashboard'))  # ou outra rota apropriada
+        return redirect(url_for('dashboard'))
     est_id = resultado['pro_est_id']
 
-    # Atualizar status se for um POST com ação
     if request.form.get('acao') in ['concluir', 'cancelar']:
         agendamento_id = request.form.get('id')
         novo_status = 'concluído' if request.form.get(
@@ -554,7 +531,6 @@ def agendamentos():
         flash(f'Agendamento {novo_status} com sucesso.', 'success')
         return redirect(url_for('estabelecimento.agendamentos'))
 
-    # Buscar agendamentos do estabelecimento na data
     cur.execute('''
         SELECT 
             age_id, age_data, age_horario, age_status, cli_nome,

@@ -9,9 +9,7 @@ HORARIOS_DISPONIVEIS = [
     "08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"
 ]
 
-# rota para carregar a página sem data
 @agendamento_bp.route('/agendar/<int:ser_id>', methods=['GET', 'POST'])
-# rota para carregar horários filtrados por data
 @agendamento_bp.route('/agendar/<int:ser_id>/<data>', methods=['GET', 'POST'])
 def agendar(ser_id, data=None):
     if request.method == 'POST':
@@ -95,7 +93,6 @@ def confirmar_agendamento():
                 flash("Você já possui 2 agendamentos para este dia.", "danger")
                 return redirect(url_for('agendamento.agendar', ser_id=ser_id, data=data))            
 
-            # Checa conflito
             cur.execute("""
                 SELECT 1 FROM tb_agendamento
                 WHERE age_ser_id=%s AND DATE(age_data)=%s AND age_horario=%s
@@ -105,7 +102,6 @@ def confirmar_agendamento():
                 return redirect(url_for('agendamento.agendar',
                                         ser_id=ser_id, data=data))
 
-            # Busca dados do serviço
             cur.execute("""
                 SELECT ser_preco, ser_duracao, ser_est_id 
                 FROM tb_servico 
@@ -116,7 +112,6 @@ def confirmar_agendamento():
             duracao = serv['ser_duracao']
             est_id = serv['ser_est_id']
 
-            # Busca profissional
             cur.execute("""
                 SELECT pro_id 
                 FROM tb_profissional 
@@ -126,7 +121,6 @@ def confirmar_agendamento():
             prof = cur.fetchone()
             pro_id = prof['pro_id'] if prof else None
 
-            # Insere agendamento
             cur.execute("""
                 INSERT INTO tb_agendamento (
                   age_ser_id, age_cli_id, age_data, age_horario,

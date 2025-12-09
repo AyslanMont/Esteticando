@@ -76,7 +76,6 @@
 
         </div>
 
-        <!-- Seção de Endereço -->
         <div class="form-section">
             <h2>Endereço do Estabelecimento</h2>
             
@@ -169,10 +168,8 @@
     input.addEventListener('input', function(e) {
       let v = input.value;
     
-      // Remove tudo que não for número
       v = v.replace(/\D/g, '');
     
-      // Formata conforme a quantidade de dígitos
       if (v.length > 0) {
         v = '(' + v;
       }

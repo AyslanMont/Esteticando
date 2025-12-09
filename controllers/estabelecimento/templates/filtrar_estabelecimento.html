@@ -52,7 +52,6 @@
       {% if result_est %}
         {% for estabelecimento in result_est %}
         <div class="estabelecimento">
-          <!-- Imagem pequena no quadrado à esquerda -->
           <div class="foto">
             {% if estabelecimento.imagem_base64 %}
               <img src="data:image/jpeg;base64,{{ estabelecimento.imagem_base64 }}" 

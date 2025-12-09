@@ -34,12 +34,10 @@
             </div>
         </div>
     </nav>
-    <!-- Banner and Profile -->
     <div class="banner bg-secondary text-white d-flex align-items-center justify-content-center" style="background-image: url('https://via.placeholder.com/800x200');">
         <img src="https://via.placeholder.com/100" alt="Profile Icon" class="profile-icon">
     </div>
     <div class="container mt-5">
-        <!-- Establishment Information -->
         <div class="card mb-4">
             <div class="card-body">
                 <h2 class="card-title">Nome do Estabelecimento</h2>
@@ -50,9 +48,7 @@
             </div>
         </div>
 
-        <!-- Services and Professionals -->
         <div class="row">
-            <!-- Services Box -->
             <div class="col-md-6">
                 <h4>Serviços</h4>
                 <div class="box" onclick="toggleBannerLateral('Serviço Exemplo')">
@@ -60,7 +56,6 @@
                     <p>Descrição do serviço.</p>
                 </div>
             </div>
-            <!-- Professionals Box -->
             <div class="col-md-6">
                 <h4>Profissionais</h4>
                 <div class="box" data-bs-toggle="modal" data-bs-target="#professionalModal">
@@ -71,14 +66,12 @@
         </div>
     </div>
 
-    <!-- Banner Lateral -->
     <div class="banner-lateral" id="bannerLateral">
         <h5 id="bannerTitle">Título do Serviço</h5>
         <p>Informações detalhadas sobre o serviço clicado.</p>
         <button class="btn btn-secondary" onclick="toggleBannerLateral()">Fechar</button>
     </div>
 
-    <!-- Professional Modal -->
     <div class="modal fade" id="professionalModal" tabindex="-1" aria-labelledby="professionalModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

@@ -7,14 +7,12 @@ servico_bp = Blueprint('servico', __name__, url_prefix='/servico')
 @servico_bp.route('/adicionar/<int:est_id>', methods=['GET', 'POST'])
 @login_required
 def adicionar_servico(est_id):
-    # Verificar se o usuário é um profissional
     if not hasattr(current_user, 'tipo_usuario') or current_user.tipo_usuario != 'profissional':
         flash('Apenas profissionais podem adicionar serviços.', 'danger')
         return redirect(url_for('auth.login'))
 
     try:
         with mysql.connection.cursor() as cur:
-            # Verificar se o usuário é dono do estabelecimento
             cur.execute("""
                 SELECT est_nome, est_dono_id 
                 FROM tb_estabelecimento 
@@ -40,7 +38,6 @@ def adicionar_servico(est_id):
                 categoria_id = request.form.get('categoria')
                 duracao = request.form.get('duracao')
 
-                # Validação dos campos
                 if not all([nome, descricao, preco, categoria_id, duracao]):
                     flash("Todos os campos são obrigatórios.", "warning")
                     return render_template('adicionar_servico.html', 
@@ -60,7 +57,6 @@ def adicionar_servico(est_id):
                                         est_nome=estabelecimento['est_nome'], 
                                         categorias=categorias)
 
-                # Inserir o serviço
                 cur.execute("""
                     INSERT INTO tb_servico 
                     (ser_nome, ser_descricao, ser_preco, ser_duracao, ser_est_id, ser_cat_id)
@@ -71,7 +67,6 @@ def adicionar_servico(est_id):
                 flash("Serviço adicionado com sucesso!", "success")
                 return redirect(url_for('estabelecimento.perfil_estabelecimento', est_id=est_id))
 
-            # Método GET
             return render_template('adicionar_servico.html', 
                                 est_id=est_id, 
                                 est_nome=estabelecimento['est_nome'], 
@@ -88,7 +83,6 @@ def adicionar_servico(est_id):
 def listar_funcionarios(est_id):
     try:
         with mysql.connection.cursor() as cur:
-            # Verificar permissão
             cur.execute("SELECT est_dono_id FROM tb_estabelecimento WHERE est_id = %s", (est_id,))
             estabelecimento = cur.fetchone()
             
@@ -100,7 +94,6 @@ def listar_funcionarios(est_id):
                 flash("Apenas o dono pode ver os funcionários.", "danger")
                 return redirect(url_for('estabelecimento.perfil_estabelecimento', est_id=est_id))
 
-            # Buscar funcionários
             cur.execute("""
                 SELECT pro_id, pro_nome, pro_telefone
                 FROM tb_profissional
@@ -108,7 +101,6 @@ def listar_funcionarios(est_id):
             """, (est_id,))
             funcionarios = cur.fetchall()
 
-            # Buscar nome do estabelecimento
             cur.execute("SELECT est_nome FROM tb_estabelecimento WHERE est_id = %s", (est_id,))
             est_nome = cur.fetchone()['est_nome']
 
@@ -127,7 +119,6 @@ def listar_funcionarios(est_id):
 def adicionar_funcionario(est_id):
     try:
         with mysql.connection.cursor() as cur:
-            # Verificar permissão
             cur.execute("SELECT est_dono_id, est_nome FROM tb_estabelecimento WHERE est_id = %s", (est_id,))
             estabelecimento = cur.fetchone()
             
@@ -149,7 +140,6 @@ def adicionar_funcionario(est_id):
                                         est_id=est_id, 
                                         est_nome=estabelecimento['est_nome'])
 
-                # Inserir funcionário
                 cur.execute("""
                     INSERT INTO tb_profissional 
                     (pro_nome, pro_telefone, pro_est_id)
@@ -160,7 +150,6 @@ def adicionar_funcionario(est_id):
                 flash("Funcionário adicionado com sucesso!", "success")
                 return redirect(url_for('servico.listar_funcionarios', est_id=est_id))
 
-            # Método GET
             return render_template('adicionar_funcionario.html', 
                                 est_id=est_id, 
                                 est_nome=estabelecimento['est_nome'])

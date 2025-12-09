@@ -55,7 +55,6 @@ def editar_perfil():
     cur = mysql.connection.cursor()
 
     if request.method == 'POST':
-        # Busca os dados atuais
         cur.execute("""
             SELECT pro_nome, pro_senha, pro_telefone 
             FROM tb_profissional 
@@ -77,7 +76,6 @@ def editar_perfil():
         try:
             senha_db = dados_atuais['pro_senha']
 
-            # Se usuário preencheu nova senha
             if nova_senha:
                 if not check_password_hash(senha_db, senha_atual):
                     flash('Senha atual incorreta', 'danger')
@@ -89,9 +87,8 @@ def editar_perfil():
 
                 senha_hash = generate_password_hash(nova_senha)
             else:
-                senha_hash = senha_db  # Mantém senha antiga
+                senha_hash = senha_db
 
-            # Atualiza dados no banco
             cur.execute("""
                 UPDATE tb_profissional 
                 SET pro_nome = %s, pro_senha = %s, pro_telefone = %s
@@ -108,7 +105,6 @@ def editar_perfil():
 
         return redirect(url_for('profissional.editar_perfil'))
 
-    # Método GET: Carrega dados para o formulário
     cur.execute("""
         SELECT pro_nome, pro_telefone 
         FROM tb_profissional 
@@ -123,7 +119,7 @@ def editar_perfil():
 @profissional_bp.route('/disponibilidade', methods=['GET','POST'])
 def disponibilidade():
     if not hasattr(current_user, 'tipo_usuario') or current_user.tipo_usuario != 'profissional':
-        return redirect(url_for('index'))  # ou outra rota pública
+        return redirect(url_for('index'))
 
     if request.method == 'POST':
         dia = request.form.get('dia')

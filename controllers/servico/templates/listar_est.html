@@ -10,7 +10,6 @@
     <div class="container mt-5">
         <h1 class="mb-4">Encontre Estabelecimentos</h1>
         
-        <!-- Formulário de Filtros -->
         <div class="card mb-4">
             <div class="card-header">
                 <h5>Filtrar Estabelecimentos</h5>
@@ -18,25 +17,21 @@
             <div class="card-body">
                 <form method="POST" action="{{ url_for('estabelecimento_cliente.listar_estabelecimentos') }}">
                     <div class="row g-3">
-                        <!-- Campo Estado (obrigatório) -->
                         <div class="col-md-3">
                             <label for="estado" class="form-label">Estado*</label>
                             <input type="text" class="form-control" id="estado" name="estado" required>
                         </div>
                         
-                        <!-- Campo Cidade -->
                         <div class="col-md-3">
                             <label for="cidade" class="form-label">Cidade</label>
                             <input type="text" class="form-control" id="cidade" name="cidade">
                         </div>
                         
-                        <!-- Campo Bairro -->
                         <div class="col-md-3">
                             <label for="bairro" class="form-label">Bairro</label>
                             <input type="text" class="form-control" id="bairro" name="bairro">
                         </div>
                         
-                        <!-- Novo Campo: Nome do Estabelecimento -->
                         <div class="col-md-3">
                             <label for="nome" class="form-label">Nome do Estabelecimento</label>
                             <input type="text" class="form-control" id="nome" name="nome">
@@ -52,7 +47,6 @@
             </div>
         </div>
 
-        <!-- Mensagens Flash -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -64,7 +58,6 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Lista de Estabelecimentos -->
         <div class="card">
             <div class="card-header">
                 <h5>Resultados</h5>
