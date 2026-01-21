@@ -329,7 +329,7 @@ def cadastrar_estabelecimento():
 
     try:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria")
+        cur.execute("SELECT cat_id, cat_nome FROM tb_categoria_servico")
         categorias = cur.fetchall()
         estados = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
                    'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
